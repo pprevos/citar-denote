@@ -1,0 +1,38 @@
+#+title: Denote-Citar
+#+date: [2022-07-23 Sat]
+
+Emacs has various packages to create and maintain bibliography files through the Bib TeX format (=.bib= files). These packages have five main objectives:
+
+- Create or edit bib files
+- Provide access to your bibliographies (searching, narrowing etc)
+- Insert citations in various major modes (Org, Markdown, LaTeX)
+- Link to associated attachments
+- Link to associated notes
+
+| Function                 | Packages                             |
+|--------------------------+--------------------------------------|
+| Create or edit bib files | bibtex-mode (built-in), ebib         |
+| Access bib files         | ebib, ivy-bibtex, helm-bibtex, citar |
+| Insert citations         | org, org-ref, ebib                   |
+| Access attachments       | ebib, ivy-bibtex, helm-bibtex, citar |
+| Access to notes          | roam-bibtex, zetteldesk-ref          |
+
+Each package uses a different completion and search mechanism, e.g. ebib, ivy, helm or minibuffer completion (Citar). For an example of such an integration, read my article on [[https://lucidmanager.org/productivity/emacs-bibtex-mode/][linking a bibliography to Org Roam]].
+
+* Literature notes in Denote
+The recent Denote package provides a minimalist approach to notes, but none of the BibTeX integrators mentioned above is compatible with Denote's strict file naming conventions.
+
+The Citar package is closest to the philosophy behind Denote as it uses minibuffer completion and integrates with the popular Vertico, Marginalia, Consult and Embark toolchain.
+
+The /Denote-Citar/ package enables accessing and creating Denote notes through the Citar bibliography management package. So far, the package can only create new notes from within the Citar interface.
+
+Due to the file-naming convention in Denote, and the fact that citation keys can contain underscores, denote-citar adds a line with the citation key to the front matter, e.g.:
+
+=#+reference: stalman_1985=
+
+This reference line will late be used to inform Citar which note relates to which citation key.
+
+The package also adds a standard keyword to the file. The default is =bib=, but this can be configured through the =denote-citar-keyword= variable. This standard keyword makes it easy to find bibliography notes through Denote.
+
+This code would not have existed without the help of Protesilaos Stavrou.
+
