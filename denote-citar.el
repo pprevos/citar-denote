@@ -28,6 +28,7 @@
 ;; denote-citar offers integration of Denote with BibTeX through Citar
 ;; The main task of denote-citar is to seamlessly integrate Denote and Citar
 ;;
+;; This code would not have existed without the help of Protesilaos Stavrou.
 
 (require 'citar)
 (require 'denote)
@@ -52,6 +53,7 @@
               (sort choice #'string-lessp)
             choice))))
 
+;; Helper function to create new note
 (defun denote-citar-file--create-note (key &optional entry)
   "Create a bibliography note through Citar."
   (let ((denote-file-type nil)) ; make sure it is Org
