@@ -1,7 +1,7 @@
 #+title: Denote-Citar
 #+date: [2022-07-23 Sat]
 
-Emacs has various packages to create and maintain bibliography files through the Bib TeX format (=.bib= files). These packages have five main objectives:
+One of the major tasks in the research workflow is to reflect on the literature you read. Emacs has various packages to create and maintain bibliography files through the Bib TeX format (=.bib= files). These packages have five main objectives:
 
 - Create or edit bib files
 - Provide access to your bibliographies (searching, narrowing etc)
@@ -17,22 +17,41 @@ Emacs has various packages to create and maintain bibliography files through the
 | Access attachments       | ebib, ivy-bibtex, helm-bibtex, citar |
 | Access to notes          | roam-bibtex, zetteldesk-ref          |
 
-Each package uses a different completion and search mechanism, e.g. ebib, ivy, helm or minibuffer completion (Citar). For an example of such an integration, read my article on [[https://lucidmanager.org/productivity/emacs-bibtex-mode/][linking a bibliography to Org Roam]].
+Emacs has various note-taking packages, some of which can be integrated with a bibliography. For an example of such an integration, read my article on [[https://lucidmanager.org/productivity/emacs-bibtex-mode/][linking a bibliography to Org Roam]]. The new Denote package by Protesilaos Stavrou does not yet have such functionality, which is my motivation to develop my first Emacs package.
 
 * Literature notes in Denote
 The recent Denote package provides a minimalist approach to notes, but none of the BibTeX integrators mentioned above is compatible with Denote's strict file naming conventions.
 
-The Citar package is closest to the philosophy behind Denote as it uses minibuffer completion and integrates with the popular Vertico, Marginalia, Consult and Embark toolchain.
+The Ebib, Helm-BibTeX and Ivy-BibTeX each use their own completion system. The Citar package is closest to the philosophy behind Denote as it uses minibuffer completion and integrates with the popular Vertico, Marginalia, Consult and Embark tool chain.
 
-The /Denote-Citar/ package enables accessing and creating Denote notes through the Citar bibliography management package. So far, the package can only create new notes from within the Citar interface.
+The /Denote-Citar/ package enables accessing and creating Denote notes through the Citar bibliography management package.
 
-Due to the file-naming convention in Denote, and the fact that citation keys can contain underscores, denote-citar adds a line with the citation key to the front matter, e.g.:
+This code would not have existed without the help of Protesilaos Stavrou, developer of Denote.
 
-=#+reference: stalman_1985=
+** Create bibliographic notes
+The =citar-create-note= function lets the user create a new note for the selected bibliographic entry.
 
-This reference line will late be used to inform Citar which note relates to which citation key.
+- The note uses the current date and time to generate the identifier.
+- The title of the note is the citation key. Titles in Denote file names cannot contain underscores but citation keys can and often do. Underscores are thus replaced by dashes to conform with the Denote file naming convention.
+- The package also adds a standard keyword to the file. The default is =bib=, but this can be configured through the =denote-citar-keyword= variable. 
+- Lastly, /Denote-Citar/ adds a line with the citation key to the front matter, e.g.: =#+reference: stalman_1985=. This reference line will late be used to inform Citar which note relates to which citation key.
 
-The package also adds a standard keyword to the file. The default is =bib=, but this can be configured through the =denote-citar-keyword= variable. This standard keyword makes it easy to find bibliography notes through Denote.
+** Access bibliographic notes
+This functionality is not yet available.
 
-This code would not have existed without the help of Protesilaos Stavrou.
+* Installation
+- Clone this page with =git clone https://github.com/pprevos/denote-citar=
+- Add the location of the =denote-citar= folder to your path
+- Activate the package
 
+#+begin_src elisp
+  (add-to-list 'load-path "~/.config/emacs/github/denote-citar")
+  (require 'denote-citar)
+#+end_src
+
+* Todo
+- [ ] Write function to integrate Denote with the =citar-open-notes= function.
+- [ ] Improve note-creation
+  - [ ] Add configurable option to construct note title from BibTeX entry, e.g. author and title
+  - [ ] Add option to edit the title in the note creation workflow
+- [ ] Write blog post about managing bibliography notes with Denote

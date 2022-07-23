@@ -58,6 +58,7 @@
   "Create a bibliography note through Citar."
   (let ((denote-file-type nil)) ; make sure it is Org
     (denote
+     ;; Replace underscores in citation key
      (replace-regexp-in-string "_" "-" key)
      (denote-citar--keywords-prompt))
     ;; From here on we add the custom front matter "#+reference"
