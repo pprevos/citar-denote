@@ -47,11 +47,15 @@ This functionality is not yet available.
 #+begin_src elisp
   (add-to-list 'load-path "~/.config/emacs/github/denote-citar")
   (require 'denote-citar)
+  (setq citar-notes-paths denote-directory)
 #+end_src
 
 * Todo
+- [ ] Refactor code: [[https://github.com/orgs/emacs-citar/discussions/666#discussioncomment-3214026][bdarcus]]
 - [ ] Write function to integrate Denote with the =citar-open-notes= function.
 - [ ] Improve note-creation
   - [ ] Add configurable option to construct note title from BibTeX entry, e.g. author and title
   - [ ] Add option to edit the title in the note creation workflow
+- [ ] Create bibliography files for Markdown and text files
+- [ ] Function to access attachments from note reference
 - [ ] Write blog post about managing bibliography notes with Denote

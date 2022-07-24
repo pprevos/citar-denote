@@ -43,6 +43,10 @@
   :group 'denote-citar
   :type '(repeat string))
 
+(defconst denote-citar-retrieve--ref-front-matter-key-regexp
+  "^\\(?:#\\+\\)?\\(?:reference\\)\\s-*[:=]"
+  "Regular expression for reference key.")
+
 ;; Helper function for selecting keywords
 (defun denote-citar--keywords-prompt ()
   "Prompt for one or more keywords and include `denote-citar-keyword'."
@@ -61,26 +65,26 @@
      ;; Replace underscores in citation key
      (replace-regexp-in-string "_" "-" key)
      (denote-citar--keywords-prompt))
-    ;; From here on we add the custom front matter "#+reference"
-    ;; The `denote-last-buffer' is the one we just created with
-    ;; `denote'.
+    ;; The `denote-last-buffer' is the one we just created with `denote'.
     (with-current-buffer (get-buffer denote-last-buffer)
-      ;; Ask the user for a string, which will be used as the citation
-      ;; key.
-      ;; With the `save-excursion' we do not move the point away from
-      ;; where it would have been originally.
       (save-excursion
-        ;; These motions do:
-        ;; 1. to the top
 	(goto-char (point-min))
-	;; 2. search for the identifier's line
 	(re-search-forward denote-retrieve--id-front-matter-key-regexp)
-        ;; 3. go to the end of that line
 	(goto-char (point-at-eol))
-        ;; 4. insert a newline
         (newline)
-        ;; 5. insert the #+reference
         (insert (format "#+reference:  %s" key))))))
+
+;; Prot: Check 'denote-retrieve--value-title'.
+;; You would basically just need to create a copy of it and
+;; 'denote-retrieve--title-front-matter-key-regexp' with "reference"
+;; instead of "title".
+
+(defun denote-citar-retrieve--value-ref (file &optional key)
+  "Return title value from FILE.
+If optional KEY is non-nil, return the key instead."
+  (denote-retrieve--search
+   file
+   denote-citar-retrieve--ref-front-matter-key-regexp key))
 
 ;; Modify the way Citar links notes to bibliographies
 (setq citar-notes-sources
