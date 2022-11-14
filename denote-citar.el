@@ -100,6 +100,50 @@ If optional KEY is non-nil, return the key instead."
    file
    denote-citar-retrieve--ref-front-matter-key-regexp key))
 
+;; This is essentially a rewrite of `citar-file--get-notes' lin
+;; "citar-file.el" to find notes following `denote' naming convention.
+(defun denote-citar--get-notes (&optional keys)
+  (let ((files (make-hash-table :test 'equal))
+	;; For now, we only support one extension.
+	(org-files-regexp ".*\.org$")
+	(marker1 nil)
+	(marker2 nil)
+	(dirs citar-notes-paths))
+    (prog1 files
+      (dolist (dir dirs)
+	(when (file-directory-p dir)
+	  (dolist (file (directory-files dir t ".*\.org$"))
+	    ;; There certainly is a more elegant way of doing this
+	    (with-current-buffer (get-buffer (find-file-noselect file))
+	      (save-excursion
+		;; Not sure if this is needed
+		(goto-char (point-min))
+		;; This should put us at the beginnig of the reference
+		;; name. If this search fails, we are not dealing with
+		;; a notes file for a reference.
+		(when (search-forward "#+reference: " nil t)
+		  ;; Here we select the reference name
+		  (forward-to-word 1)
+		  (setq marker1 (point))
+		  (end-of-line)
+		  (setq marker2 (point))
+		  ;; If we have supplied a key, then we want to note
+		  ;; the file which matches the key
+		  (if keys
+		      (dolist (key keys)
+			(when (string= key
+				       (buffer-substring-no-properties marker1 marker2))
+			  (push file (gethash key files))))
+		    ;; If we have supplied no key, then we need to
+		    ;; extract the key so that we get a hash table of
+		    ;; all keys and their corresponding key names
+		    (let ((key (buffer-substring-no-properties marker1 marker2)))
+		      (push file (gethash key files))))))))))
+      ;; Reverse file lists because push adds elements to the front
+      (maphash (lambda (key filelist)
+                 (puthash key (nreverse filelist) files))
+	       files))))
+
 ;; Modify the way Citar links notes to bibliographies
 (setq citar-notes-sources
       `((citar-file .
