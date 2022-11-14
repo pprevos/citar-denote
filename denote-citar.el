@@ -65,11 +65,14 @@
      ;; Replace underscores in citation key
      (replace-regexp-in-string "_" "-" key)
      (denote-citar--keywords-prompt))
-    ;; The `denote-last-buffer' is the one we just created with `denote'.
-    (with-current-buffer (get-buffer denote-last-buffer)
+    (with-current-buffer (current-buffer) ;; This is the buffer
+					  ;; created by denote
       (save-excursion
 	(goto-char (point-min))
-	(re-search-forward denote-retrieve--id-front-matter-key-regexp)
+	;; Find the end of the front matter and insert the key there.
+	;; This can probably be solved in a better way.
+	(re-search-forward "^[^#]")
+	(search-backward "#")
 	(goto-char (point-at-eol))
         (newline)
         (insert (format "#+reference:  %s" key))))))
