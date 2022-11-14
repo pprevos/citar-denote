@@ -64,7 +64,18 @@
     (denote
      ;; Replace underscores in citation key
      (replace-regexp-in-string "_" "-" key)
-     (denote-citar--keywords-prompt))
+     (denote-citar--keywords-prompt)
+     nil ;; use default file type
+     ;; We use `citar-notes-paths' to allow the user to configure
+     ;; subdirectories. This is a list. If it has only one element, we
+     ;; use it as the path. Otherwise, we ask the user to specify which
+     ;; path to use. We use `<=' when checking the length of
+     ;; `citar-notes-paths' as if the if list is empty, this will
+     ;; place the note in the default location (`denote-directory').
+     (if (<= (length citar-notes-paths) 1)
+	 (car citar-notes-paths)
+       (completing-read "Please choose which folder to store the note:"
+			citar-notes-paths nil t)))
     (with-current-buffer (current-buffer) ;; This is the buffer
 					  ;; created by denote
       (save-excursion
