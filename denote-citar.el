@@ -144,6 +144,14 @@ If optional KEY is non-nil, return the key instead."
                  (puthash key (nreverse filelist) files))
 	       files))))
 
+;; This is modified version of `citar-file--has-notes'. It uses our
+;; own "get-notes" function. The original function utilises `let', but
+;; that for some reason does not work here.
+(defun denote-citar--has-notes ()
+  (setq notes (denote-citar--get-notes))
+    (unless (hash-table-empty-p notes)
+      (lambda (citekey) (and (gethash citekey notes) t))))
+
 ;; Modify the way Citar links notes to bibliographies
 (setq citar-notes-sources
       `((citar-file .
