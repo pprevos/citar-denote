@@ -152,15 +152,13 @@ If optional KEY is non-nil, return the key instead."
     (unless (hash-table-empty-p notes)
       (lambda (citekey) (and (gethash citekey notes) t))))
 
-;; Modify the way Citar links notes to bibliographies
-(setq citar-notes-sources
-      `((citar-file .
-                    ,(list :name "Notes"
-                           :category 'file
-                           :items #'citar-file--get-notes
-                           :hasitems #'citar-file--has-notes
-                           :open #'find-file
-                           :create #'denote-citar-file--create-note
-                           :transform #'file-name-nondirectory))))
+(citar-register-notes-source
+ 'denote-citar-source (list :name "Denote Notes"
+			    :category 'file
+			    :items 'denote-citar--get-notes
+			    :hasitems 'denote-citar--has-notes
+			    :open 'find-file
+                            :create 'denote-citar-file--create-note))
+(setq citar-notes-source 'denote-citar-source)
 
 (provide 'denote-citar)
