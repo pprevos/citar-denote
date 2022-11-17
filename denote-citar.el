@@ -64,12 +64,26 @@
     (denote
      ;; Replace underscores in citation key
      (replace-regexp-in-string "_" "-" key)
-     (denote-citar--keywords-prompt))
-    ;; The `denote-last-buffer' is the one we just created with `denote'.
-    (with-current-buffer (get-buffer denote-last-buffer)
+     (denote-citar--keywords-prompt)
+     nil ;; use default file type
+     ;; We use `citar-notes-paths' to allow the user to configure
+     ;; subdirectories. This is a list. If it has only one element, we
+     ;; use it as the path. Otherwise, we ask the user to specify which
+     ;; path to use. We use `<=' when checking the length of
+     ;; `citar-notes-paths' as if the if list is empty, this will
+     ;; place the note in the default location (`denote-directory').
+     (if (<= (length citar-notes-paths) 1)
+	 (car citar-notes-paths)
+       (completing-read "Please choose which folder to store the note:"
+			citar-notes-paths nil t)))
+    (with-current-buffer (current-buffer) ;; This is the buffer
+					  ;; created by denote
       (save-excursion
 	(goto-char (point-min))
-	(re-search-forward denote-retrieve--id-front-matter-key-regexp)
+	;; Find the end of the front matter and insert the key there.
+	;; This can probably be solved in a better way.
+	(re-search-forward "^[^#]")
+	(search-backward "#")
 	(goto-char (point-at-eol))
         (newline)
         (insert (format "#+reference:  %s" key))))))
@@ -86,15 +100,65 @@ If optional KEY is non-nil, return the key instead."
    file
    denote-citar-retrieve--ref-front-matter-key-regexp key))
 
-;; Modify the way Citar links notes to bibliographies
-(setq citar-notes-sources
-      `((citar-file .
-                    ,(list :name "Notes"
-                           :category 'file
-                           :items #'citar-file--get-notes
-                           :hasitems #'citar-file--has-notes
-                           :open #'find-file
-                           :create #'denote-citar-file--create-note
-                           :transform #'file-name-nondirectory))))
+;; This is essentially a rewrite of `citar-file--get-notes' lin
+;; "citar-file.el" to find notes following `denote' naming convention.
+(defun denote-citar--get-notes (&optional keys)
+  (let ((files (make-hash-table :test 'equal))
+	;; For now, we only support one extension.
+	(org-files-regexp ".*\.org$")
+	(marker1 nil)
+	(marker2 nil)
+	(dirs citar-notes-paths))
+    (prog1 files
+      (dolist (dir dirs)
+	(when (file-directory-p dir)
+	  (dolist (file (directory-files dir t ".*\.org$"))
+	    ;; There certainly is a more elegant way of doing this
+	    (with-current-buffer (get-buffer (find-file-noselect file))
+	      (save-excursion
+		;; Not sure if this is needed
+		(goto-char (point-min))
+		;; This should put us at the beginnig of the reference
+		;; name. If this search fails, we are not dealing with
+		;; a notes file for a reference.
+		(when (search-forward "#+reference: " nil t)
+		  ;; Here we select the reference name
+		  (forward-to-word 1)
+		  (setq marker1 (point))
+		  (end-of-line)
+		  (setq marker2 (point))
+		  ;; If we have supplied a key, then we want to note
+		  ;; the file which matches the key
+		  (if keys
+		      (dolist (key keys)
+			(when (string= key
+				       (buffer-substring-no-properties marker1 marker2))
+			  (push file (gethash key files))))
+		    ;; If we have supplied no key, then we need to
+		    ;; extract the key so that we get a hash table of
+		    ;; all keys and their corresponding key names
+		    (let ((key (buffer-substring-no-properties marker1 marker2)))
+		      (push file (gethash key files))))))))))
+      ;; Reverse file lists because push adds elements to the front
+      (maphash (lambda (key filelist)
+                 (puthash key (nreverse filelist) files))
+	       files))))
+
+;; This is modified version of `citar-file--has-notes'. It uses our
+;; own "get-notes" function. The original function utilises `let', but
+;; that for some reason does not work here.
+(defun denote-citar--has-notes ()
+  (setq notes (denote-citar--get-notes))
+    (unless (hash-table-empty-p notes)
+      (lambda (citekey) (and (gethash citekey notes) t))))
+
+(citar-register-notes-source
+ 'denote-citar-source (list :name "Denote Notes"
+			    :category 'file
+			    :items 'denote-citar--get-notes
+			    :hasitems 'denote-citar--has-notes
+			    :open 'find-file
+                            :create 'denote-citar-file--create-note))
+(setq citar-notes-source 'denote-citar-source)
 
 (provide 'denote-citar)
