@@ -22,7 +22,7 @@ Open the Citar interface (=citar-open=) and select the entry you like to create 
 
 A new note is created in the Denote folder with the title of the BibTeX entry as title. You can select filetags with the usual Denote menu. The =bib= tag is added by default. This tag is required to be able to easily find all notes related to a publication. The =citar-denote-keyword= allows you to change the tag to something else.
 
-The citation key is added to the metadata, e.g. =#+reference:  =einstein_1905=. This line and the file tag link is what relates the note file to the BibTeX entry and any change will result in breaking that link.
+The citation key is added to the metadata, e.g. =#+reference:  einstein_1905=. This line and the file tag link is what relates the note file to the BibTeX entry and any change will result in breaking that link.
 
 Each reference can have multiple notes.
 
@@ -32,6 +32,8 @@ When first opening the bibliography menu, Citar will check all files tagged with
 When opening Citar, any file with a note is indicated with a flag in the second column. Filtering the list with =has:n= will show only entries with notes.
 
 Hit enter and select the Denote Notes you like to open.
+
+[[file:citar-menu.png]]
 
 * Installation
 Clone this page with =git clone https://github.com/pprevos/citar-denote= and add the following code to your =init= file:
