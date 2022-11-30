@@ -7,7 +7,7 @@ The [[https://joostkremers.github.io/ebib/][Ebib]], [[https://github.com/tmalsbu
 
 The /Citar-Denote/ package enables accessing and creating Denote notes through the Citar bibliography management package.
 
-This code would not have existed without the help of Protesilaos Stavrou, developer of Denote and Joel Lööw.
+This code would not have existed without the help of Protesilaos Stavrou, developer of Denote, Citar developer  Avatar Bruce D'Arcus, Joel Lööw and Noboru Ota.
 
 Please note that this package is still being prepared for production. I am an Elisp novice, so any assistance would be appreciated.
 
@@ -17,11 +17,11 @@ Please note that the Citar-Denote package only works with Org Mode Denotes files
 ** Create bibliographic notes
 Open the Citar interface (=citar-open=) and select the entry you like to create a note for. Then, hit =ENTER= and select the 'Create Denote Notes' option.
 
-A new note is created in the Denote folder with the title of the BibTeX entry as the title. You can select file tags with the usual Denote menu. The =bib= tag is added by default. This tag is required to easily find all notes related to a publication. The =citar-denote-keyword= allows you to change the tag to something else.
+A new note is created in the Denote folder with the title of the BibTeX entry as the title as the default. You can select file tags with the usual Denote menu. The =bib= tag is added by default. This tag is required to easily find all notes related to a publication. The =citar-denote-keyword= variable allows you to change the tag to something else. If are using the package and like to change tags, you will have to update notes with the previous Citar keyword.
 
-The citation key is added to the metadata, e.g. =#+reference:  einstein_1905=. This line and the file tag link relate the note file to the BibTeX entry, and any change will result in breaking that link.
+The package add the citation key to the front matter, e.g. =#+reference:  einstein_1905=. This line and the file tag link relate the note file to the BibTeX entry, and any change will result in breaking that link.
 
-Each reference can have multiple notes.
+One note can only have one citation key, but each reference can have multiple notes. You could as such create a note about each chapter of a book.
 
 ** Access bibliographic notes
 When opening the bibliography menu for the first time in an Emacs session, Citar checks all files tagged with the =citar-denote-keyword= and reads the relevant references. This can take a while if you have a lot of bibliographic notes. This initialisation creates a hash table for Citar.
@@ -47,6 +47,6 @@ Clone this page with =git clone https://github.com/pprevos/citar-denote= and add
 * Todo
 - [ ] Optimise the code so it does not keep open bibliography buffers upon startup.
 - [ ] Streamline citation key extraction in =citar-denote--get-notes=
-- [ ] Provide the option to edit the title when creating a new note.
 - [ ] Buttonise the citation key to open the entry in Citar.
 - [ ] Store hash table to disk?
+- [X] Provide the option to edit the title when creating a new note.
