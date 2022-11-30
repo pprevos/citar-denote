@@ -61,7 +61,8 @@
   "Create a bibliography note for `KEY' with properties `ENTRY'."
   (let ((denote-file-type nil)) ; make sure it is Org
     (denote
-     (citar-get-value "title" key)
+     ;;(citar-get-value "title" key)
+     (read-string "Title?: " (citar-get-value "title" key))
      (citar-denote--keywords-prompt))
     (with-current-buffer (current-buffer)
       (goto-char (point-min))
