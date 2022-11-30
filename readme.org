@@ -1,9 +1,6 @@
-#+title: Denote-Citar
-#+date: [2022-07-23 Sat]
-
 [[https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true]]
 
-* Literature notes in Denote
+* Citar-Denote: Literature notes in Denote
 The Denote package provides a minimalist approach to creating and managing notes in Emacs. The only think lacking is integration of the notes with a bibliographic database. Several Emacs packages are available that can link BibTeX files to notes.
 
 The [[https://joostkremers.github.io/ebib/][Ebib]], [[https://github.com/tmalsburg/helm-bibtex][Helm-BibTeX and Ivy-BibTeX]] each use their own completion system. The [[https://github.com/emacs-citar/citar][Citar]] package is closest to the philosophy behind Denote as it uses minibuffer completion and integrates with the popular Vertico, Marginalia, Consult and Embark tool chain.
