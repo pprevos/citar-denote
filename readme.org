@@ -1,30 +1,30 @@
 [[https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true]]
 
 * Citar-Denote: Literature notes in Denote
-The Denote package provides a minimalist approach to creating and managing notes in Emacs. The only think lacking is integration of the notes with a bibliographic database. Several Emacs packages are available that can link BibTeX files to notes.
+The Denote package provides a minimalist approach to creating and managing notes in Emacs. A note-taking system is often connected to a bibliographic database. Several Emacs packages are available that can link BibTeX files to notes.
 
-The [[https://joostkremers.github.io/ebib/][Ebib]], [[https://github.com/tmalsburg/helm-bibtex][Helm-BibTeX and Ivy-BibTeX]] each use their own completion system. The [[https://github.com/emacs-citar/citar][Citar]] package is closest to the philosophy behind Denote as it uses minibuffer completion and integrates with the popular Vertico, Marginalia, Consult and Embark tool chain.
+The [[https://joostkremers.github.io/ebib/][Ebib]], [[https://github.com/tmalsburg/helm-bibtex][Helm-BibTeX and Ivy-BibTeX]] each use their own completion system. The [[https://github.com/emacs-citar/citar][Citar]] package is closest to the philosophy behind Denote as it uses minibuffer completion and integrates with the popular Vertico, Marginalia, Consult and Embark toolchain.
 
 The /Citar-Denote/ package enables accessing and creating Denote notes through the Citar bibliography management package.
 
 This code would not have existed without the help of Protesilaos Stavrou, developer of Denote and Joel Lööw.
 
-Please note that this package is not ready for production. I am an Elisp novice so any assistance 
+Please note that this package is still being prepared for production. I am an Elisp novice, so any assistance would be appreciated.
 
 * Functionality
 Please note that the Citar-Denote package only works with Org Mode Denotes files.
 
 ** Create bibliographic notes
-Open the Citar interface (=citar-open=) and select the entry you like to create a note for. Hit =ENTER= and select the 'Create Denote Notes' option.
+Open the Citar interface (=citar-open=) and select the entry you like to create a note for. Then, hit =ENTER= and select the 'Create Denote Notes' option.
 
-A new note is created in the Denote folder with the title of the BibTeX entry as title. You can select filetags with the usual Denote menu. The =bib= tag is added by default. This tag is required to be able to easily find all notes related to a publication. The =citar-denote-keyword= allows you to change the tag to something else.
+A new note is created in the Denote folder with the title of the BibTeX entry as the title. You can select file tags with the usual Denote menu. The =bib= tag is added by default. This tag is required to easily find all notes related to a publication. The =citar-denote-keyword= allows you to change the tag to something else.
 
-The citation key is added to the metadata, e.g. =#+reference:  einstein_1905=. This line and the file tag link is what relates the note file to the BibTeX entry and any change will result in breaking that link.
+The citation key is added to the metadata, e.g. =#+reference:  einstein_1905=. This line and the file tag link relate the note file to the BibTeX entry, and any change will result in breaking that link.
 
 Each reference can have multiple notes.
 
 ** Access bibliographic notes
-When first opening the bibliography menu, Citar will check all files tagged with the =citar-denote-keyword= and read the relevant references. This can take a while if you have a lot of bibliographic notes. This initialisation creates a hash table for Citar.
+When opening the bibliography menu for the first time in an Emacs session, Citar checks all files tagged with the =citar-denote-keyword= and reads the relevant references. This can take a while if you have a lot of bibliographic notes. This initialisation creates a hash table for Citar.
 
 When opening Citar, any file with a note is indicated with a flag in the second column. Filtering the list with =has:n= will show only entries with notes.
 
