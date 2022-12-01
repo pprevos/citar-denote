@@ -73,39 +73,30 @@
       (newline))))
 
 (defun citar-denote--get-notes (&optional keys)
-  "Return denote files associated with `KEYS'."
-  (let ((files (make-hash-table :test 'equal))
-	(marker1 nil)
-	(marker2 nil)
-	(dirs citar-notes-paths))
+  "Return Denote files associated with the `KEYS' list.
+Return a hash table mapping elements of `KEY'` to associated notes.
+
+If `KEYS' is omitted, return notes for all Denote files tagged with
+`ditar-denote-keyword'."
+  (let ((files (make-hash-table :test 'equal)))
     (prog1 files
-      (dolist (dir dirs)
-	(when (file-directory-p dir)
-	  (dolist (file
-		   (denote-directory-files-matching-regexp
-		    (concat "_" citar-denote-keyword)))
-	    ;; There certainly is a more elegant way of doing this
-	    (with-current-buffer (get-buffer (find-file-noselect file))
-	      (save-excursion
-		;; Not sure if this is needed
-		(goto-char (point-min))
-		;; This should put us at the beginnig of the reference
-		;; name. If this search fails, we are not dealing with
-		;; a notes file for a reference.
-		(when (search-forward "#+reference: " nil t)
-		  ;; Here we select the reference name
-		  (forward-to-word 1)
-		  (setq marker1 (point))
-		  (end-of-line)
-		  (setq marker2 (point))
-		  (if keys
-		      (dolist (key keys)
-			(when (string= key
-				       (buffer-substring-no-properties marker1 marker2))
-			  (push file (gethash key files))))
-		    (let ((key (buffer-substring-no-properties marker1 marker2)))
-		      (push file (gethash key files))))))))))
-      ;; Reverse file lists because push adds elements to the front
+      (dolist (file (denote-directory-files-matching-regexp
+		     (concat "_" citar-denote-keyword)))
+	(with-current-buffer (get-buffer (find-file-noselect file))
+	  (save-excursion
+	    (when (search-forward "#+reference:" nil t)
+	      (forward-to-word 1)
+	      (setq marker1 (point))
+	      (end-of-line)
+	      (setq marker2 (point))
+	      (if keys
+		  (dolist (key keys)
+		    (when (string= key
+				   (buffer-substring-no-properties
+				    marker1 marker2))
+		      (push file (gethash key files))))
+		(let ((key (buffer-substring-no-properties marker1 marker2)))
+		  (push file (gethash key files))))))))
       (maphash (lambda (key filelist)
                  (puthash key (nreverse filelist) files))
 	       files))))
