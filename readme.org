@@ -28,7 +28,7 @@ One note can only have one citation key, but each reference can have multiple no
 When converting an existing note to a bibliographic note by adding the file tag and citation key, the package does not (yet) register this changed file. It only registers it when Citar is first started.
 
 ** Access bibliographic notes
-When opening the bibliography menu for the first time in an Emacs session, Citar checks all files tagged with the =citar-denote-keyword= and reads the relevant references. This can take a while if you have a lot of bibliographic notes. This initialisation creates a hash table for Citar.
+When opening the bibliography menu for the first time in an Emacs session, The =citar-denote--get-notes= function checks all Denote files tagged with the =citar-denote-keyword= and reads the relevant references. This initialisation can take a while if you have a lot of bibliographic notes. This initialisation creates a hash table for Citar.
 
 When opening Citar, any file with a note is indicated with a flag in the second column. Filtering the list with =:n= shows only entries with notes.
 
