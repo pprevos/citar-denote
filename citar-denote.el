@@ -30,9 +30,10 @@
 ;;
 ;; This code would not have existed without the help of others.
 ;; Thanks to:
-;; Protesilaos Stavrou for creating Denote and encouraging me to write this code.
+;; Protesilaos Stavrou for creating Denote and encouraging me to write elisp.
 ;; Bruce D'Arcus for creating Citar and given me some guidance.
 ;; Joel Lööw for adding the caching functionality.
+;; Noboru Ota
 
 ;;; Code:
 
@@ -62,7 +63,7 @@
   (let ((denote-file-type nil)) ; make sure it is Org
     (denote
      ;;(citar-get-value "title" key)
-     (read-string "Title?: " (citar-get-value "title" key))
+     (read-string "Title: " (citar-get-value "title" key))
      (citar-denote--keywords-prompt))
     (with-current-buffer (current-buffer)
       (goto-char (point-min))
@@ -84,6 +85,7 @@ If `KEYS' is omitted, return notes for all Denote files tagged with
 		     (concat "_" citar-denote-keyword)))
 	(with-current-buffer (get-buffer (find-file-noselect file))
 	  (save-excursion
+	    (beginning-of-buffer)
 	    (when (search-forward "#+reference:" nil t)
 	      (forward-to-word 1)
 	      (setq marker1 (point))
@@ -110,7 +112,7 @@ See documentation for `citar-has-notes'."
 
 ;; Modify the way Citar links notes to bibliographies
 (citar-register-notes-source
- 'citar-denote-source (list :name "Denote Notes"
+ 'citar-denote-source (list :name "Denote"
 			    :category 'file
 			    :items 'citar-denote--get-notes
 			    :hasitems 'citar-denote--has-notes
