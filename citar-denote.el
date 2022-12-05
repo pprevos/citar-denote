@@ -28,12 +28,11 @@
 ;; citar-denote offers integration of Denote with bibliographies through Citar
 ;; The main task of citar-denote is to seamlessly integrate Denote and Citar
 ;;
-;; This code would not have existed without the help of others.
-;; Thanks to:
-;; Protesilaos Stavrou for creating Denote and encouraging me to write elisp.
-;; Bruce D'Arcus for creating Citar and given me some guidance.
-;; Joel Lööw for adding the caching functionality.
-;; Noboru Ota
+;; This code would not have existed without the help of others:
+;; - Protesilaos Stavrou for creating Denote and encouraging me to write elisp.
+;; - Bruce D'Arcus for creating Citar and given me some guidance.
+;; - Joel Lööw for adding the caching functionality.
+;; - Noboru Ota provided some suggestions
 
 ;;; Code:
 
