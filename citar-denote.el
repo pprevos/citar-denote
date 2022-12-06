@@ -30,7 +30,7 @@
 ;;
 ;; This code would not have existed without the help of others:
 ;; - Protesilaos Stavrou for creating Denote and encouraging me to write elisp.
-;; - Bruce D'Arcus for creating Citar and given me some guidance.
+;; - Bruce D'Arcus for creating Citar and help creating this package.
 ;; - Joel Lööw for adding the caching functionality.
 ;; - Noboru Ota provided some suggestions
 
@@ -117,8 +117,6 @@ See documentation for `citar-has-notes'."
 			    :hasitems 'citar-denote--has-notes
 			    :open 'find-file
                             :create 'citar-denote--create-note))
-
-(setq citar-notes-source 'citar-denote-source)
 
 (provide 'citar-denote)
 
