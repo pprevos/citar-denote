@@ -6,7 +6,7 @@
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; URL: https://github.com/pprevos/denote
 ;; Version: 0.1
-;; Package-Requires: ((emacs "28.2"))
+;; Package-Requires: ((emacs "28.2") (citar "1.0") (denote "1.1"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -25,8 +25,11 @@
 
 ;;; Commentary:
 ;;
-;; citar-denote offers integration of Denote with bibliographies through Citar
-;; The main task of citar-denote is to seamlessly integrate Denote and Citar
+;; citar-denote offers integration of Denote notes with bibliographies
+;; using the Citar package.  It provides the following functionality:
+;; 1. Link notes to citations with `#+reference: citation-key' in the front matter
+;; 2. Create new notes linked to citations
+;; 3. Access existing notes linked to citations
 ;;
 ;; This code would not have existed without the help of others:
 ;; - Protesilaos Stavrou for creating Denote and encouraging me to write elisp.
@@ -47,6 +50,22 @@
   "Denote keyword (file tag) to indicate bibliographical notes."
   :group 'citar-denote
   :type '(repeat string))
+
+(defconst citar-denote-orig-source
+  citar-notes-source
+  "Store the `citar-notes-source' value prior to enabling citar-denote.")
+
+(defconst citar-denote-config
+  (list :name "Denote"
+	:category 'file
+	:items #'citar-denote--get-notes
+	:hasitems #'citar-denote--has-notes
+	:open #'find-file
+	:create #'citar-denote--create-note)
+  "Instructing citar to use citar-denote functions.")
+
+(defvar citar-notes-source)
+(defvar citar-notes-sources)
 
 (defun citar-denote--keywords-prompt ()
   "Prompt for one or more keywords and include `citar-denote-keyword'."
@@ -75,7 +94,6 @@
 (defun citar-denote--get-notes (&optional keys)
   "Return Denote files associated with the `KEYS' list.
 Return a hash table mapping elements of `KEY'` to associated notes.
-
 If `KEYS' is omitted, return notes for all Denote files tagged with
 `ditar-denote-keyword'."
   (let ((files (make-hash-table :test 'equal)))
@@ -109,15 +127,26 @@ See documentation for `citar-has-notes'."
   (unless (hash-table-empty-p notes)
     (lambda (citekey) (and (gethash citekey notes) t))))
 
-;; Modify the way Citar links notes to bibliographies
-(citar-register-notes-source
- 'citar-denote-source (list :name "Denote"
-			    :category 'file
-			    :items 'citar-denote--get-notes
-			    :hasitems 'citar-denote--has-notes
-			    :open 'find-file
-                            :create 'citar-denote--create-note))
+(defun citar-denote-setup ()
+  "Setup `citar-denote-mode'."
+  (citar-register-notes-source
+   'citar-denote-source citar-denote-config)
+  (setq citar-notes-source 'citar-denote-source))
+
+(defun citar-denote-reset ()
+  "Reset citar to default values."
+  (setq citar-notes-source citar-denote-orig-source)
+  (citar-remove-notes-source 'citar-denote))
+
+;;;###autoload
+(define-minor-mode citar-denote-mode
+  "Toggle `citar-denote-mode'."
+  :global t
+  :group 'citar
+  :lighter " citar-denote"
+  (if citar-denote-mode
+      (citar-denote-setup)
+    (citar-denote-reset)))
 
 (provide 'citar-denote)
-
 ;;; citar-denote.el ends here
