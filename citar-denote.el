@@ -35,7 +35,7 @@
 ;; - Protesilaos Stavrou for creating Denote and encouraging me to write elisp.
 ;; - Bruce D'Arcus for creating Citar and help creating this package.
 ;; - Joel Lööw for adding the caching functionality.
-;; - Noboru Ota provided some suggestions
+;; - Noboru Ota and u/L-Szos provided some suggestions
 
 ;;; Code:
 
@@ -58,16 +58,16 @@
 (defconst citar-denote-config
   (list :name "Denote"
 	:category 'file
-	:items #'citar-denote--get-notes
-	:hasitems #'citar-denote--has-notes
+	:items #'citar-denote-get-notes
+	:hasitems #'citar-denote-has-notes
 	:open #'find-file
-	:create #'citar-denote--create-note)
+	:create #'citar-denote-create-note)
   "Instructing citar to use citar-denote functions.")
 
 (defvar citar-notes-source)
 (defvar citar-notes-sources)
 
-(defun citar-denote--keywords-prompt ()
+(defun citar-denote-keywords-prompt ()
   "Prompt for one or more keywords and include `citar-denote-keyword'."
   (let ((choice (append (list citar-denote-keyword)
                         (denote--keywords-crm (denote-keywords)))))
@@ -76,13 +76,12 @@
               (sort choice #'string-lessp)
             choice))))
 
-(defun citar-denote--create-note (key &optional entry)
+(defun citar-denote-create-note (key &optional entry)
   "Create a bibliography note for `KEY' with properties `ENTRY'."
-  (let ((denote-file-type nil)) ; make sure it is Org
+  (let ((denote-file-type denote-file-type)) 
     (denote
-     ;;(citar-get-value "title" key)
      (read-string "Title: " (citar-get-value "title" key))
-     (citar-denote--keywords-prompt))
+     (citar-denote-keywords-prompt))
     (with-current-buffer (current-buffer)
       (goto-char (point-min))
       (while (not(eq (char-after) 10))
@@ -91,7 +90,7 @@
       (newline)
       (newline))))
 
-(defun citar-denote--get-notes (&optional keys)
+(defun citar-denote-get-notes (&optional keys)
   "Return Denote files associated with the `KEYS' list.
 Return a hash table mapping elements of `KEY'` to associated notes.
 If `KEYS' is omitted, return notes for all Denote files tagged with
@@ -100,7 +99,7 @@ If `KEYS' is omitted, return notes for all Denote files tagged with
     (prog1 files
       (dolist (file (denote-directory-files-matching-regexp
 		     (concat "_" citar-denote-keyword)))
-	(with-current-buffer (get-buffer (find-file-noselect file))
+	(with-current-buffer (find-file-noselect file)
 	  (save-excursion
 	    (beginning-of-buffer)
 	    (when (search-forward "#+reference:" nil t)
@@ -120,10 +119,10 @@ If `KEYS' is omitted, return notes for all Denote files tagged with
                  (puthash key (nreverse filelist) files))
 	       files))))
 
-(defun citar-denote--has-notes ()
+(defun citar-denote-has-notes ()
   "Return predicate testing whether entry has associated denote files.
 See documentation for `citar-has-notes'."
-  (setq notes (citar-denote--get-notes))
+  (setq notes (citar-denote-get-notes))
   (unless (hash-table-empty-p notes)
     (lambda (citekey) (and (gethash citekey notes) t))))
 
