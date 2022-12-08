@@ -57,11 +57,11 @@
 
 (defconst citar-denote-config
   (list :name "Denote"
-	:category 'file
-	:items #'citar-denote-get-notes
-	:hasitems #'citar-denote-has-notes
-	:open #'find-file
-	:create #'citar-denote-create-note)
+        :category 'file
+        :items #'citar-denote-get-notes
+        :hasitems #'citar-denote-has-notes
+        :open #'find-file
+        :create #'citar-denote-create-note)
   "Instructing citar to use citar-denote functions.")
 
 (defvar citar-notes-source)
@@ -78,14 +78,14 @@
 
 (defun citar-denote-create-note (key &optional entry)
   "Create a bibliography note for `KEY' with properties `ENTRY'."
-  (let ((denote-file-type denote-file-type)) 
+  (let ((denote-file-type denote-file-type))
     (denote
      (read-string "Title: " (citar-get-value "title" key))
      (citar-denote-keywords-prompt))
     (with-current-buffer (current-buffer)
       (goto-char (point-min))
       (while (not(eq (char-after) 10))
-	(next-line))
+        (next-line))
       (insert (format "#+reference:  %s" key))
       (newline)
       (newline))))
@@ -98,26 +98,26 @@ If `KEYS' is omitted, return notes for all Denote files tagged with
   (let ((files (make-hash-table :test 'equal)))
     (prog1 files
       (dolist (file (denote-directory-files-matching-regexp
-		     (concat "_" citar-denote-keyword)))
-	(with-current-buffer (find-file-noselect file)
-	  (save-excursion
-	    (beginning-of-buffer)
-	    (when (search-forward "#+reference:" nil t)
-	      (forward-to-word 1)
-	      (setq marker1 (point))
-	      (end-of-line)
-	      (setq marker2 (point))
-	      (if keys
-		  (dolist (key keys)
-		    (when (string= key
-				   (buffer-substring-no-properties
-				    marker1 marker2))
-		      (push file (gethash key files))))
-		(let ((key (buffer-substring-no-properties marker1 marker2)))
-		  (push file (gethash key files))))))))
+                     (concat "_" citar-denote-keyword)))
+        (with-current-buffer (find-file-noselect file)
+          (save-excursion
+            (beginning-of-buffer)
+            (when (search-forward "#+reference:" nil t)
+              (forward-to-word 1)
+              (setq marker1 (point))
+              (end-of-line)
+              (setq marker2 (point))
+              (if keys
+                  (dolist (key keys)
+                    (when (string= key
+                                   (buffer-substring-no-properties
+                                    marker1 marker2))
+                      (push file (gethash key files))))
+                (let ((key (buffer-substring-no-properties marker1 marker2)))
+                  (push file (gethash key files))))))))
       (maphash (lambda (key filelist)
                  (puthash key (nreverse filelist) files))
-	       files))))
+               files))))
 
 (defun citar-denote-has-notes ()
   "Return predicate testing whether entry has associated denote files.
