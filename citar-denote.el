@@ -53,10 +53,10 @@
 
 ;; New variables to enable non-Org file types.  These are candidates for
 ;; defcustom.
-(defvar citar-denote-file-type denote-file-type
+(defvar citar-denote-file-type (or denote-file-type 'org)
   "File Type used by Citar-Denote.
-Default is `denote-file-type'.  Users can use another file type
-for their bibliographic notes.")
+Default is `denote-file-type' or org if the former is nil.  Users
+can use another file type for their bibliographic notes.")
 
 (defvar citar-denote-reference-format "#+reference:  %s\n"
   "Property added to bibliographic notes' front matter.
