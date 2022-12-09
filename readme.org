@@ -1,34 +1,34 @@
 [[https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true]]
 
 * Citar-Denote: Literature notes for Denote
-The [[https://protesilaos.com/emacs/denote][Denote package]] provides a minimalist approach to creating and managing notes in Emacs, which is appealing to many not-takers in the Emacs ecosystem.
+The [[https://protesilaos.com/emacs/denote][Denote package]] provides a minimalist approach to creating and managing notes in Emacs, which is appealing to many note-takers in the Emacs ecosystem.
 
-Note-taking systems are often connected to a bibliographic database, which assists with creating and finding notes related to books, articles and reference types.
+Literature is the source materials for most researchers and many notes derive from reading literature. Note-taking systems are therefore often connected to a bibliographic database (such as a BibTeX file), which assists with creating and finding notes related to books, articles and reference types. Bibliographic databases are useful because they provide access to related materials, links to online sources and stored electronic versions of the books or articles.
 
-Several Emacs packages are available that can link BibTeX files to notes. The [[https://joostkremers.github.io/ebib/][Ebib]], [[https://github.com/tmalsburg/helm-bibtex][Helm-BibTeX and Ivy-BibTeX]] each use their own completion system. The [[https://github.com/emacs-citar/citar][Citar]] package is closest to the philosophy behind Denote as it uses minibuffer completion and integrates with the popular Vertico, Marginalia, Consult and Embark toolchain.
+Several Emacs packages are available that can link BibTeX files to notes. The [[https://joostkremers.github.io/ebib/][Ebib]], [[https://github.com/tmalsburg/helm-bibtex][Helm-BibTeX and Ivy-BibTeX]] each use their own completion system. The [[https://github.com/emacs-citar/citar][Citar]] package is closest to the Denote philosophy as it uses minibuffer completion and integrates with the popular Vertico - Marginalia - Consult - Embark toolchain.
 
-The default behaviour for these bibliography managers is that the relevant notes filename is the same as or includes the citation key (e.g. =einstein_1905.org=) so it can be linked to the BibTeX entry. Other stems, such as Org Roam, use a database for this purpose. These approaches is not possible with Denote due to its reliance on a strict file naming convention and it not relying on a database.
+The default behaviour for these bibliography managers is that the filename for the relevant note includes the citation key (e.g. =einstein_1905.org=) so it can be linked to the BibTeX entry. Other stems, such as Org Roam, use a database for this purpose. These approaches are not possible with Denote due to its reliance on a file naming convention.
 
-The /Citar-Denote/ package enables accessing and creating Denote notes through the Citar bibliography management package. The relationship between citation keys and note files is stored in a cache, which is created when first starting Citar. The citation key for each Org Mode file is located in the =#+reference:= line in the front matter.
+The /Citar-Denote/ package enables accessing and creating Denote notes through the Citar bibliography management package. The relationship between citation keys and note files is stored in a cache, which is created when first starting Citar. The citation key for each Org Mode file is located in the =reference= line in the front matter.
 
 * Functionality
-Please note that the Citar-Denote package only works with Org Mode Denotes files.
-
 ** Create bibliographic notes
 Open the Citar interface (=citar-open=) and select the entry you like to create a note for. Then, hit =ENTER= and select the 'Create Denote' option in the mini buffer.
 
-A new note is created in the Denote folder with the title of the BibTeX entry as the title as the default. You can edit the name of the note and select file tags with the usual Denote menu. The =bib= tag is added by default. This tag is required to easily find all notes related to a publication. The =citar-denote-keyword= variable allows you to change the tag to something else. If are using the package and like to change tags, you will have to update notes with the previous Citar keyword.
+A new note is created in the Denote folder with the title of the BibTeX entry as the title as the default. You can edit the name of the note and select file tags with the usual Denote menu.
 
-The package adds the citation key to the front matter, e.g. =#+reference: einstein_1905=. This line and the file tag link relate the note file to the BibTeX entry, and any changes result in breaking that link.
+The package uses the default file type set by the `denote-file-type` variable, which you can override with the `citar-denote-file-type` variable. The Citar-Denote package works with all Denote file types (Org Mode, Markdown (YAML and TOML) and plain text files).
+
+The =bib= file tag is added by default. This tag is required to easily find all notes related to a publication. The =citar-denote-keyword= variable allows you to change the tag to something else. If are using the package and like to change tags, you will have to update notes with the previous Citar keyword.
+
+The package adds the citation key to the front matter, e.g. =#+reference: einstein_1905= for an Org Mode file. This line and the file tag link relate the note file to the BibTeX entry, and any changes result in breaking that link.
 
 One note can only have one citation key, but each reference can have multiple notes. You could as such create a note about each chapter of a book.
 
-When converting an existing note to a bibliographic note by adding the file tag and citation key, the package does not (yet) register this changed file. It only registers it when Citar is first started.
-
 ** Access bibliographic notes
-When opening the bibliography menu for the first time in an Emacs session, The =citar-denote--get-notes= function checks all Denote files tagged with the =citar-denote-keyword= and reads the relevant references. This initialisation can take a while if you have a lot of bibliographic notes. This initialisation creates a hash table for Citar.
+When opening the bibliography menu for the first time in an Emacs session, The =citar-denote-get-notes= function checks all Denote files tagged with the =citar-denote-keyword= and reads the relevant references. This initialisation can take a second if you have a lot of bibliographic notes.
 
-When opening Citar, any file with a note is indicated with a flag in the second column. Filtering the list with =:n= shows only entries with notes.
+When opening Citar, any file with a note is indicated with a flag in the second column. Filtering the list of citations with =:n= shows only entries with notes.
 
 Hit enter and select the Denote Notes you like to open.
 
@@ -48,14 +48,5 @@ Clone this page with =git clone https://github.com/pprevos/citar-denote= and add
 Citar-Denote ignores the =citar-notes-paths= variable as it assumes that all bibliographic notes are part of the Denote collection.
 
 * Acknowledgements
-This code would not have existed without the help of Protesilaos Stavrou, developer of Denote, Citar developer  Avatar Bruce D'Arcus, Joel Lööw and Noboru Ota.
+This code would not have existed without the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus. Joel Lööw and Noboru Ota added major contributions without which this package would be useless.
 
-* Todo
-- [ ] =citar-denote--get-notes=.
-  - [ ] Optimise the code so it does not keep open bibliography buffers upon startup.
-  - [ ] Streamline citation key extraction (stop opening dictionaries etc) 
-- [ ] Buttonise the citation key in the note front matter to open the entry in Citar.
-- [ ] Write an embark function to open citation entry or files related to a note
-- [ ] Register renamed files and existing files converted to bibliographic notes.
-- [ ] Store hash table to disk?
-- [X] Provide the option to edit the title when creating a new note.
