@@ -146,7 +146,7 @@ If `KEYS' is omitted, return notes for all Denote files tagged with
       (dolist (file (denote-directory-files-matching-regexp
                      citar-denote-files-regexp))
         (let ((key-in-file (citar-denote-retrieve-reference-key-value
-                            file denote-file-type)))
+                            file citar-denote-file-type)))
           (if keys (dolist (key keys)
                      (when (string= key key-in-file)
                        (push file (gethash key-in-file files))))
