@@ -51,17 +51,39 @@
   :group 'citar-denote
   :type '(repeat string))
 
+;; New variables to enable non-Org file types.  These are candidates for
+;; defcustom.
+(defvar citar-denote-file-type denote-file-type
+  "File Type used by Citar-Denote.
+Default is `denote-file-type'.  Users can use another file type
+for their bibliographic notes.")
+
+(defvar citar-denote-reference-format "#+reference:  %s\n"
+  "Property added to bibliographic notes' front matter.
+The default assumes Org file type.  Users can define their own;
+e.g. for the markdown file type the following might be preferred.
+
+   \"reference: \%s\\n\"")
+(defvar citar-denote-reference-regexp "^#\\+reference\\s-*:"
+  "Regexp used to look for the citekey in a bibliographic notes.
+The default assumes Org file type.  This must correspond to
+`citar-denote-reference-format'.")
+
+(defvar citar-denote-files-regexp (concat "_" citar-denote-keyword)
+  "Regexp used to look for file names of bibliographic notes.
+The default assumes \"_bib\" tag is part of the file name.")
+
 (defconst citar-denote-orig-source
   citar-notes-source
   "Store the `citar-notes-source' value prior to enabling citar-denote.")
 
 (defconst citar-denote-config
   (list :name "Denote"
-	:category 'file
-	:items #'citar-denote-get-notes
-	:hasitems #'citar-denote-has-notes
-	:open #'find-file
-	:create #'citar-denote-create-note)
+        :category 'file
+        :items #'citar-denote-get-notes
+        :hasitems #'citar-denote-has-notes
+        :open #'find-file
+        :create #'citar-denote-create-note)
   "Instructing citar to use citar-denote functions.")
 
 (defvar citar-notes-source)
@@ -76,19 +98,43 @@
               (sort choice #'string-lessp)
             choice))))
 
-(defun citar-denote-create-note (key &optional entry)
-  "Create a bibliography note for `KEY' with properties `ENTRY'."
-  (let ((denote-file-type denote-file-type)) 
+(defun citar-denote-add-reference (key file-type)
+  "Add reference property with KEY in front matter of FILE-TYPE.
+Currently it is added after keywords property, thus it needs to
+present in the front matter."
+  (goto-char (point-min))
+  (when (re-search-forward (denote--keywords-key-regexp file-type) nil t 1)
+    (goto-char (line-beginning-position 2))
+    (insert (format citar-denote-reference-format key))))
+
+(defun citar-denote-create-note (key &optional _entry)
+  "Create a bibliography note for `KEY' with properties `ENTRY'.
+The file type for the note to be created is determined by user
+option `denote-file-type'."
+  (let ((denote-file-type citar-denote-file-type))
     (denote
+     ;;(citar-get-value "title" key)
      (read-string "Title: " (citar-get-value "title" key))
      (citar-denote-keywords-prompt))
+    ;; TODO: Check if with-current-buffer (current-buffer) is needed.
+    ;; Left as is because the original version had it -- it's probably
+    ;; redandunt.
     (with-current-buffer (current-buffer)
-      (goto-char (point-min))
-      (while (not(eq (char-after) 10))
-	(next-line))
-      (insert (format "#+reference:  %s" key))
-      (newline)
-      (newline))))
+      (citar-denote-add-reference key denote-file-type))))
+
+(defun citar-denote-retrieve-reference-key-value (file file-type)
+  "Return cite key value from FILE front matter per FILE-TYPE.
+This function assume title and reference values can be retrieved
+by the same function per file-type; hence, it callls
+`denote--title-value-reverse-function' instead of requiring cite
+key specific function."
+  (with-temp-buffer
+    (insert-file-contents file)
+    (goto-char (point-min))
+    (when (re-search-forward citar-denote-reference-regexp nil t 1)
+      ;; Reuse denote--title-value-reverse-function
+      (funcall (denote--title-value-reverse-function file-type)
+               (buffer-substring-no-properties (point) (line-end-position))))))
 
 (defun citar-denote-get-notes (&optional keys)
   "Return Denote files associated with the `KEYS' list.
@@ -98,26 +144,17 @@ If `KEYS' is omitted, return notes for all Denote files tagged with
   (let ((files (make-hash-table :test 'equal)))
     (prog1 files
       (dolist (file (denote-directory-files-matching-regexp
-		     (concat "_" citar-denote-keyword)))
-	(with-current-buffer (find-file-noselect file)
-	  (save-excursion
-	    (beginning-of-buffer)
-	    (when (search-forward "#+reference:" nil t)
-	      (forward-to-word 1)
-	      (setq marker1 (point))
-	      (end-of-line)
-	      (setq marker2 (point))
-	      (if keys
-		  (dolist (key keys)
-		    (when (string= key
-				   (buffer-substring-no-properties
-				    marker1 marker2))
-		      (push file (gethash key files))))
-		(let ((key (buffer-substring-no-properties marker1 marker2)))
-		  (push file (gethash key files))))))))
+                     citar-denote-files-regexp))
+        (let ((key-in-file (citar-denote-retrieve-reference-key-value
+                            file denote-file-type)))
+          (if keys (dolist (key keys)
+                     (when (string= key key-in-file)
+                       (push file (gethash key-in-file files))))
+            ;; If optional arg keys are not provided
+            (push file (gethash key-in-file files)))))
       (maphash (lambda (key filelist)
                  (puthash key (nreverse filelist) files))
-	       files))))
+               files))))
 
 (defun citar-denote-has-notes ()
   "Return predicate testing whether entry has associated denote files.
