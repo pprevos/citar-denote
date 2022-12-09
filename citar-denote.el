@@ -116,10 +116,9 @@ The default assumes \"_bib\" tag is part of the file name.")
   "Prompt for one or more keywords and include `citar-denote-keyword'."
   (let ((choice (append (list citar-denote-keyword)
                         (denote--keywords-crm (denote-keywords)))))
-    (setq denote-last-keywords
-          (if denote-sort-keywords
-              (sort choice #'string-lessp)
-            choice))))
+    (if denote-sort-keywords
+        (sort choice #'string-lessp)
+      choice)))
 
 (defun citar-denote-add-reference (key file-type)
   "Add reference property with KEY in front matter of FILE-TYPE.
@@ -172,9 +171,9 @@ If `KEYS' is omitted, return notes for all Denote files tagged with
 (defun citar-denote-has-notes ()
   "Return predicate testing whether entry has associated denote files.
 See documentation for `citar-has-notes'."
-  (setq notes (citar-denote-get-notes))
-  (unless (hash-table-empty-p notes)
-    (lambda (citekey) (and (gethash citekey notes) t))))
+  (let ((notes (citar-denote-get-notes)))
+    (unless (hash-table-empty-p notes)
+      (lambda (citekey) (and (gethash citekey notes) t)))))
 
 (defun citar-denote-setup ()
   "Setup `citar-denote-mode'."
