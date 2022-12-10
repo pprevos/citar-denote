@@ -59,29 +59,35 @@ can use another file type for their bibliographic notes.")
 (defvar citar-denote-file-types
   `((org
      :reference-format "#+reference:  %s\n"
-     :reference-regex "^#\\+reference\\s-*:")
+     :reference-regex "^#\\+reference\\s-*:"
+     :frontmatter-end "^\n")
     (markdown-yaml
      :reference-format "reference:  %s\n"
-     :reference-regex "^reference\\s-*:")
+     :reference-regex "^reference\\s-*:"
+     :frontmatter-end "^---")
     (markdown-toml
      :reference-format "reference  = %s\n"
-     :reference-regex "^reference\\s-*=")
+     :reference-regex "^reference\\s-*="
+     :frontmatter-end "^+++")
     (text
      :reference-format "reference:  %s\n"
-     :reference-regex "^reference\\s-*:"))
+     :reference-regex "^reference\\s-*:"
+     :frontmatter-end "^---"))
   "Alist of `denote-file-type' and their format properties.
 
 Each element is of the form (SYMBOL . PROPERTY-LIST).  SYMBOL is
 one of those specified in `citar-denote-file-type'.
 
-PROPERTY-LIST is a plist that consists of two elements:
+PROPERTY-LIST is a plist that consists of three elements:
 
-- `:reference-format' front matter identifier for citation key.
-- `:reference-regex' Regexp to look for the citekey in a bibliographic notes.")
+- `:reference-format' Front matter identifier for citation key.
+- `:reference-regex' Regexp to look for the citekey in a bibliographic notes.
+- `:front-matter-end' Location to place citation key.")
 
 (defvar citar-denote-files-regexp (concat "_" citar-denote-keyword)
   "Regexp used to look for file names of bibliographic notes.
-The default assumes \"_bib\" tag is part of the file name.")
+The default assumes \"_bib\" tag is part of the file name.
+Configurable with `citar-denote-keyword'.")
 
 (defconst citar-denote-config
   (list :name "Denote"
@@ -112,6 +118,12 @@ The default assumes \"_bib\" tag is part of the file name.")
    (alist-get file-type citar-denote-file-types)
    :reference-regex))
 
+(defun citar-denote-frontmatter-end (file-type)
+  "Return the reference regex associated to FILE-TYPE."
+  (plist-get
+   (alist-get file-type citar-denote-file-types)
+   :frontmatter-end))
+
 (defun citar-denote-keywords-prompt ()
   "Prompt for one or more keywords and include `citar-denote-keyword'."
   (let ((choice (append (list citar-denote-keyword)
@@ -121,17 +133,10 @@ The default assumes \"_bib\" tag is part of the file name.")
       choice)))
 
 (defun citar-denote-add-reference (key file-type)
-  "Add reference property with KEY in front matter of FILE-TYPE.
-It is added after the keywords property if it is present.  If
-not, it is added in the first blank line, which can be outside
-the front matter depending on FILE-TYPE."
-  (goto-char (point-min))
-  (if (re-search-forward (denote--keywords-key-regexp file-type) nil t 1)
-      ;; find keywords property and move to the next line
-      (goto-char (line-beginning-position 2))
-    ;; if keywords property is not present, move to the first blank line
-    (while (not (eq (char-after) 10)) (forward-line)))
-  (insert (format (citar-denote-reference-format citar-denote-file-type) key)))
+  "Add reference property with KEY in front matter of FILE-TYPE."
+  ;;(goto-char (point-min))
+  (re-search-forward (citar-denote-frontmatter-end file-type) nil t -1)
+(insert (format (citar-denote-reference-format file-type) key)))
 
 (defun citar-denote-create-note (key &optional _entry)
   "Create a bibliography note for `KEY' with properties `ENTRY'.
