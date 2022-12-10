@@ -122,7 +122,7 @@ The default assumes \"_bib\" tag is part of the file name.")
 
 (defun citar-denote-add-reference (key file-type)
   "Add reference property with KEY in front matter of FILE-TYPE.
-Currently it is added after keywords property, thus it needs to
+Currently it is added after keywords property, thus it must be
 present in the front matter."
   (goto-char (point-min))
   (when (re-search-forward (denote--keywords-key-regexp file-type) nil t 1)
