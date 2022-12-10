@@ -122,12 +122,16 @@ The default assumes \"_bib\" tag is part of the file name.")
 
 (defun citar-denote-add-reference (key file-type)
   "Add reference property with KEY in front matter of FILE-TYPE.
-Currently it is added after keywords property, thus it needs to
-present in the front matter."
+It is added after the keywords property if it is present.  If
+not, it is added in the first blank line, which can be outside
+the front matter depending on FILE-TYPE."
   (goto-char (point-min))
-  (when (re-search-forward (denote--keywords-key-regexp file-type) nil t 1)
-    (goto-char (line-beginning-position 2))
-    (insert (format (citar-denote-reference-format citar-denote-file-type) key))))
+  (if (re-search-forward (denote--keywords-key-regexp file-type) nil t 1)
+      ;; find keywords property and move to the next line
+      (goto-char (line-beginning-position 2))
+    ;; if keywords property is not present, move to the first blank line
+    (while (not (eq (char-after) 10)) (forward-line)))
+  (insert (format (citar-denote-reference-format citar-denote-file-type) key)))
 
 (defun citar-denote-create-note (key &optional _entry)
   "Create a bibliography note for `KEY' with properties `ENTRY'.
