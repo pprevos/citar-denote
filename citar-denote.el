@@ -25,11 +25,11 @@
 
 ;;; Commentary:
 ;;
-;; citar-denote offers integration of Denote notes with bibliographies
+;; Citar-Denote offers integration of Denote notes with bibliographies
 ;; using the Citar package.  It provides the following functionality:
-;; 1. Link notes to citations with citation-key in the front matter
-;; 2. Create new notes linked to citations
-;; 3. Access existing notes linked to citations
+;; 1. Link notes to citations with citation-key in the front matter.
+;; 2. Create new notes linked to citations.
+;; 3. Access existing notes linked to citations.
 ;;
 ;; This code would not have existed without the help of others:
 ;; - Protesilaos Stavrou for creating Denote and encouraging me to write elisp.
@@ -136,7 +136,7 @@ Configurable with `citar-denote-keyword'.")
   "Add reference property with KEY in front matter of FILE-TYPE."
   ;;(goto-char (point-min))
   (re-search-forward (citar-denote-frontmatter-end file-type) nil t -1)
-(insert (format (citar-denote-reference-format file-type) key)))
+  (insert (format (citar-denote-reference-format file-type) key)))
 
 (defun citar-denote-create-note (key &optional _entry)
   "Create a bibliography note for `KEY' with properties `ENTRY'.
@@ -146,7 +146,7 @@ option `denote-file-type'."
     (denote
      (read-string "Title: " (citar-get-value "title" key))
      (citar-denote-keywords-prompt))
-      (citar-denote-add-reference key denote-file-type)))
+    (citar-denote-add-reference key denote-file-type)))
 
 (defun citar-denote-retrieve-reference-key-value (file file-type)
   "Return cite key value from FILE front matter per FILE-TYPE."
