@@ -15,22 +15,22 @@ The /Citar-Denote/ package enables accessing and creating Denote notes through t
 ** Create bibliographic notes
 Open the Citar interface (=citar-create-note=), select the entry you want to create a note for, and hit =ENTER=.
 
-A new note is created in the Denote folder with the title of the BibTeX entry as the title as the default. You can edit the name of the note and select file tags with the usual Denote menu.
+A new note is created in the Denote folder with the title of the BibTeX entry as the defsault title. You can edit the name of the note and select file tags with the usual Denote menu.
 
 The package uses the default file type set by the =denote-file-type= variable, which you can override with =citar-denote-file-type=. The Citar-Denote package works with all Denote file types (Org Mode, Markdown (YAML and TOML) and plain text).
 
-The =bib= file tag is added by default. This tag is required to easily find all notes related to a publication. Using this tag saves time checking non-bibliographic notes for reference lines. The =citar-denote-keyword= variable allows you to change the tag to something else. If you are using the package and like to change tags, you will have to update notes with the previous Citar-Denote keyword.
+The =bib= file tag is added by default. This tag is required to easily find all notes related to a publication. Using this tag saves time by only checking bibliographic notes for references. The =citar-denote-keyword= variable allows you to change the tag to something else. You will have to update notes that already have a bibliography keyword as the package only recognises one.
 
-The package adds the citation key to the front matter, e.g. =#+reference: einstein_1905= for an Org Mode file. This line and the file tag link relate the note file to the BibTeX entry, and any changes result in breaking that link.
+The package adds the citation key to the front matter, e.g. =#+reference: einstein_1905= for an Org Mode file. This line and the file tag link relate the note file to the BibTeX entry. Any changes to this line or the bibliography file tag breaks that link.
 
-One note can only have one citation key, but each reference can have multiple notes. So, for example, you could create a note about each book chapter. 
+You can create bibliographic notes manually by adding the =bib= file tag and a reference line with citation key.
+
+One note can only have one citation key, but each reference can have multiple notes. So, for example, you could create a note about each book chapter.
 
 ** Access bibliographic notes
-When opening the bibliography menu for the first time in an Emacs session, The =citar-denote-get-notes= function checks all Denote files tagged with the 'bib' keyword and reads the relevant references. This initialisation can take a second if you have a lot of bibliographic notes.
+When opening the Citar bibliography menu, The =citar-denote-get-notes= function checks all Denote files tagged with the "bib" keyword and reads the relevant references. This initialisation can take a few seconds if you have lots of bibliographic notes.
 
-Use =citar-open-notes= to open the bibliographic menu. Citar indicates the existence of notes with a flag in the second column. Filtering the list of citations with =:n= shows only entries with notes.
-
-Hit enter and select the Denote Notes you like to open. If the entry does not already have a note, Citar-Denote will create a new note for that entry.
+Use =citar-open-notes= to open the bibliographic menu. Citar indicates the existence of notes with a flag in the second column. Filtering the list of citations with =:n= shows only entries with notes. Hit enter and select the Denote Notes you like to open.
 
 #+caption: Screenshot with Vertico and symbol customisation.
 [[file:citar-menu.png]]
@@ -48,4 +48,3 @@ Citar-Denote ignores the =citar-notes-paths= variable as it assumes that bibliog
 
 * Acknowledgements
 This code would only have existed with the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus. Joel Lööw and Noboru Ota added significant contributions, without which this package would be useless.
-
