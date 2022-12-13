@@ -3,7 +3,9 @@
 * Citar-Denote: Literature notes for Denote
 Literature is the lifeblood of researchers. New ideas form when taking notes based on reading books ad articles. Note-taking systems are, therefore, often connected to a bibliographic database (such as a BibTeX file), which assists with creating and finding notes related to books, articles and other reference types. Bibliographic databases are helpful because they provide access to related materials, links to online sources and stored electronic versions of relevant books or articles.
 
-Within Emacs, the [[https://protesilaos.com/emacs/denote][Denote package]] provides a minimalist approach to creating and managing notes in Emacs.
+Within Emacs, the [[https://protesilaos.com/emacs/denote][Denote package]] provides a minimalist approach to creating and managing notes in Emacs that can be easily enhanced to link it to a bibliography.
+
+[[https://lucidmanager.org/productivity/emacs-bibtex-mode/][Read the first part of this article]] if you like some guidance on how to create a BibTeX file.
 
 Several Emacs packages are available that can link bibliography files to notes. The [[https://joostkremers.github.io/ebib/][Ebib]], [[https://github.com/tmalsburg/helm-bibtex][Helm-BibTeX and Ivy-BibTeX]] each use their own completion system. The [[https://github.com/emacs-citar/citar][Citar]] package is closest to the Denote philosophy as it uses minibuffer completion and integrates perfectly with the popular Vertico - Marginalia - Consult - Embark toolchain.
 

@@ -32,7 +32,7 @@
 ;; 3. Access existing notes linked to citations.
 ;;
 ;; This code would not have existed without the help of others:
-;; - Protesilaos Stavrou for creating Denote and encouraging me to write elisp.
+;; - Protesilaos Stavrou for creating Denote and improving this package.
 ;; - Bruce D'Arcus for creating Citar and help creating this package.
 ;; - Joel Lööw for adding the caching functionality.
 ;; - Noboru Ota added the ability to use multiple file types.
