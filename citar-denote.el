@@ -127,10 +127,11 @@ Configurable with `citar-denote-keyword'.")
 (defun citar-denote-keywords-prompt ()
   "Prompt for one or more keywords and include `citar-denote-keyword'."
   (let ((choice (denote--keywords-crm (denote-keywords))))
-    (denote-keywords-sort
-     (if (member citar-denote-keyword choice)
-         choice
-       (append (list citar-denote-keyword) choice)))))
+    (unless (member citar-denote-keyword choice)
+      (setq choice (append (list citar-denote-keyword) choice)))
+    (if denote-sort-keywords
+        (sort choice #'string-lessp)
+      choice)))
 
 (defun citar-denote-add-reference (key file-type)
   "Add reference property with KEY in front matter of FILE-TYPE."
