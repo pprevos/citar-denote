@@ -1,12 +1,12 @@
-;;; citar-denote.el --- Creating and accessing bibliography Denote notes with Citar -*- lexical-binding: t -*-
+;;; citar-denote.el --- Creating and accessing bibliography notes with Denote and Citar -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022  Peter Prevos
 
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
-;; URL: https://github.com/pprevos/denote
-;; Version: 0.9
-;; Package-Requires: ((emacs "28.2") (citar "1.0") (denote "1.1"))
+;; Homepage: https://github.com/pprevos/denote
+;; Version: 1.0.0
+;; Package-Requires: ((emacs "28.2") (citar "1.0") (denote "1.2"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -25,18 +25,12 @@
 
 ;;; Commentary:
 ;;
-;; Citar-Denote offers integration of Denote notes with bibliographies
+;; Citar-Denote offers integration of Denote with bibliographies
 ;; using the Citar package.  It provides the following functionality:
 ;; 1. Link notes to citations with citation-key in the front matter.
 ;; 2. Create new notes linked to citations.
 ;; 3. Access existing notes linked to citations.
-;;
-;; This code would not have existed without the help of others:
-;; - Protesilaos Stavrou for creating Denote and improving this package.
-;; - Bruce D'Arcus for creating Citar and help creating this package.
-;; - Joel Lööw for adding the caching functionality.
-;; - Noboru Ota added the ability to use multiple file types.
-
+;; 
 ;;; Code:
 
 (require 'citar)
