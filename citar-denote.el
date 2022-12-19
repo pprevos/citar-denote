@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/denote
-;; Version: 1.0.0
+;; Version: 1.1.0
 ;; Package-Requires: ((emacs "28.1") (citar "1.0") (denote "1.2"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -53,20 +53,16 @@ can use another file type for their bibliographic notes.")
 (defvar citar-denote-file-types
   `((org
      :reference-format "#+reference:  %s\n"
-     :reference-regex "^#\\+reference\\s-*:"
-     :frontmatter-end "^\n")
+     :reference-regex "^#\\+reference\\s-*:")
     (markdown-yaml
      :reference-format "reference:  %s\n"
-     :reference-regex "^reference\\s-*:"
-     :frontmatter-end "^---")
+     :reference-regex "^reference\\s-*:")
     (markdown-toml
      :reference-format "reference  = %s\n"
-     :reference-regex "^reference\\s-*="
-     :frontmatter-end "^+++")
+     :reference-regex "^reference\\s-*=")
     (text
      :reference-format "reference:  %s\n"
-     :reference-regex "^reference\\s-*:"
-     :frontmatter-end "^---"))
+     :reference-regex "^reference\\s-*:"))
   "Alist of `denote-file-type' and their format properties.
 
 Each element is of the form (SYMBOL . PROPERTY-LIST).  SYMBOL is
@@ -128,9 +124,13 @@ Configurable with `citar-denote-keyword'.")
       choice)))
 
 (defun citar-denote-add-reference (key file-type)
-  "Add reference property with KEY in front matter of FILE-TYPE."
-  (re-search-forward (citar-denote-frontmatter-end file-type) nil t -1)
-  (insert (format (citar-denote-reference-format file-type) key)))
+  "Add reference property with KEY in front matter with FILE-TYPE."
+  (save-excursion (goto-char (point-min))
+  (re-search-forward "^\n" nil t)
+  (previous-line)
+  (if (not (eq file-type 'org))
+      (previous-line))
+  (insert (format (citar-denote-reference-format file-type) key))))
 
 (defun citar-denote-create-note (key &optional _entry)
   "Create a bibliography note for `KEY' with properties `ENTRY'.
@@ -189,6 +189,14 @@ This function provides access to related additional notes, attachments and URLs.
       (citar-run-default-action (list citekey))
     (user-error "No citation key found")))
 
+(defun citar-denote-add-citekey ()
+  "Select citation key and convert denote buffer to bibliographic note."
+  (interactive)
+  (let ((file-type (denote-filetype-heuristics buffer-file-name))
+        (citekey (car (citar-select-refs))))
+    (citar-denote-add-reference citekey file-type)
+    (denote-keywords-add (list citar-denote-keyword))))
+
 (defun citar-denote-setup ()
   "Setup `citar-denote-mode'."
   (citar-register-notes-source
@@ -202,7 +210,7 @@ This function provides access to related additional notes, attachments and URLs.
 
 ;;;###autoload
 (define-minor-mode citar-denote-mode
-  "Toggle `citar-denote-mode'."
+  "Toggle integration between Citar and Denote."
   :global t
   :group 'citar
   :lighter " citar-denote"
