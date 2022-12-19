@@ -55,16 +55,12 @@ The =citar-denote-dwim= function provides access to the Citar menu from where yo
 
 Select the attachment, URL or note you like to access and hit =ENTER=.
 
-** Keybindings
-You can bind the four relevant functions to your preferred keybindings, following the suggestion in the [[https://protesilaos.com/emacs/denote#h:5d16932d-4f7b-493d-8e6a-e5c396b15fd6][Denote manual]], you could use:
-
-#+begin_src elisp
-  (let ((map global-map))
-    (define-key map (kbd "C-c n c c") #'citar-create-note)
-    (define-key map (kbd "C-c n c o") #'citar-open-notes)
-    (define-key map (kbd "C-c n c d") #'citar-denote-dwim)
-    (define-key map (kbd "C-c n c a") #'citar-denote-add-citekey))
-#+end_src
+** Summary
+The following interactive functions are available:
+- =citar-create-note=: Create a new bibliographic note using the Citar completion menu.
+- =citar-open-notes=: Open an existing bibliographic note using the Citar completion menu.
+- =citar-denote-dwim=: Open resources related to a bibliographic note (attachments, URLs and other notes)
+- =citar-denote-ad-citekey=: Convert existing Denote buffer to a bibliographic note.
 
 * Installation
 This package is not yet available in MELPA.
@@ -75,6 +71,17 @@ Clone this page with =git clone https://github.com/pprevos/citar-denote= and add
   (add-to-list 'load-path "~/.config/emacs/github/citar-denote")
   (require 'citar-denote)
   (citar-denote-mode)
+#+end_src
+
+** Keybindings
+You can bind the four relevant functions to your preferred keybindings, following the suggestion in the [[https://protesilaos.com/emacs/denote#h:5d16932d-4f7b-493d-8e6a-e5c396b15fd6][Denote manual]], you could use:
+
+#+begin_src elisp
+  (let ((map global-map))
+    (define-key map (kbd "C-c n c c") #'citar-create-note)
+    (define-key map (kbd "C-c n c o") #'citar-open-notes)
+    (define-key map (kbd "C-c n c d") #'citar-denote-dwim)
+    (define-key map (kbd "C-c n c a") #'citar-denote-add-citekey))
 #+end_src
 
 * Acknowledgements
