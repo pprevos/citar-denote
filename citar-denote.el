@@ -129,7 +129,6 @@ Configurable with `citar-denote-keyword'.")
 
 (defun citar-denote-add-reference (key file-type)
   "Add reference property with KEY in front matter of FILE-TYPE."
-  ;;(goto-char (point-min))
   (re-search-forward (citar-denote-frontmatter-end file-type) nil t -1)
   (insert (format (citar-denote-reference-format file-type) key)))
 
@@ -161,12 +160,13 @@ If `KEYS' is omitted, return notes for all Denote files tagged with
     (prog1 files
       (dolist (file (denote-directory-files-matching-regexp
                      citar-denote-files-regexp))
+        ;; TODO: add denote-file-is-note-p to exclude attachments.
         (let ((key-in-file (citar-denote-retrieve-reference-key-value
                             file (denote-filetype-heuristics file))))
           (if keys (dolist (key keys)
                      (when (string= key key-in-file)
                        (push file (gethash key-in-file files))))
-            ;; If optional arg keys are not provided
+            ;; FIX: If optional arg keys are not provided.
             (push file (gethash key-in-file files)))))
       (maphash (lambda (key filelist)
                  (puthash key (nreverse filelist) files))
@@ -178,6 +178,16 @@ See documentation for `citar-has-notes'."
   (let ((notes (citar-denote-get-notes)))
     (unless (hash-table-empty-p notes)
       (lambda (citekey) (and (gethash citekey notes) t)))))
+
+(defun citar-denote-dwim ()
+  "Open the Citar menu related to the citation key in a bibliographic note.
+This function provides access to related additional notes, attachments and URLs."
+  (interactive)
+  (if-let ((citekey (citar-denote-retrieve-reference-key-value
+                     buffer-file-name
+                     (denote-filetype-heuristics buffer-file-name))))
+      (citar-run-default-action (list citekey))
+    (user-error "No citation key found")))
 
 (defun citar-denote-setup ()
   "Setup `citar-denote-mode'."
