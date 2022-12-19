@@ -1,10 +1,10 @@
-;;; citar-denote.el --- Creating and accessing bibliography notes with Denote and Citar -*- lexical-binding: t -*-
+;;; citar-denote.el --- Minor mode to integrate Citar and Denote -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022  Peter Prevos
 
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
-;; Homepage: https://github.com/pprevos/denote
+;; Homepage: https://github.com/pprevos/citar-denote
 ;; Version: 1.1.0
 ;; Package-Requires: ((emacs "28.1") (citar "1.0") (denote "1.2"))
 
@@ -25,12 +25,13 @@
 
 ;;; Commentary:
 ;;
-;; Citar-Denote offers integration of Denote with bibliographies
-;; using the Citar package.  It provides the following functionality:
-;; 1. Link notes to citations with citation-key in the front matter.
-;; 2. Create new notes linked to citations.
-;; 3. Access existing notes linked to citations.
+;; A minor-mode to integrate 'citar' and 'denote'.
+;;
+;; Provides the following functionality:
 ;; 
+;; 1. Link notes to bibliographic entries with citation key in front matter.
+;; 2. Use Citar to create and access bibliographic notes
+;;
 ;;; Code:
 
 (require 'citar)
@@ -127,9 +128,9 @@ Configurable with `citar-denote-keyword'.")
   "Add reference property with KEY in front matter with FILE-TYPE."
   (save-excursion (goto-char (point-min))
   (re-search-forward "^\n" nil t)
-  (previous-line)
+  (forward-line -1)
   (if (not (eq file-type 'org))
-      (previous-line))
+      (forward-line -1))
   (insert (format (citar-denote-reference-format file-type) key))))
 
 (defun citar-denote-create-note (key &optional _entry)
