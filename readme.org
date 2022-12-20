@@ -63,11 +63,11 @@ The following interactive functions are available:
 - =citar-denote-ad-citekey=: Convert existing Denote buffer to a bibliographic note.
 
 * Installation
-This package is available in MELPA. You can install it with Use-Package or any other favourite method:
+This package is available in MELPA. You can install it with  John Wiegley's [[https://github.com/jwiegley/use-package][Use-Package]], or any other favourite method:
 
 #+begin_src elisp
   (use-package citar-denote
-    :init
+    :config
     (citar-denote-mode))
 #+end_src
 
