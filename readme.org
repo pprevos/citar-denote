@@ -1,4 +1,4 @@
-[[https://github.com/minad/corfu/blob/screenshots/emacs.svg?raw=true]]
+[[https://melpa.org/#/citar-denote][file:https://melpa.org/packages/citar-denote-badge.svg]]
 
 * Citar-Denote: Literature notes for Denote
 Literature is the lifeblood for intellectuals and researchers alike. Reading books and articles can be a wellspring of new ideas. Note-taking systems are, therefore, often connected to a bibliographic database (such as a BibTeX file). These databases help you to create and find notes related to books, articles and other reference types. Bibliographic databases are also helpful because they provide access to related materials, such as links to online sources and stored electronic versions of relevant books or articles. Last but not least, bibliographies are necessary to add citations to your writings.
@@ -59,18 +59,16 @@ Select the attachment, URL or note you like to access and hit =ENTER=.
 The following interactive functions are available:
 - =citar-create-note=: Create a new bibliographic note using the Citar completion menu.
 - =citar-open-notes=: Open an existing bibliographic note using the Citar completion menu.
-- =citar-denote-dwim=: Open resources related to a bibliographic note (attachments, URLs and other notes)
+- =citar-denote-dwim=: Open resources related to a bibliographic note (attachments, URLs and other notes).
 - =citar-denote-ad-citekey=: Convert existing Denote buffer to a bibliographic note.
 
 * Installation
-This package is not yet available in MELPA.
-
-Clone this page with =git clone https://github.com/pprevos/citar-denote= and add the following code to your =init= file (change the folder location to suit yours):
+This package is available in MELPA. You can install it with Use-Package or any other favourite method:
 
 #+begin_src elisp
-  (add-to-list 'load-path "~/.config/emacs/github/citar-denote")
-  (require 'citar-denote)
-  (citar-denote-mode)
+  (use-package citar-denote
+    :init
+    (citar-denote-mode))
 #+end_src
 
 ** Keybindings
