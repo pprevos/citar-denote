@@ -51,10 +51,19 @@
 (defcustom citar-denote-file-type (or denote-file-type 'org)
   "File Type used by Citar-Denote.
 Default is `denote-file-type' or org if the former is nil.  Users
-can use another file type for their bibliographic notes.")
+can use another file type for their bibliographic notes."
+  :group 'citar-denote
+  :type '(choice
+          (const :tag "Unspecified (defaults to Org)" nil)
+          (const :tag "Org mode (default)" org)
+          (const :tag "Markdown (YAML front matter)" markdown-yaml)
+          (const :tag "Markdown (TOML front matter)" markdown-toml)
+          (const :tag "Plain text" text)))
 
 (defcustom citar-denote-subdir 'nil
-  "Ask for a subdirectory when creating a new bibliographic note.")
+  "Ask for a subdirectory when creating a new bibliographic note."
+  :group 'citar-denote
+  :type 'boolean)
 
 (defvar citar-denote-file-types
   `((org
@@ -126,11 +135,11 @@ Configurable with `citar-denote-keyword'.")
 (defun citar-denote-add-reference (key file-type)
   "Add reference property with KEY in front matter with FILE-TYPE."
   (save-excursion (goto-char (point-min))
-  (re-search-forward "^\n" nil t)
-  (forward-line -1)
-  (if (not (eq file-type 'org))
-      (forward-line -1))
-  (insert (format (citar-denote-reference-format file-type) key))))
+                  (re-search-forward "^\n" nil t)
+                  (forward-line -1)
+                  (if (not (eq file-type 'org))
+                      (forward-line -1))
+                  (insert (format (citar-denote-reference-format file-type) key))))
 
 (defun citar-denote-create-note (key &optional _entry)
   "Create a bibliography note for `KEY' with properties `ENTRY'.
@@ -189,9 +198,9 @@ This function provides access to related additional notes, attachments and URLs.
       ;; Check if citation keys are in the bibliography
       (if-let
           (keys? (not (seq-every-p 'null
-                             (mapcar (lambda (key)
-                                       (gethash key (citar-get-entries)))
-                                     keys))))
+                                   (mapcar (lambda (key)
+                                             (gethash key (citar-get-entries)))
+                                           keys))))
           (citar-open keys)
         (user-error "Citation key(s) not in bibliography"))
     (user-error "No reference citation key found in current buffer")))
