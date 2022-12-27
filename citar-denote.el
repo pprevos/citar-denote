@@ -94,6 +94,8 @@ PROPERTY-LIST is a plist that consists of three elements:
 The default assumes \"_bib\" tag is part of the file name.
 Configurable with `citar-denote-keyword'.")
 
+;; Citar integration
+
 (defconst citar-denote-config
   (list :name "Denote"
         :category 'file
@@ -110,6 +112,8 @@ Configurable with `citar-denote-keyword'.")
 (defvar citar-notes-source)
 
 (defvar citar-notes-sources)
+
+;; Auxiliary functions
 
 (defun citar-denote-reference-format (file-type)
   "Return the reference format associated to FILE-TYPE."
@@ -153,14 +157,18 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
    (when citar-denote-subdir (denote-subdirectory-prompt)))
   (citar-denote-add-reference key citar-denote-file-type))
 
-(defun citar-denote-retrieve-reference-key-value (file file-type)
-  "Return cite key value from FILE front matter per FILE-TYPE."
+(defun citar-denote-retrieve-keys (file)
+  "Return cite key value(s) from FILE front matter."
   (with-temp-buffer
     (insert-file-contents file)
     (goto-char (point-min))
-    (when (re-search-forward (citar-denote-reference-regex file-type) nil t 1)
-      (funcall (denote--title-value-reverse-function file-type)
-               (buffer-substring-no-properties (point) (line-end-position))))))
+    (let ((trims "[ \t\n\r]+")
+          (file-type (denote-filetype-heuristics file)))
+      (when (re-search-forward (citar-denote-reference-regex file-type) nil t 1)
+        (split-string
+         (string-trim
+          (buffer-substring-no-properties (point) (line-end-position))
+          trims trims) ";")))))
 
 (defun citar-denote-get-notes (&optional keys)
   "Return Denote files associated with the `KEYS' citation keys.
