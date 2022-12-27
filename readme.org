@@ -87,4 +87,4 @@ You can bind the four relevant functions to your preferred keybindings, followin
 #+end_src
 
 * Acknowledgements
-This code would only have existed with the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus. In addition, Joel Lööw and Noboru Ota added significant contributions, without which this package would be useless.
+This code would only have existed with the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus. In addition, Joel Lööw and Noboru Ota added significant contributions, without which this package would be useless. Guillermo Navarro and Colin McLear provided some useful suggestions.

@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 1.1.0
+;; Version: 1.2.0
 ;; Package-Requires: ((emacs "28.1") (citar "1.0") (denote "1.2"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -114,12 +114,6 @@ Configurable with `citar-denote-keyword'.")
    (alist-get file-type citar-denote-file-types)
    :reference-regex))
 
-(defun citar-denote-frontmatter-end (file-type)
-  "Return the reference regex associated to FILE-TYPE."
-  (plist-get
-   (alist-get file-type citar-denote-file-types)
-   :frontmatter-end))
-
 (defun citar-denote-keywords-prompt ()
   "Prompt for one or more keywords and include `citar-denote-keyword'."
   (let ((choice (denote--keywords-crm (denote-keywords))))
@@ -160,22 +154,19 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
                (buffer-substring-no-properties (point) (line-end-position))))))
 
 (defun citar-denote-get-notes (&optional keys)
-  "Return Denote files associated with the `KEYS' list.
-Return a hash table mapping elements of `KEY'` to associated notes.
-If `KEYS' is omitted, return notes for all Denote files tagged with
+  "Return Denote files associated with the `KEYS' citation keys.
+If `KEYS' is omitted, return all Denote files tagged with
 `citar-denote-keyword'."
   (let ((files (make-hash-table :test 'equal)))
     (prog1 files
       (dolist (file (denote-directory-files-matching-regexp
                      citar-denote-files-regexp))
-        ;; TODO: add denote-file-is-note-p to exclude attachments.
-        (let ((key-in-file (citar-denote-retrieve-reference-key-value
-                            file (denote-filetype-heuristics file))))
-          (if keys (dolist (key keys)
-                     (when (string= key key-in-file)
-                       (push file (gethash key-in-file files))))
-            ;; FIX: If optional arg keys are not provided.
-            (push file (gethash key-in-file files)))))
+        (let ((key-in-file (citar-denote-retrieve-keys file)))
+          (dolist (key key-in-file)
+            (if keys (dolist (k keys)
+                       (when (string= k key)
+                         (push file (gethash key files))))
+              (push file (gethash key files))))))
       (maphash (lambda (key filelist)
                  (puthash key (nreverse filelist) files))
                files))))
@@ -187,24 +178,43 @@ See documentation for `citar-has-notes'."
     (unless (hash-table-empty-p notes)
       (lambda (citekey) (and (gethash citekey notes) t)))))
 
+;; Interactive functions
+
 (defun citar-denote-dwim ()
   "Open the Citar menu related to the citation key in a bibliographic note.
 This function provides access to related additional notes, attachments and URLs."
   (interactive)
-  (if-let ((citekey (citar-denote-retrieve-reference-key-value
-                     buffer-file-name
-                     (denote-filetype-heuristics buffer-file-name))))
-      (citar-run-default-action (list citekey))
-    (user-error "No citation key found")))
+  ;; Any citation keys in the note?
+  (if-let ((keys (citar-denote-retrieve-keys (buffer-file-name))))
+      ;; Check if citation keys are in the bibliography
+      (if-let
+          (keys? (not (seq-every-p 'null
+                             (mapcar (lambda (key)
+                                       (gethash key (citar-get-entries)))
+                                     keys))))
+          (citar-open keys)
+        (user-error "Citation key(s) not in bibliography"))
+    (user-error "No reference citation key found in current buffer")))
 
 (defun citar-denote-add-citekey ()
-  "Select citation key and convert denote buffer to bibliographic note."
+  "Add citation key to existing or convert to bibliographic note."
   (interactive)
-  (let ((file-type (denote-filetype-heuristics buffer-file-name))
-        (citekey (car (citar-select-refs))))
-    (citar-denote-add-reference citekey file-type)
-    (denote-keywords-add (list citar-denote-keyword))))
+  (let ((file-type (denote-filetype-heuristics (buffer-file-name)))
+        (citekeys (citar-select-refs)))
+    ;; Check whether reference line already exists
+    (if-let (keys (citar-denote-retrieve-keys (buffer-file-name)))
+        ;; Append reference list
+        (save-excursion
+          (goto-char (point-min))
+          (re-search-forward (citar-denote-reference-regex file-type))
+          (end-of-line)
+          (insert (concat ";" (mapconcat 'identity citekeys ";"))))
+      ;; New citation keys
+      (progn (citar-denote-add-reference
+              (mapconcat 'identity citekeys ";") file-type)
+             (denote-keywords-add (list citar-denote-keyword))))))
 
+;; Initialise minor mode
 (defun citar-denote-setup ()
   "Setup `citar-denote-mode'."
   (citar-register-notes-source
