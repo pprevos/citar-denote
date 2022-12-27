@@ -48,10 +48,13 @@
   :group 'citar-denote
   :type '(repeat string))
 
-(defvar citar-denote-file-type (or denote-file-type 'org)
+(defcustom citar-denote-file-type (or denote-file-type 'org)
   "File Type used by Citar-Denote.
 Default is `denote-file-type' or org if the former is nil.  Users
 can use another file type for their bibliographic notes.")
+
+(defcustom citar-denote-subdir 'nil
+  "Ask for a subdirectory when creating a new bibliographic note.")
 
 (defvar citar-denote-file-types
   `((org
@@ -137,13 +140,15 @@ Configurable with `citar-denote-keyword'.")
 
 (defun citar-denote-create-note (key &optional _entry)
   "Create a bibliography note for `KEY' with properties `ENTRY'.
-The file type for the note to be created is determined by user
-option `denote-file-type'."
-  (let ((denote-file-type citar-denote-file-type))
-    (denote
-     (read-string "Title: " (citar-get-value "title" key))
-     (citar-denote-keywords-prompt))
-    (citar-denote-add-reference key denote-file-type)))
+
+The file type for the note to be created is determined by `denote-file-type'.
+When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
+  (denote
+   (read-string "Title: " (citar-get-value "title" key))
+   (citar-denote-keywords-prompt)
+   citar-denote-file-type
+   (when citar-denote-subdir (denote-subdirectory-prompt)))
+  (citar-denote-add-reference key citar-denote-file-type))
 
 (defun citar-denote-retrieve-reference-key-value (file file-type)
   "Return cite key value from FILE front matter per FILE-TYPE."
