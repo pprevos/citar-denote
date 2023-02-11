@@ -64,6 +64,7 @@ can use another file type for their bibliographic notes."
 
 (defcustom citar-denote-subdir 'nil
   "Ask for a subdirectory when creating a new bibliographic note."
+  ;; https://github.com/pprevos/citar-denote/issues/11
   :group 'citar-denote
   :type 'boolean)
 
@@ -140,14 +141,16 @@ Configurable with `citar-denote-keyword'.")
 
 (defun citar-denote-add-reference (key file-type)
   "Add reference property with KEY in front matter with FILE-TYPE."
-  (save-excursion (goto-char (point-min))
-                  (re-search-forward "^\n" nil t)
-                  (forward-line -1)
-                  (if (not (eq file-type 'org))
-                      (forward-line -1))
-                  (insert
-                   (format (citar-denote-reference-format file-type)
-                           key))))
+  (if (denote-file-is-note-p (buffer-file-name))
+      (save-excursion
+        (goto-char (point-min))
+        (re-search-forward "^\n" nil t)
+        (forward-line -1)
+        (if (not (eq file-type 'org))
+            (forward-line -1))
+        (insert
+         (format (citar-denote-reference-format file-type) key)))
+    (user-error "Buffer is not a Denote file")))
 
 (defun citar-denote-create-note (key &optional _entry)
   "Create a bibliography note for `KEY' with properties `ENTRY'.
@@ -235,7 +238,7 @@ See documentation for `citar-has-notes'."
             (file-type (denote-filetype-heuristics file))
             (citekeys (citar-select-refs)))
       ;; Check whether reference line already exists
-      (if-let (keys (citar-denote-retrieve-keys (buffer-file-name)))
+      (if-let (keys (citar-denote-retrieve-keys file))
           ;; Append reference list
           (save-excursion
             (goto-char (point-min))
@@ -248,9 +251,40 @@ See documentation for `citar-has-notes'."
                (denote-keywords-add (list citar-denote-keyword))))
     (user-error "Buffer is not a Denote file")))
 
-;; TODO
+(defun citar-denote-remove-bibkey (file)
+  "Remove `citar-denote-bibkey' from FILE."
+  (let ((file-type (denote-filetype-heuristics file))
+        (keywords (denote-retrieve-keywords-value file file-type)))
+    (denote--rewrite-keywords
+     file
+     (delete citar-denote-keyword keywords)
+     file-type)
+    (denote-rename-file-using-front-matter file t)))
+
 (defun citar-denote-remove-citekey ()
-  "TODO: Remove citation key(s) to existing bibliographic note.")
+  "Remove citation key(s) to existing bibliographic note."
+  (interactive)
+  (let* ((file (buffer-file-name))
+         (file-type (denote-filetype-heuristics file))
+         (citekeys (citar-denote-retrieve-keys file))
+         (selected (if (< (length citekeys) 2)
+                       (car citekeys)
+                     (citar-select-ref
+                      :filter (citar-denote-has-citekeys citekeys))))
+         (new-citekeys (delete selected citekeys)))
+    (if (denote-file-is-note-p file)
+        (save-excursion
+          ;; Remove references line
+          (goto-char (point-min))
+          (re-search-forward (citar-denote-reference-regex file-type))
+          (move-beginning-of-line nil)
+          (kill-line 1)
+          ;; Add new line when applicable
+          (if (> (length new-citekeys) 0)
+              (citar-denote-add-reference
+               (mapconcat 'identity new-citekeys ";") file-type)
+            (citar-denote-remove-bibkey file)))
+      (user-error "Buffer is not a Denote file"))))
 
 ;; Find citations
 ;; https://github.com/pprevos/citar-denote/issues/12

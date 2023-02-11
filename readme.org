@@ -21,10 +21,11 @@ Citar-Denote integrates with Citar and provides five commands specific to Denote
 
 1. Create a new bibliographic note: =citar-create-note=.
 2. Open existing bibliographic notes: =citar-denote-open-note=.
-3. Convert existing notes to bibliographic notes: =citar-denote-add-citekey=.
-4. Open attachments, URLs or other associated notes: =citar-denote-dwim=.
-5. Find a citation in Denote files: =citar-denote-find-citation=.
-6. Find Denote file citing the current reference(s): =citar-denote-find-reference=.
+3. Open attachments, URLs or other associated notes: =citar-denote-dwim=.
+4. Convert existing notes to bibliographic notes: =citar-denote-add-citekey=.
+5. Removing references from bibliographic notes: =citar-denote-remove-citekey=
+6. Find a citation in Denote files: =citar-denote-find-citation=.
+7. Find Denote file citing the current reference(s): =citar-denote-find-reference=.
 
 ** Create bibliographic notes
 Open the Citar interface (=citar-create-note=), select the entry you want to create a note for, and hit =ENTER=.
@@ -56,6 +57,11 @@ Use =citar-denote-open-note= to open the bibliographic menu. Citar indicates the
 
 *** Find related information
 The =citar-denote-dwim= function provides access to the Citar menu from where you can open attachments, other notes and links related to the citation references associated with the current buffer. Select the attachment, URL or note you like to access and hit =ENTER=.
+
+** Modify bibliographic notes
+You can add and remove citation references with the =citar-denote-add-citekey= and =citar-denote-remove-citekey= commands.
+
+When removing the last reference, the bibliography keyword is also remove and the file is renamed to reflect this change.
 
 ** Finding citations backlinks
 Two functions are available to find notes that cite either references or any other citation in your bibliography.
