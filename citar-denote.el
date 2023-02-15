@@ -301,26 +301,42 @@ See documentation for `citar-has-notes'."
           (re-search-forward (citar-denote-reference-regex file-type))
           (move-beginning-of-line nil)
           (kill-line 1)
-          ;; Add new line when applicable
+          ;; Add new line or remove file tags when applicable
           (if (> (length new-citekeys) 0)
               (citar-denote-add-reference
                (mapconcat 'identity new-citekeys ";") file-type)
             (citar-denote-remove-bibkey file)))
       (user-error "Buffer is not a Denote file"))))
 
-(defun citar-denote-find-citation (citekey)
+(defun citar-denote-extract-citations ()
+  "Extract all citations from all Denote files."
+  (let* ((files (denote-directory-text-only-files))
+         (citations (mapcar
+                     #'xref-match-item-summary
+                     (xref-matches-in-files "@[a-z]" files))))
+         (delete-dups (mapcar
+                       (lambda (cite)
+                         (replace-regexp-in-string
+                          "\\[cite:\\|@\\|\\]\\|\\;" ""
+                          (substring cite (string-match "@[a-z]" cite))))
+                       citations))))
+
+(defun citar-denote-find-citation ()
   "Find a selected CITEKEY in Denote files."
-  (interactive (list (citar-select-ref)))
-  ;; TODO: Show only citations that have been used
-  (if-let ((files (delete (buffer-file-name)
-                          (citar-denote-retrieve-files citekey))))
+  (interactive)
+  (let ((citations (citar-denote-extract-citations))
+        (citekey (citar-select-ref :filter (citar-denote-has-citekeys citations)))
+        (files  (citar-denote-retrieve-files citekey)))
       (find-file (denote-get-path-by-id
                   (denote-extract-id-from-string
-                   (denote-link--find-file-prompt files))))
-    (user-error "No citation found in Denote files")))
+                   (denote-link--find-file-prompt files))))))
+
+(defun citar-denote-find-nocite ()
+  "Find bibliographic entries not cited in Denote files."
+  (message "Work in Progress"))
 
 (defun citar-denote-find-reference ()
-  "Find Denote file citing the current reference."
+  "Find Denote file(s) citing the current reference."
   ;; https://github.com/pprevos/citar-denote/issues/12
   (interactive)
   (if-let* ((file (buffer-file-name))
