@@ -6,7 +6,7 @@
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
 ;; Version: 1.3.1
-;; Package-Requires: ((emacs "28.1") (citar "1.0") (denote "1.2"))
+;; Package-Requires: ((emacs "28.1") (citar "1.0") (denote "1.2.0") (dash 2.19.1))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -41,6 +41,7 @@
 
 (require 'citar)
 (require 'denote)
+(require 'dash)
 
 (defgroup citar-denote ()
   "Creating and accessing bibliography files with Citar and Denote."
@@ -179,7 +180,7 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
           (buffer-substring-no-properties (point) (line-end-position))
           trims trims) ";")))))
 
-(defun citar-denote-get-notes (&optional keys)
+(defun citar-denote-get-notes (&optional citekeys)
   "Return Denote files associated with the `KEYS' citation keys.
 If `KEYS' is omitted, return all Denote files tagged with
 `citar-denote-keyword'."
@@ -187,26 +188,25 @@ If `KEYS' is omitted, return all Denote files tagged with
     (prog1 files
       (dolist (file (denote-directory-files-matching-regexp
                      citar-denote-files-regexp))
-        (let ((key-in-file (citar-denote-retrieve-references file)))
-          (dolist (key key-in-file)
-            (if keys (dolist (k keys)
-                       (when (string= k key)
-                         (push file (gethash key files))))
+        (let ((keys-in-file (citar-denote-retrieve-references file)))
+          (dolist (key keys-in-file)
+            (if citekeys
+                (dolist (k citekeys)
+                  (when (string= k key)
+                    (push file (gethash key files))))
               (push file (gethash key files))))))
-      (maphash (lambda (key filelist)
-                 (puthash key (nreverse filelist) files))
-               files))))
+      (maphash
+       (lambda (key filelist)
+         (puthash key (nreverse filelist) files)) files))))
 
 (defun citar-denote-retrieve-files (citekey)
-  "Return sorted, unique file names containing CITEKEY."
+  "Return unique file names containing CITEKEY."
   (let ((files (denote-directory-text-only-files)))
-    (sort
      (delete-dups
       (mapcar
        #'xref-location-group
        (mapcar #'xref-match-item-location
-               (xref-matches-in-files (format "@%s" citekey) files))))
-     #'string-lessp)))
+               (xref-matches-in-files (format "@%s" citekey) files))))))
 
 (defun citar-denote-has-notes ()
   "Return predicate testing whether entry has associated denote files.
@@ -237,11 +237,13 @@ See documentation for `citar-has-notes'."
 
 ;; Interactive functions
 
+;;;###autoload
 (defun citar-denote-open-note ()
   "Open note related to a bibliographic entry."
   (interactive)
   (citar-select-ref :filter (citar-denote-has-notes)))
 
+;;;###autoload
 (defun citar-denote-dwim ()
   "Access attachments, notes and links related to the references in a bibliographic note."
   (interactive)
@@ -262,6 +264,7 @@ See documentation for `citar-has-notes'."
           (citar-denote-dwim))
       (user-error "Buffer is not a Denote file"))))
 
+;;;###autoload
 (defun citar-denote-add-citekey ()
   "Add citation key(s) to existing or convert to bibliographic note."
   (interactive)
@@ -283,6 +286,7 @@ See documentation for `citar-has-notes'."
                (denote-keywords-add (list citar-denote-keyword))))
     (user-error "Buffer is not a Denote file")))
 
+;;;###autoload
 (defun citar-denote-remove-citekey ()
   "Remove citation key(s) to existing bibliographic note."
   (interactive)
@@ -309,32 +313,47 @@ See documentation for `citar-has-notes'."
       (user-error "Buffer is not a Denote file"))))
 
 (defun citar-denote-extract-citations ()
-  "Extract all citations from all Denote files."
+  ;; TODO Fix this function (2546 matches)
+  "Extract citations from all Denote files."
   (let* ((files (denote-directory-text-only-files))
+         (citekey-regex  "@[a-zA-Z0-9\\-\\:?]+")
          (citations (mapcar
                      #'xref-match-item-summary
-                     (xref-matches-in-files "@[a-z]" files))))
+                     (xref-matches-in-files citekey-regex files))))
          (delete-dups (mapcar
                        (lambda (cite)
                          (replace-regexp-in-string
                           "\\[cite:\\|@\\|\\]\\|\\;" ""
-                          (substring cite (string-match "@[a-z]" cite))))
+                          (substring cite (string-match
+                                           citekey-regex cite))))
                        citations))))
 
+;;;###autoload
 (defun citar-denote-find-citation ()
   "Find a selected CITEKEY in Denote files."
   (interactive)
-  (let ((citations (citar-denote-extract-citations))
-        (citekey (citar-select-ref :filter (citar-denote-has-citekeys citations)))
-        (files  (citar-denote-retrieve-files citekey)))
-      (find-file (denote-get-path-by-id
-                  (denote-extract-id-from-string
-                   (denote-link--find-file-prompt files))))))
+  (let* ((citations (citar-denote-extract-citations))
+         (citekey (citar-select-ref
+                   :filter (citar-denote-has-citekeys citations)))
+         (files (citar-denote-retrieve-files citekey)))
+    (message citekey)
+    (mapcar (lambda (f) (message f)) files)
+    (find-file (denote-get-path-by-id
+                (denote-extract-id-from-string
+                 (denote-link--find-file-prompt files))))))
 
+;;;###autoload
 (defun citar-denote-find-nocite ()
   "Find bibliographic entries not cited in Denote files."
-  (message "Work in Progress"))
+  (interactive)
+  (let ((all-citations (hash-table-keys (citar-get-entries)))
+        (used-citations (citar-denote-extract-citations))
+        (no-citations (-difference all-citations used-citations)))
+    (citar-insert-citation
+     (citar-select-refs
+      :filter (citar-denote-has-citekeys no-citations)))))
 
+;;;###autoload
 (defun citar-denote-find-reference ()
   "Find Denote file(s) citing the current reference."
   ;; https://github.com/pprevos/citar-denote/issues/12
