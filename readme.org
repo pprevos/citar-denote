@@ -70,6 +70,8 @@ The =citar-denote-find-citation= opens the Citar menu. If the selected citation 
 
 The =citar-denote-find-reference= function searches for notes that cite any of the references used in the current Denote buffer.
 
+=citar-denote-find-nocite= is an experimental function that lets you add a citation for a reference that is not yet used within the Denote folder. Looking for feedback to ensure this function works as suggested.
+
 * Installation
 This package is available in MELPA. You can install it with  John Wiegley's [[https://github.com/jwiegley/use-package][Use-Package]]:
 
