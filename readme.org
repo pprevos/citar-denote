@@ -23,10 +23,10 @@ Several Emacs packages are available that can link bibliography files to notes. 
 
 The most common behaviour for these bibliography managers is that the filename for the relevant note includes the citation key (e.g. =einstein_1905.org=) so it can be linked to the BibTeX entry. Other systems, such as Org Roam, use a database or a memory cache. In Citar-Denote, the relationship between citation keys and note files is stored in a cache. The cache is regenerated when Citar-Denote is used, which can be slow when using thousands of references. A future version will use =xref= to enhance performance.
 
-The citations search mechanism already uses the =xref= system. You can improve the search process by installing [[https://github.com/BurntSushi/ripgrep][ripgrep]] and setting =xref-search-program= to ='ripgrep=.
+The citations search mechanism already uses the =xref= system. You can improve the search process by installing [[https://github.com/BurntSushi/ripgrep][ripgrep]] and setting =xref-search-program= to =ripgrep=.
 
 * Functionality
-Citar-Denote integrates with Citar and provides five commands specific to Denote:
+Citar-Denote integrates with Citar and provides eight commands specific to Denote:
 
 1. Create a new bibliographic note: =citar-create-note=.
 2. Open existing bibliographic notes: =citar-denote-open-note=.
