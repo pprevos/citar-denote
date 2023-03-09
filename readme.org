@@ -5,16 +5,25 @@ Literature is the lifeblood of intellectuals and researchers alike. Note-taking 
 
 The /Citar-Denote/ auxiliary package integrates the [[https://github.com/emacs-citar/citar][Citar]] bibliography package with the [[https://protesilaos.com/emacs/denote][Denote]] note-taking system. 
 
-Citar-Denote provides a global minor mode that enables linking notes to a bibliographic entry. Each bibliography item can have one or more notes, and each note can relate to one or more pieces of literature. The citation key for each note is located in the =reference= line in the front matter of your notes, and each bibliographic note is marked with the =_bib= file tag.
+Citar-Denote provides a global minor-mode that enables linking notes to a bibliographic entry. Each bibliography item can have one or more notes, and each note can relate to one or more pieces of literature. The citation key for each note is located in the =reference= line in the front matter of your notes, and each bibliographic note is marked with the =_bib= file tag.
 
-In the context of this package, a reference contains one or more pieces of literature associated with a Denote file. A citation is an inline citation reference used for bibliographies. References are for literature reviews, citations are mostly used in other notes types.
+In the context of this package, a reference contains one or more pieces of literature associated with a Denote file. A citation is an inline citation reference used for bibliographies. References are for literature reviews; citations are primarily used in other note types.
 
-The Citar-Denote package works with all Denote file types (Org Mode, Markdown (YAML and TOML) and plain text). The Citar documentation shows to how configure it to add citations t various file types.
+The Citar-Denote package works with all Denote file types (Org Mode, Markdown (YAML and TOML) and plain text). The package also supports BibTeX, BibLaTeX and CSL bibliography formats.
+
+** Terminology
+- /Bibliographic entry/: An item in the bibliography (book, article, chapter etc.) accessed via the Citar completion menu.
+- /Bibliographic note/: A Denote file linked to one or more bibliographic entries.
+- /Reference/: Link in a bibliographic note to a bibliographic entry (the reference line).
+- /Citation/: A citation of a bibliographic entry in a note. Citations can occur in regular notes and in bibliographic notes.
+- /Citation key/: The unique key used to identify a bibliographic entry
 
 ** Inner workings
-Several Emacs packages are available that can link bibliography files to notes. The [[https://joostkremers.github.io/ebib/][Ebib]], [[https://github.com/tmalsburg/helm-bibtex][Helm-BibTeX and Ivy-BibTeX]] each use their own completion system. The [[https://github.com/emacs-citar/citar][Citar]] package uses minibuffer completion and integrates perfectly with the popular Vertico - Marginalia - Consult - Embark toolchain. The Citar package is an ideal companion to Denote due to its extensibility.
+Several Emacs packages are available that can link bibliography files to notes. The [[https://joostkremers.github.io/ebib/][Ebib]], [[https://github.com/tmalsburg/helm-bibtex][Helm-BibTeX and Ivy-BibTeX]] each use their own completion system. The [[https://github.com/emacs-citar/citar][Citar]] package uses minibuffer completion and integrates perfectly with the popular Vertico - Marginalia - Consult - Embark toolchain. The Citar package is an ideal companion to Denote due to its extensibility and use of the minibuffer.
 
-The most common behaviour for these bibliography managers is that the filename for the relevant note includes the citation key (e.g. =einstein_1905.org=) so it can be linked to the BibTeX entry. Other systems, such as Org Roam, use a database or a memory cache. The relationship between citation keys and note files is stored in a cache, generated with the =citar-denote-get-notes= function.
+The most common behaviour for these bibliography managers is that the filename for the relevant note includes the citation key (e.g. =einstein_1905.org=) so it can be linked to the BibTeX entry. Other systems, such as Org Roam, use a database or a memory cache. In Citar-Denote, the relationship between citation keys and note files is stored in a cache. The cache is regenerated when Citar-Denote is used, which can be slow when using thousands of references. A future version will use =xref= to enhance performance.
+
+The citations search mechanism already uses the =xref= system. You can improve the search process by installing [[https://github.com/BurntSushi/ripgrep][ripgrep]] and setting =xref-search-program= to ='ripgrep=.
 
 * Functionality
 Citar-Denote integrates with Citar and provides five commands specific to Denote:
@@ -24,53 +33,69 @@ Citar-Denote integrates with Citar and provides five commands specific to Denote
 3. Open attachments, URLs or other associated notes: =citar-denote-dwim=.
 4. Convert existing notes to bibliographic notes: =citar-denote-add-citekey=.
 5. Removing references from bibliographic notes: =citar-denote-remove-citekey=
-6. Find a citation in Denote files: =citar-denote-find-citation=.
-7. Find Denote file citing the current reference(s): =citar-denote-find-reference=.
+6. Find Denote file citing the current reference(s): =citar-denote-find-reference=.
+7. Find a citation in Denote files: =citar-denote-find-citation=.
+8. Find citations not referenced or cited in any note =citar-denote-find-nocite=
 
 ** Create bibliographic notes
 Open the Citar interface (=citar-create-note=), select the entry you want to create a note for, and hit =ENTER=.
 
-A new note is created in the Denote folder with the title of the BibTeX entry as the default title. You can edit the name of the note and select file tags with the usual Denote menu. If a reference not already exists, a new one is created.
+*** Title format
+The default name for a new note is the title of the bibliographic entry. You can modify this behaviour with the =citar-denote-title-format= variable. Four options are available:
 
+1. ="title"=: Extract the title from the bibliographic item (default)
+2. ="author-year"=: Use citation format as "author(s) (year)" (or editors when no authors are defined)
+3. ="full"=: Full citation of the entry.
+4. =nil= or any other string: The plain citation key
+
+The author-year can be further configured to specify the maximum number of names if there are more than two authors (=citar-denote-title-format-authors=) and the connecting term (=citar-denote-title-format-andstr=), which is "and" by default, e.g.:
+
+- "Coppa et al. (2008)": Default for three or more authors
+- "Coppa, Hass & Peck et al. (2008)": Three authors and "&" as connecting term
+
+*** File type
 The package uses the default file type set by the =denote-file-type= variable, which you can override with =citar-denote-file-type= to use a different file type for bibliographic notes. 
 
-The =bib= file tag is added by default. This tag is required to minimise the search space for citation references. The =citar-denote-keyword= variable lets you change the tag to something else. If you change the default, you will have to update existing bibliographic notes, as the package only recognises one.
+*** Keyword
+The =bib= file tag is added by default. This tag is required to minimise the search space when caching notes. The =citar-denote-keyword= variable lets you change the tag to something else. If you change the default, you must update existing bibliographic notes, as the package only recognises a single string.
 
-The package adds the citation key to the front matter, e.g. =#+reference: einstein_1905= for an Org Mode file. This line and the file tag link relate the note file to the BibTeX entry. Any changes to this line or the bibliography file tag break that link.
+*** Reference
+The package adds the reference to the front matter, e.g. =#+reference: einstein_1905= for an Org Mode file. This line and the file tag link relate the note file to the BibTeX entry. Any changes to this line or the bibliography file tag break that link.
 
-Each reference can have multiple notes, and each note can have multiple references, separated by a semicolon. For example, you could create a note about each book chapter or write a single literature review note for multiple papers. You need to enable this option by setting the =citar-open-always-create-notes= variable to =t=.
+Each reference can have multiple notes, and each note can have multiple references, separated by a semicolon. For example, you could create a note about each book chapter or write a single literature review note for various papers. You must enable this option by setting the =citar-open-always-create-notes= variable to =t=.
 
-If you like to store your bibliographic notes in a specific subdirectory, then set the =citar-denote-subdir= variable to =t=. When this variable is non-nil, Denote will ask for a subdirectory when creating a new bibliographic note.
+*** Subdirectory
+If you like storing your bibliographic notes in a specific subdirectory, set the =citar-denote-subdir= variable to =t=. When this variable is non-nil, Denote asks for a subdirectory when creating a new bibliographic note.
 
-*** Changing a bibliographic note or converting a Denote buffer to a bibliographic note
-The =citar-denote-add-citekey= function adds citation keys or converts an existing Denote file to a bibliographic note.
-
-The function opens the Citar selection menu and adds the selected citation keys to the front matter. Use the =TAB= key to select multiple entries. When converting a regular Denote file, the function adds the =bib= keyword to the front matter and renames the file accordingly.
-
-** Access bibliographic notes
-When opening the Citar bibliography menu, The =citar-denote-get-notes= function reads all Denote files tagged with the =bib= keyword and extracts the relevant references. This initialisation can take a few moments if you have a large corpus of bibliographic notes.
-
-Use =citar-denote-open-note= to open the bibliographic menu. Citar indicates the existence of notes with a flag in the second column. Hit enter and select the Denote Notes you like to open.
+** Open Existing Bibliographic Notes
+Use =citar-denote-open-note= to open the bibliographic menu. Citar only shows entries that have one or more associated notes. Hit enter and select the Denote Notes you like to open.
 
 #+caption: Screenshot with Vertico and symbol customisation.
 [[file:citar-menu.png]]
 
-*** Find related information
+** Open Attachments, URLs and Other Associated Notes
 The =citar-denote-dwim= function provides access to the Citar menu from where you can open attachments, other notes and links related to the citation references associated with the current buffer. Select the attachment, URL or note you like to access and hit =ENTER=.
 
-** Modify bibliographic notes
-You can add and remove citation references with the =citar-denote-add-citekey= and =citar-denote-remove-citekey= commands.
+** Convert Existing Notes to Bibliographic Notes
+The =citar-denote-add-citekey= function adds citation keys or converts an existing Denote file to a bibliographic note. When converting a regular Denote file, the function adds the =bib= keyword to the front matter and renames the file accordingly.
 
-When removing the last reference, the bibliography keyword is also remove and the file is renamed to reflect this change.
+The function opens the Citar selection menu and adds the selected citation keys to the front matter. Use the =TAB= key to select multiple entries.
 
-** Finding citations backlinks
-Two functions are available to find notes that cite either references or any other citation in your bibliography.
+This function can also be used to add references to existing bibliographic notes.
 
-The =citar-denote-find-citation= opens the Citar menu. If the selected citation is used in a note, then you can open this note.
+** Removing References From Bibliographic Notes
+You remove citation references with the =citar-denote-remove-citekey= command.
 
-The =citar-denote-find-reference= function searches for notes that cite any of the references used in the current Denote buffer.
+The bibliography keyword is also removed when removing the last reference, and the file is renamed to reflect this change.
 
-=citar-denote-find-nocite= is an experimental function that lets you add a citation for a reference that is not yet used within the Denote folder. Looking for feedback to ensure this function works as suggested.
+** Find Denote file citing the current reference(s)
+When reviewing bibliographic notes, finding where the references are cited within other notes can be helpful. The =citar-denote-find-reference= function searches all Denote notes to find instances where the selected reference is cited.
+
+** Find a citation in Denote files
+The =citar-denote-find-citation= function helps you find bibliographic entries in the Citar menu cited in your corpus of Denote notes. 
+
+** Find citations not referenced or cited in any note
+This last command is the opposite of the previous one. This function identifies all bibliographic entries not cited or referenced in any Denote file. The =citar-denote-find-nocite= function shows the list of these entries. Hitting enter adds a citation to the current buffer.
 
 * Installation
 This package is available in MELPA. You can install it with  John Wiegley's [[https://github.com/jwiegley/use-package][Use-Package]]:
@@ -92,10 +117,11 @@ You can bind the six available commands to your preferred keyboard shortcuts, fo
     (define-key map (kbd "C-c n c d") #'citar-denote-dwim)
     (define-key map (kbd "C-c n c a") #'citar-denote-add-citekey)
     (define-key map (kbd "C-c n c r") #'citar-denote-find-reference)
-    (define-key map (kbd "C-c n c f") #'citar-denote-find-citation))
+    (define-key map (kbd "C-c n c f") #'citar-denote-find-citation)
+    (define-key map (kbd "C-c n c n") #'citar-denote-find-nocite))
 #+end_src
 
 * Acknowledgements
 This code would only have existed with the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus.
 
-In addition, Joel Lööw and Noboru Ota added significant contributions, without which this package would be useless. Guillermo Navarro, Colin McLear and Lucas Gruss provided useful suggestions to extend the functionality.
+In addition, Joel Lööw and Noboru Ota added significant contributions, without which this package would be useless. Finally, Guillermo Navarro, Colin McLear, Lucas Gruss, and Adrian Adermon provided valuable suggestions to extend the functionality.
