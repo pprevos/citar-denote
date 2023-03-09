@@ -5,8 +5,8 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 1.4
-;; Package-Requires: ((emacs "28.1") (citar "1.0") (denote "1.2.0") (dash "2.19.1"))
+;; Version: 1.5
+;; Package-Requires: ((emacs "28.1") (citar "1.1") (denote "1.2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -72,6 +72,25 @@ can also use Markdown or plain text for their bibliographic notes."
   :group 'citar-denote
   :type 'boolean)
 
+(defcustom citar-denote-title-format "author-year"
+  "Title for new bibliographic notes.
+          - \"title\": Extract title (or short title) from entry
+          - \"author-year\": Author-year citation style
+          - \"full\": Full citation (author-year and title)
+          - nil: Citekey as-is"
+  :group 'citar-denote
+  :type  'string)
+
+(defcustom citar-denote-title-format-authors 1
+  "Maximum authors in \"author-year\" for `citar-denote-title-format`."
+  :group 'citar-denote
+  :type  'string)
+
+(defcustom citar-denote-title-format-andstr "and"
+  "Connecting authors in \"author-year\" for `citar-denote-note-title`."
+  :group 'citar-denote
+  :type  'string)
+
 (defvar citar-denote-file-types
   `((org
      :reference-format "#+reference:  %s\n"
@@ -102,25 +121,6 @@ Configurable with `citar-denote-keyword'.")
 
 (defvar citar-denote-citekey-regex "@[a-zA-Z0-9:?-]+"
   "Regular expression to extract citation keys.")
-
-;; Citar integration
-
-(defconst citar-denote-config
-  (list :name "Denote"
-        :category 'file
-        :items #'citar-denote-get-notes
-        :hasitems #'citar-denote-has-notes
-        :open #'find-file
-        :create #'citar-denote-create-note)
-  "Instructing citar to use citar-denote functions.")
-
-(defconst citar-denote-orig-source
-  citar-notes-source
-  "Store the `citar-notes-source' value prior to enabling `citar-denote-mode'.")
-
-(defvar citar-notes-source)
-
-(defvar citar-notes-sources)
 
 ;; Auxiliary functions
 
@@ -158,19 +158,6 @@ Configurable with `citar-denote-keyword'.")
     (insert
      (format (citar-denote-reference-format file-type) citekey))))
 
-(defun citar-denote-create-note (citekey &optional _entry)
-  "Create a bibliography note for CITEKEY with properties ENTRY.
-
-The file type for the new note is determined by `citar-denote-file-type'.
-When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
-  (denote
-   (read-string "Title: " (citar-get-value "title" citekey))
-   (citar-denote-keywords-prompt)
-   citar-denote-file-type
-   (when citar-denote-subdir (denote-subdirectory-prompt)))
-  (citar-denote-add-reference citekey citar-denote-file-type)
-  (insert (citar-format-reference (list citekey))))
-
 (defun citar-denote-retrieve-references (file)
   "Return reference key value(s) from FILE front matter."
   (with-temp-buffer
@@ -186,6 +173,7 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
           trims trims) ";")))))
 
 (defun citar-denote-get-notes (&optional citekeys)
+  ;; TODO: Use xref to find references
   "Return Denote files associated with the CITEKEYS citation keys.
 If CITEKEYS is omitted, return all Denote files tagged with
 `citar-denote-keyword'."
@@ -257,6 +245,40 @@ See documentation for `citar-has-notes'."
          (substring
           cite (string-match citar-denote-citekey-regex cite))))
       citations))))
+
+(defun citar-denote-generate-title (citekey)
+  ;; https://github.com/pprevos/citar-denote/issues/15
+  (let ((title (citar-get-value "title" citekey))
+        (author-names (or (citar-get-value "author" citekey)
+                          (citar-get-value "editor" citekey)))
+        (year (or (citar-get-value "year" citekey)
+                  (citar-get-value "date" citekey)
+                  (citar-get-value "issued" citekey))))
+    (cond ((equal citar-denote-title-format "title")
+           title)
+          ((equal citar-denote-title-format "author-year")
+           (concat (citar--shorten-names
+                    author-names
+                    citar-denote-title-format-authors
+                    citar-denote-title-format-andstr)
+                   " (" year ")"))
+          ((equal citar-denote-title-format "full")
+           (citar-format-reference (list citekey)))
+          (t citekey))))
+
+;;;###autoload
+(defun citar-denote-create-note (citekey &optional _entry)
+  "Create a bibliography note for CITEKEY with properties ENTRY.
+
+The file type for the new note is determined by `citar-denote-file-type'.
+The title of the new note is set by `citar-denote-title-format'.
+When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
+  (denote
+   (read-string "Title: " (citar-denote-generate-title citekey))
+   (citar-denote-keywords-prompt)
+   citar-denote-file-type
+   (when citar-denote-subdir (denote-subdirectory-prompt)))
+  (citar-denote-add-reference citekey citar-denote-file-type))
 
 ;; Interactive functions
 
@@ -395,6 +417,25 @@ See documentation for `citar-has-notes'."
          (citar-select-refs
           :filter (citar-denote-has-citekeys unused))))
     (user-error "Buffer is not a Denote file")))
+
+;; Citar integration
+
+(defconst citar-denote-config
+  (list :name "Denote"
+        :category 'file
+        :items #'citar-denote-get-notes
+        :hasitems #'citar-denote-has-notes
+        :open #'find-file
+        :create #'citar-denote-create-note)
+  "Instructing citar to use citar-denote functions.")
+
+(defconst citar-denote-orig-source
+  citar-notes-source
+  "Store the `citar-notes-source' value prior to enabling `citar-denote-mode'.")
+
+(defvar citar-notes-source)
+
+(defvar citar-notes-sources)
 
 ;; Initialise minor mode
 
