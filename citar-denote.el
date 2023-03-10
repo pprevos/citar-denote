@@ -295,9 +295,10 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
 (defun citar-denote-dwim ()
   "Access attachments, notes and links of a bibliographic reference."
   (interactive)
+  ;; TODO: Generalise this function with embark
   ;; Any citation keys in the note?
-  (if-let ((keys (citar-denote-retrieve-references (buffer-file-name)))
-           (key (if (= (length keys) 1)
+  (if-let* ((keys (citar-denote-retrieve-references (buffer-file-name)))
+            (key (if (= (length keys) 1)
                     (car keys)
                   (citar-select-ref
                    :filter (citar-denote-has-citekeys keys)))))
@@ -306,6 +307,22 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
         (when (yes-or-no-p "Current buffer does not reference a citation key.  Add a reference? ")
           (citar-denote-add-citekey)
           (citar-denote-dwim))
+      (user-error "Buffer is not a Denote file"))))
+
+;;;###autoload
+(defun citar-denote-open-reference-entry ()
+  "Open bibliographic entry associated with a bibliographic reference."
+  (interactive)
+  (if-let* ((keys (citar-denote-retrieve-references (buffer-file-name)))
+            (key (if (= (length keys) 1)
+                    (car keys)
+                  (citar-select-ref
+                   :filter (citar-denote-has-citekeys keys)))))
+      (citar-open-entry key)
+    (if (denote-file-is-note-p (buffer-file-name))
+        (when (yes-or-no-p "Current buffer does not reference a citation key.  Add a reference? ")
+          (citar-denote-add-citekey)
+          (citar-denote-open-reference-entry))
       (user-error "Buffer is not a Denote file"))))
 
 ;;;###autoload
