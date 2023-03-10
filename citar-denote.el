@@ -293,18 +293,17 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
 
 ;;;###autoload
 (defun citar-denote-dwim ()
-  "Access attachments, notes and links associated with a bibliographic note."
+  "Access attachments, notes and links of a bibliographic reference."
   (interactive)
   ;; Any citation keys in the note?
-  (if-let ((keys (citar-denote-retrieve-references (buffer-file-name))))
-      ;; Check if citation keys are in the bibliography
-      (if-let (keys? (not (seq-every-p 'null
-                                       (mapcar (lambda (key)
-                                                 (gethash key (citar-get-entries))) keys))))
-          (citar-open keys)
-        (user-error "Citation key(s) not in bibliography"))
+  (if-let ((keys (citar-denote-retrieve-references (buffer-file-name)))
+           (key (if (= (length keys) 1)
+                    (car keys)
+                  (citar-select-ref
+                   :filter (citar-denote-has-citekeys keys)))))
+      (citar-open (list key))
     (if (denote-file-is-note-p (buffer-file-name))
-        (when (yes-or-no-p "Current buffer does not reference a citation key.  Add a reference ?")
+        (when (yes-or-no-p "Current buffer does not reference a citation key.  Add a reference? ")
           (citar-denote-add-citekey)
           (citar-denote-dwim))
       (user-error "Buffer is not a Denote file"))))
@@ -370,7 +369,8 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
          (files (citar-denote-retrieve-cite-files citekey)))
     (find-file (denote-get-path-by-id
                 (denote-extract-id-from-string
-                 (denote-link--find-file-prompt files))))))
+                 (denote-link--find-file-prompt files))))
+    (search-forward citekey)))
 
 ;;;###autoload
 (defun citar-denote-find-reference ()
