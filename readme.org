@@ -25,22 +25,26 @@ The most common behaviour for these bibliography managers is that the filename f
 
 The citations search mechanism already uses the =xref= system. You can improve the search process by installing [[https://github.com/BurntSushi/ripgrep][ripgrep]] and setting =xref-search-program= to =ripgrep=.
 
+#+caption: Screenshot with Vertico and symbol customisation.
+[[file:citar-menu.png]]
+
 * Functionality
-Citar-Denote integrates with Citar and provides eight commands specific to Denote:
+Citar-Denote integrates with Citar and provides a series of commands specific to Denote files:
 
 1. Create a new bibliographic note: =citar-create-note=.
 2. Open existing bibliographic notes: =citar-denote-open-note=.
 3. Open attachments, URLs or other associated notes: =citar-denote-dwim=.
 4. Convert existing notes to bibliographic notes: =citar-denote-add-citekey=.
 5. Removing references from bibliographic notes: =citar-denote-remove-citekey=
-6. Find Denote file citing the current reference(s): =citar-denote-find-reference=.
-7. Find a citation in Denote files: =citar-denote-find-citation=.
-8. Find citations not referenced or cited in any note =citar-denote-find-nocite=
+6. Open bibliographic entry: =citar-denote-open-reference-entry=
+7. Find Denote file citing the current reference(s): =citar-denote-find-reference=.
+8. Find a citation in Denote files: =citar-denote-find-citation=.
+9. Find citations not referenced or cited in any note =citar-denote-find-nocite=
 
-** Create bibliographic notes
+* Create bibliographic notes
 Open the Citar interface (=citar-create-note=), select the entry you want to create a note for, and hit =ENTER=.
 
-*** Title format
+** Title format
 The default name for a new note is the title of the bibliographic entry. You can modify this behaviour with the =citar-denote-title-format= variable. Four options are available:
 
 1. ="title"=: Extract the title from the bibliographic item (default)
@@ -53,28 +57,31 @@ The author-year can be further configured to specify the maximum number of names
 - "Coppa et al. (2008)": Default for three or more authors
 - "Coppa, Hass & Peck et al. (2008)": Three authors and "&" as connecting term
 
-*** File type
+** File type
 The package uses the default file type set by the =denote-file-type= variable, which you can override with =citar-denote-file-type= to use a different file type for bibliographic notes. 
 
-*** Keyword
+** Keyword
 The =bib= file tag is added by default. This tag is required to minimise the search space when caching notes. The =citar-denote-keyword= variable lets you change the tag to something else. If you change the default, you must update existing bibliographic notes, as the package only recognises a single string.
 
-*** Reference
+** Reference
 The package adds the reference to the front matter, e.g. =#+reference: einstein_1905= for an Org Mode file. This line and the file tag link relate the note file to the BibTeX entry. Any changes to this line or the bibliography file tag break that link.
 
 Each reference can have multiple notes, and each note can have multiple references, separated by a semicolon. For example, you could create a note about each book chapter or write a single literature review note for various papers. You must enable this option by setting the =citar-open-always-create-notes= variable to =t=.
 
-*** Subdirectory
+** Subdirectory
 If you like storing your bibliographic notes in a specific subdirectory, set the =citar-denote-subdir= variable to =t=. When this variable is non-nil, Denote asks for a subdirectory when creating a new bibliographic note.
 
+* Working with Existing Notes
 ** Open Existing Bibliographic Notes
 Use =citar-denote-open-note= to open the bibliographic menu. Citar only shows entries that have one or more associated notes. Hit enter and select the Denote Notes you like to open.
 
-#+caption: Screenshot with Vertico and symbol customisation.
-[[file:citar-menu.png]]
-
 ** Open Attachments, URLs and Other Associated Notes
-The =citar-denote-dwim= function provides access to the Citar menu from where you can open attachments, other notes and links related to the citation references associated with the current buffer. Select the attachment, URL or note you like to access and hit =ENTER=.
+The =citar-denote-dwim= function provides access to the Citar menu from where you can open attachments, other notes and links related to the citation references associated with the current buffer.
+
+If there is more than one reference, then select the reference and then the attachment, URL or note you like to access and hit =ENTER=. When only one reference is present, the first step is skipped.
+
+** Open bibliographic entry
+The =citar-denote-open-reference-entry= function add the bibliographic entry (BibTex, BibLaTeX or CSL file) for a selected reference.
 
 ** Convert Existing Notes to Bibliographic Notes
 The =citar-denote-add-citekey= function adds citation keys or converts an existing Denote file to a bibliographic note. When converting a regular Denote file, the function adds the =bib= keyword to the front matter and renames the file accordingly.
@@ -91,6 +98,7 @@ The bibliography keyword is also removed when removing the last reference, and t
 ** Find Denote file citing the current reference(s)
 When reviewing bibliographic notes, finding where the references are cited within other notes can be helpful. The =citar-denote-find-reference= function searches all Denote notes to find instances where the selected reference is cited.
 
+* Citation management
 ** Find a citation in Denote files
 The =citar-denote-find-citation= function helps you find bibliographic entries in the Citar menu cited in your corpus of Denote notes. 
 
@@ -115,7 +123,9 @@ You can bind the six available commands to your preferred keyboard shortcuts, fo
     (define-key map (kbd "C-c n c c") #'citar-create-note)
     (define-key map (kbd "C-c n c o") #'citar-denote-open-note)
     (define-key map (kbd "C-c n c d") #'citar-denote-dwim)
+    (define-key map (kbd "C-c n c e") #'citar-denote-open-reference-entry)
     (define-key map (kbd "C-c n c a") #'citar-denote-add-citekey)
+    (define-key map (kbd "C-c n c k") #'citar-denote-remove-citekey)
     (define-key map (kbd "C-c n c r") #'citar-denote-find-reference)
     (define-key map (kbd "C-c n c f") #'citar-denote-find-citation)
     (define-key map (kbd "C-c n c n") #'citar-denote-find-nocite))
