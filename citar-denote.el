@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 1.5
+;; Version: 1.6
 ;; Package-Requires: ((emacs "28.1") (citar "1.1") (denote "1.2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -36,7 +36,8 @@
 ;; 5. Access resources related to the references of a bibliographic note: `citar-denote-dwim'
 ;; 6. Find Denote file(s) citing the current reference(s): `citar-denote-find-reference'
 ;; 7. Find a citation in Denote files: `citar-denote-find-citation'
-;; 8. Find bibliographic entries not cited or referenced in Denote files: `citar-denote-find-nocite'
+;; 8. Cite bibliographic entries not cited or referenced in any Denote files: `citar-denote-cite-nocite'
+;; 9. Create bibliographic note for entry not cited or referenced in any Denote files: `citar-denote-reference-nocite'
 ;;
 ;;; Code:
 
@@ -275,6 +276,19 @@ Either title, author/year, full reference or citation key, based on `citar-denot
                 (substring ref 0 (- (length ref) 2))))
           (t citekey))))
 
+(defun citar-denote-get-nocite ()
+  "Find bibliographic entries not cited or referenced in Denote files."
+  (let* ((all-items (hash-table-keys (citar-get-entries)))
+         (used-citations (citar-denote-extract-citations))
+         (references
+          (hash-table-keys (citar-denote-get-notes)))
+         (all-citations
+          (delete-dups (append used-citations references)))
+         (unused (-difference all-items all-citations)))
+     (citar-select-refs
+      :multiple t
+      :filter (citar-denote-has-citekeys unused))))
+
 ;;;###autoload
 (defun citar-denote-create-note (citekey &optional _entry)
   "Create a bibliography note for CITEKEY with properties ENTRY.
@@ -429,32 +443,24 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
             (user-error "No citation found in other Denote files"))))
       (user-error "Buffer is not a Denote file"))))
 
-(defun citar-denote-find-nocite ()
-  "Find bibliographic entries not cited or referenced in Denote files."
-  (let* ((all-items (hash-table-keys (citar-get-entries)))
-         (used-citations (citar-denote-extract-citations))
-         (setreferences
-          (hash-table-keys (citar-denote-get-notes)))
-         (all-citations
-          (delete-dups (append used-citations references)))
-         (unused (-difference all-items all-citations)))
-     (citar-select-refs
-      :multiple t
-      :filter (citar-denote-has-citekeys unused))))
-
 ;;;###autoload
 (defun citar-denote-cite-nocite ()
   "Cite bibliographic entries not cited or referenced in Denote files."
   (interactive)
   (if (denote-file-is-note-p (buffer-file-name))
-      (citar-insert-citation (citar-denote-find-nocite))
+      (citar-insert-citation (citar-denote-get-nocite))
     (user-error "Buffer is not a Denote file")))
+
+(define-obsolete-function-alias
+  'citar-denote-find-nocite
+  'citar-denote-cite-nocite
+  "1.6")
 
 ;;;###autoload
 (defun citar-denote-note-nocite ()
   "Create note for bibliographic entries not cited or referenced in Denote files."
   (interactive)
-  (citar-create-note (car (citar-denote-find-nocite))))
+  (citar-create-note (car (citar-denote-get-nocite))))
 
 ;; Citar integration
 
