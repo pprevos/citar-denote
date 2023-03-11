@@ -72,12 +72,12 @@ can also use Markdown or plain text for their bibliographic notes."
   :group 'citar-denote
   :type 'boolean)
 
-(defcustom citar-denote-title-format "author-year"
+(defcustom citar-denote-title-format "title"
   "Title for new bibliographic notes.
-          - \"title\": Extract title (or short title) from entry
-          - \"author-year\": Author-year citation style
-          - \"full\": Full citation (author-year and title)
-          - nil: Citekey as-is"
+- \"title\": Extract title (or short title) from entry
+- \"author-year\": Author-year citation style
+- \"full\": Full citation (author-year and title)
+- nil: Citekey as-is"
   :group 'citar-denote
   :type  'string)
 
@@ -247,6 +247,8 @@ See documentation for `citar-has-notes'."
       citations))))
 
 (defun citar-denote-generate-title (citekey)
+  "Generate title for new bibliographic note using CITEKEY.
+Either title, author/year, full reference or citation key, based on `citar-denote-title-format'."
   ;; https://github.com/pprevos/citar-denote/issues/15
   (let ((title (citar-get-value "title" citekey))
         (author-names (or (citar-get-value "author" citekey)
@@ -263,7 +265,8 @@ See documentation for `citar-has-notes'."
                     citar-denote-title-format-andstr)
                    " (" year ")"))
           ((equal citar-denote-title-format "full")
-           (citar-format-reference (list citekey)))
+           (let ((ref (citar-format-reference (list citekey))))
+                (substring ref 0 (- (length ref) 2))))
           (t citekey))))
 
 ;;;###autoload
