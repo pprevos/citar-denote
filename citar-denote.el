@@ -411,32 +411,44 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
            (files
             (find-file (denote-get-path-by-id
                         (denote-extract-id-from-string
-                         (denote-link--find-file-prompt files)))))
+                         (denote-link--find-file-prompt files))))
+            ;; TODO: Find citekey
+            )
            ((null citekey)
-            (when (yes-or-no-p "Current buffer does not reference a citation key.  Add a reference ?")
+            (when (yes-or-no-p
+                   "Current buffer does not reference a citation key.  Add a reference ?")
               (citar-denote-add-citekey)
               (citar-denote-find-reference)))
            (t
             (user-error "No citation found in other Denote files"))))
       (user-error "Buffer is not a Denote file"))))
 
-;;;###autoload
 (defun citar-denote-find-nocite ()
   "Find bibliographic entries not cited or referenced in Denote files."
+  (let* ((all-items (hash-table-keys (citar-get-entries)))
+         (used-citations (citar-denote-extract-citations))
+         (setreferences
+          (hash-table-keys (citar-denote-get-notes)))
+         (all-citations
+          (delete-dups (append used-citations references)))
+         (unused (-difference all-items all-citations)))
+     (citar-select-refs
+      :multiple t
+      :filter (citar-denote-has-citekeys unused))))
+
+;;;###autoload
+(defun citar-denote-cite-nocite ()
+  "Cite bibliographic entries not cited or referenced in Denote files."
   (interactive)
   (if (denote-file-is-note-p (buffer-file-name))
-      (let* ((all-items (hash-table-keys (citar-get-entries)))
-             (used-citations (citar-denote-extract-citations))
-             (references
-              (hash-table-keys (citar-denote-get-notes)))
-             (all-citations
-              (delete-dups (append used-citations references)))
-             (unused (-difference all-items all-citations)))
-        (message (format "%s unused items" (length unused)))
-        (citar-insert-citation
-         (citar-select-refs
-          :filter (citar-denote-has-citekeys unused))))
+      (citar-insert-citation (citar-denote-find-nocite))
     (user-error "Buffer is not a Denote file")))
+
+;;;###autoload
+(defun citar-denote-note-nocite ()
+  "Create note for bibliographic entries not cited or referenced in Denote files."
+  (interactive)
+  (citar-create-note (car (citar-denote-find-nocite))))
 
 ;; Citar integration
 
