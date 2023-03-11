@@ -52,12 +52,12 @@
 (defcustom citar-denote-keyword "bib"
   "Denote keyword (file tag) to indicate bibliographical notes."
   :group 'citar-denote
-  :type '(repeat string))
+  :type 'string)
 
-(defcustom citar-denote-file-type (or denote-file-type 'org)
+(defcustom citar-denote-file-type (or denote-file-type nil)
   "File Type used by Citar-Denote.
 Default is `denote-file-type' or org if the former is nil.  Users
-can also use Markdown or plain text for their bibliographic notes."
+can use Markdown or plain text for their bibliographic notes."
   :group 'citar-denote
   :type '(choice
           (const :tag "Unspecified (defaults to Org)" nil)
@@ -76,15 +76,21 @@ can also use Markdown or plain text for their bibliographic notes."
   "Title for new bibliographic notes.
 - \"title\": Extract title (or short title) from entry
 - \"author-year\": Author-year citation style
-- \"full\": Full citation (author-year and title)
-- nil: Citekey as-is"
+- \"full\": Full citation
+- nil: Citekey as-is
+
+When using \"author-year\", you can also configure `citar-denote-title-format-authors' and `citar-denote-title-format-andstr'."
   :group 'citar-denote
-  :type  'string)
+  :type  '(choice
+           (const :tag "Title" "title")
+           (const :tag "Author (Year)" "author-year")
+           (const :tag "Full citation" "full")
+           (const :tag "Citekey" nil)))
 
 (defcustom citar-denote-title-format-authors 1
   "Maximum authors in \"author-year\" for `citar-denote-title-format`."
   :group 'citar-denote
-  :type  'string)
+  :type  'integer)
 
 (defcustom citar-denote-title-format-andstr "and"
   "Connecting authors in \"author-year\" for `citar-denote-note-title`."
