@@ -5,11 +5,14 @@ Literature is the lifeblood of intellectuals and researchers alike. Note-taking 
 
 The /Citar-Denote/ auxiliary package integrates the [[https://github.com/emacs-citar/citar][Citar]] bibliography package with the [[https://protesilaos.com/emacs/denote][Denote]] note-taking system. 
 
-Citar-Denote provides a global minor-mode that enables linking notes to a bibliographic entry. Each bibliography item can have one or more notes, and each note can relate to one or more pieces of literature. The citation key for each note is located in the =reference= line in the front matter of your notes, and each bibliographic note is marked with the =_bib= file tag.
+Citar-Denote provides a global minor-mode that enables linking notes to a bibliographic entry. Each bibliography item can have one or more notes, and each note can relate to one or more pieces of literature. The =reference= line in the front matter of your notes contains the citation keys (separated by a semi-colon), and each bibliographic note is marked with the =_bib= file tag.
 
 In the context of this package, a reference contains one or more pieces of literature associated with a Denote file. A citation is an inline citation reference used for bibliographies. References are for literature reviews; citations are primarily used in other note types.
 
 The Citar-Denote package works with all Denote file types (Org Mode, Markdown (YAML and TOML) and plain text). The package also supports BibTeX, BibLaTeX and CSL bibliography formats.
+
+#+caption: Screenshot with Vertico and symbol customisation.
+[[file:citar-menu.png]]
 
 ** Terminology
 - /Bibliographic entry/: An item in the bibliography (book, article, chapter etc.) accessed via the Citar completion menu.
@@ -21,25 +24,23 @@ The Citar-Denote package works with all Denote file types (Org Mode, Markdown (Y
 ** Inner workings
 Several Emacs packages are available that can link bibliography files to notes. The [[https://joostkremers.github.io/ebib/][Ebib]], [[https://github.com/tmalsburg/helm-bibtex][Helm-BibTeX and Ivy-BibTeX]] each use their own completion system. The [[https://github.com/emacs-citar/citar][Citar]] package uses minibuffer completion and integrates perfectly with the popular Vertico - Marginalia - Consult - Embark toolchain. The Citar package is an ideal companion to Denote due to its extensibility and use of the minibuffer.
 
-The most common behaviour for these bibliography managers is that the filename for the relevant note includes the citation key (e.g. =einstein_1905.org=) so it can be linked to the BibTeX entry. Other systems, such as Org Roam, use a database or a memory cache. In Citar-Denote, the relationship between citation keys and note files is stored in a cache. The cache is regenerated when Citar-Denote is used, which can be slow when using thousands of references. A future version will use =xref= to enhance performance.
+The most common behaviour for these bibliography managers is that the filename for the relevant note includes the citation key (e.g. =einstein_1905.org=) so it can be linked to the BibTeX entry. Other systems, such as Org Roam, use a database to store these relationships. In Citar-Denote stores the relationship between citation keys and note files in a cache. The cache is generated every time Citar-Denote is used, which can be slow when using thousands of references. A future version will use =xref= to enhance performance.
 
-The citations search mechanism already uses the =xref= system. You can improve the search process by installing [[https://github.com/BurntSushi/ripgrep][ripgrep]] and setting =xref-search-program= to =ripgrep=.
-
-#+caption: Screenshot with Vertico and symbol customisation.
-[[file:citar-menu.png]]
+The package also provides insight into citations used in the Denote collections. The citations search mechanism already uses the =xref= system. You can improve the search process by installing [[https://github.com/BurntSushi/ripgrep][ripgrep]] and setting =xref-search-program= to =ripgrep=.
 
 * Functionality
 Citar-Denote integrates with Citar and provides a series of commands specific to Denote files:
 
-1. Create a new bibliographic note: =citar-create-note=.
-2. Open existing bibliographic notes: =citar-denote-open-note=.
-3. Open attachments, URLs or other associated notes: =citar-denote-dwim=.
-4. Convert existing notes to bibliographic notes: =citar-denote-add-citekey=.
+1. Create a new bibliographic note: =citar-create-note=
+2. Open existing bibliographic note: =citar-denote-open-note=
+3. Open attachments, URLs or other associated notes: =citar-denote-dwim=
+4. Convert existing notes to bibliographic notes: =citar-denote-add-citekey=
 5. Removing references from bibliographic notes: =citar-denote-remove-citekey=
 6. Open bibliographic entry: =citar-denote-open-reference-entry=
-7. Find Denote file citing the current reference(s): =citar-denote-find-reference=.
-8. Find a citation in Denote files: =citar-denote-find-citation=.
-9. Find citations not referenced or cited in any note =citar-denote-find-nocite=
+7. Find Denote file citing the current reference(s): =citar-denote-find-reference=
+8. Find a citation in Denote files: =citar-denote-find-citation=
+9. Cite entries not referenced or cited in any note =citar-denote-cite-nocite=
+10. Create a new note for entries not referenced or cited in any note: =citar-denote-reference-nocite=
 
 * Create bibliographic notes
 Open the Citar interface (=citar-create-note=), select the entry you want to create a note for, and hit =ENTER=.
@@ -50,7 +51,7 @@ The default name for a new note is the title of the bibliographic entry. You can
 1. ="title"=: Extract the title from the bibliographic item (default)
 2. ="author-year"=: Use citation format as "author(s) (year)" (or editors when no authors are defined)
 3. ="full"=: Full citation of the entry.
-4. =nil= or any other string: The plain citation key
+4.  =nil= or any other string: The plain citation key
 
 The author-year can be further configured to specify the maximum number of names if there are more than two authors (=citar-denote-title-format-authors=) and the connecting term (=citar-denote-title-format-andstr=), which is "and" by default, e.g.:
 
@@ -63,13 +64,13 @@ The package uses the default file type set by the =denote-file-type= variable, w
 ** Keyword
 The =bib= file tag is added by default. This tag is required to minimise the search space when caching notes. The =citar-denote-keyword= variable lets you change the tag to something else. If you change the default, you must update existing bibliographic notes, as the package only recognises a single string.
 
-** Reference
+** Subdirectory
+If you like storing your bibliographic notes in a specific subdirectory, set the =citar-denote-subdir= variable to =t=. When this variable is non-nil, Denote asks for a subdirectory when creating a new bibliographic note.
+
+** Reference Line
 The package adds the reference to the front matter, e.g. =#+reference: einstein_1905= for an Org Mode file. This line and the file tag link relate the note file to the BibTeX entry. Any changes to this line or the bibliography file tag break that link.
 
 Each reference can have multiple notes, and each note can have multiple references, separated by a semicolon. For example, you could create a note about each book chapter or write a single literature review note for various papers. You must enable this option by setting the =citar-open-always-create-notes= variable to =t=.
-
-** Subdirectory
-If you like storing your bibliographic notes in a specific subdirectory, set the =citar-denote-subdir= variable to =t=. When this variable is non-nil, Denote asks for a subdirectory when creating a new bibliographic note.
 
 * Working with Existing Notes
 ** Open Existing Bibliographic Notes
@@ -81,7 +82,7 @@ The =citar-denote-dwim= function provides access to the Citar menu from where yo
 If there is more than one reference, then select the reference and then the attachment, URL or note you like to access and hit =ENTER=. When only one reference is present, the first step is skipped.
 
 ** Open bibliographic entry
-The =citar-denote-open-reference-entry= function add the bibliographic entry (BibTex, BibLaTeX or CSL file) for a selected reference.
+The =citar-denote-open-reference-entry= function opens the bibliographic entry (BibTex, BibLaTeX or CSL file) for a selected reference.
 
 ** Convert Existing Notes to Bibliographic Notes
 The =citar-denote-add-citekey= function adds citation keys or converts an existing Denote file to a bibliographic note. When converting a regular Denote file, the function adds the =bib= keyword to the front matter and renames the file accordingly.
@@ -100,7 +101,13 @@ When reviewing bibliographic notes, finding where the references are cited withi
 
 * Citation management
 ** Find a citation in Denote files
+<<<<<<< Updated upstream
 The =citar-denote-find-citation= function helps you find bibliographic entries in the Citar menu cited in your corpus of Denote notes. 
+=======
+The =citar-denote-cite-citation= and =citar-denote-reference-nocite= functions find bibliographic entries in the Citar menu not cited or referenced in your corpus of Denote notes.
+
+The first function lets you select unused entries and cite them in a Denote file. The second function create a new bibliographic note for the first selected entry.
+>>>>>>> Stashed changes
 
 ** Find citations not referenced or cited in any note
 This last command is the opposite of the previous one. This function identifies all bibliographic entries not cited or referenced in any Denote file. The =citar-denote-find-nocite= function shows the list of these entries. Hitting enter adds a citation to the current buffer.
@@ -113,22 +120,24 @@ This package is available in MELPA. You can install it with  John Wiegley's [[ht
     :after citar denote
     :config
     (citar-denote-mode)
-    (setq citar-open-always-create-notes t))
+    :custom
+    (citar-open-always-create-notes t))
 #+end_src
 
-You can bind the six available commands to your preferred keyboard shortcuts, following the suggestion in the [[https://protesilaos.com/emacs/denote#h:5d16932d-4f7b-493d-8e6a-e5c396b15fd6][Denote manual]], you could use:
+You can bind the available commands to your preferred keyboard shortcuts, following the suggestion in the [[https://protesilaos.com/emacs/denote#h:5d16932d-4f7b-493d-8e6a-e5c396b15fd6][Denote manual]], you could use:
 
 #+begin_src elisp
   (let ((map global-map))
     (define-key map (kbd "C-c n c c") #'citar-create-note)
     (define-key map (kbd "C-c n c o") #'citar-denote-open-note)
     (define-key map (kbd "C-c n c d") #'citar-denote-dwim)
-    (define-key map (kbd "C-c n c e") #'citar-denote-open-reference-entry)
     (define-key map (kbd "C-c n c a") #'citar-denote-add-citekey)
     (define-key map (kbd "C-c n c k") #'citar-denote-remove-citekey)
+    (define-key map (kbd "C-c n c e") #'citar-denote-open-reference-entry)
     (define-key map (kbd "C-c n c r") #'citar-denote-find-reference)
     (define-key map (kbd "C-c n c f") #'citar-denote-find-citation)
-    (define-key map (kbd "C-c n c n") #'citar-denote-find-nocite))
+    (define-key map (kbd "C-c n c n") #'citar-denote-cite-nocite)
+    (define-key map (kbd "C-c n c m") #'citar-denote-reference-nocite))
 #+end_src
 
 * Acknowledgements
