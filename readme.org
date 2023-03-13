@@ -53,10 +53,18 @@ The default name for a new note is the title of the bibliographic entry. You can
 3. ="full"=: Full citation of the entry.
 4.  =nil= or any other string: The plain citation key
 
-The author-year can be further configured to specify the maximum number of names if there are more than two authors (=citar-denote-title-format-authors=) and the connecting term (=citar-denote-title-format-andstr=), which is "and" by default, e.g.:
+Using "author-year" for entries with one or more authors are as respectively:
+- Benjamin (2018)
+- Rensink and Kuhn (2015)
 
-- "Coppa et al. (2008)": Default for three or more authors
+For entries with three or more authors, you can specify the maximum number of names (=citar-denote-title-format-authors=) and the connecting term (=citar-denote-title-format-andstr=), which is "and" by default.
+
+For example: Coppa, Hass, Peck, Burger (2008) /Performing Magic on the Western Stage: From the Eighteenth Century to the Present/, Palgrave Macmillan. The full citation has four authors.
+
+- "Coppa et al. (2008)": Default behaviour
 - "Coppa, Hass & Peck et al. (2008)": Three authors and "&" as connecting term
+
+If =citar-denote-title-format-authors= is greater than the number of actual authors, all authors will be listed. For example: "Coppa, Hass, Pech and Burger (2008)" when maximum authors greater or equal than 4.
 
 ** File type
 The package uses the default file type set by the =denote-file-type= variable, which you can override with =citar-denote-file-type= to use a different file type for bibliographic notes. 
@@ -100,14 +108,12 @@ The bibliography keyword is also removed when removing the last reference, and t
 When reviewing bibliographic notes, finding where the references are cited within other notes can be helpful. The =citar-denote-find-reference= function searches all Denote notes to find instances where the selected reference is cited.
 
 * Citation management
-** Find a citation in Denote files
-<<<<<<< Updated upstream
-The =citar-denote-find-citation= function helps you find bibliographic entries in the Citar menu cited in your corpus of Denote notes. 
-=======
-The =citar-denote-cite-citation= and =citar-denote-reference-nocite= functions find bibliographic entries in the Citar menu not cited or referenced in your corpus of Denote notes.
+The Citar package can manage citations in Org Mode, Markdown and LaTeX. The Citar documentation explains how to configure these.
 
-The first function lets you select unused entries and cite them in a Denote file. The second function create a new bibliographic note for the first selected entry.
->>>>>>> Stashed changes
+Denote works with Org Mode, Markdown and plain text files. 
+
+** Find a citation in Denote files
+Two functions are available to work with bibliographic references that have not yet been referenced or cited:  =citar-denote-cite-citation= and =citar-denote-reference-nocite=. The first function lets you select unused entries and cite them in a Denote file. The second function create a new bibliographic note for the first selected entry.
 
 ** Find citations not referenced or cited in any note
 This last command is the opposite of the previous one. This function identifies all bibliographic entries not cited or referenced in any Denote file. The =citar-denote-find-nocite= function shows the list of these entries. Hitting enter adds a citation to the current buffer.
@@ -144,3 +150,5 @@ You can bind the available commands to your preferred keyboard shortcuts, follow
 This code would only have existed with the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus.
 
 In addition, Joel Lööw and Noboru Ota added significant contributions, without which this package would be useless. Finally, Guillermo Navarro, Colin McLear, Lucas Gruss, and Adrian Adermon provided valuable suggestions to extend the functionality.
+
+Feel free to raise an issue here on GitHub if you have any questions, find bugs or suggestions for enhanced functionality.
