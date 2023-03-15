@@ -28,6 +28,8 @@ The most common behaviour for these bibliography managers is that the filename f
 
 The package also provides insight into citations used in the Denote collections. The citations search mechanism already uses the =xref= system. You can improve the search process by installing [[https://github.com/BurntSushi/ripgrep][ripgrep]] and setting =xref-search-program= to =ripgrep=.
 
+The =citar-denote= minor mode configures Citar to use the Citar-Denote functionality by defining the functions to create notes and link them to a bibliographic item.
+
 * Functionality
 Citar-Denote integrates with Citar and provides a series of commands specific to Denote files:
 
@@ -145,6 +147,9 @@ You can bind the available commands to your preferred keyboard shortcuts, follow
     (define-key map (kbd "C-c n c n") #'citar-denote-cite-nocite)
     (define-key map (kbd "C-c n c m") #'citar-denote-reference-nocite))
 #+end_src
+
+** Citar Configuration
+You can use the standard Citar configuration and there is no need to change any settings related to bibliographic notes as this is done by Citar-Denote.
 
 * Acknowledgements
 This code would only have existed with the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus.
