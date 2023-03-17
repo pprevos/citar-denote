@@ -56,13 +56,13 @@ The default name for a new note is the title of the bibliographic entry. You can
 4. =full=: Full citation of the entry
 5. =nil= or any other string: The plain citation key
 
-Using "author-year" for entries with one or more authors are as respectively:
+Using "author-year" for entries with one or more authors results in respectively:
 - Benjamin (2018)
 - Rensink and Kuhn (2015)
 
 For entries with three or more authors, you can specify the maximum number of names (=citar-denote-title-format-authors=) and the connecting term (=citar-denote-title-format-andstr=), which is "and" by default.
 
-For example: Coppa, Hass, Peck, Burger (2008) /Performing Magic on the Western Stage: From the Eighteenth Century to the Present/, Palgrave Macmillan. The full citation has four authors.
+For example: Coppa, Hass, Peck, Burger (2008) /Performing Magic on the Western Stage: From the Eighteenth Century to the Present/, Palgrave Macmillan. The full citation has four authors. This is rendered as:
 
 - "Coppa et al. (2008)": Default behaviour
 - "Coppa, Hass & Peck et al. (2008)": Three authors and "&" as connecting term
@@ -72,8 +72,10 @@ If =citar-denote-title-format-authors= is greater than the number of actual auth
 ** File type
 The package uses the default file type set by the =denote-file-type= variable, which you can override with =citar-denote-file-type= to use a different file type for bibliographic notes. 
 
-** Keyword
+** Keywords
 The =bib= file tag is added by default. This tag is required to minimise the search space when caching notes. The =citar-denote-keyword= variable lets you change the tag to something else. If you change the default, you must update existing bibliographic notes, as the package only recognises a single string.
+
+The =citar-denote-use-bib-keywords= variable lets you include keywords defined in the bibliography as Denote keywords. When set to a non-nil value, the package extracts the available keywords from the BibTeX file.
 
 ** Subdirectory
 If you like storing your bibliographic notes in a specific subdirectory, set the =citar-denote-subdir= variable to =t=. When this variable is non-nil, Denote asks for a subdirectory when creating a new bibliographic note.
