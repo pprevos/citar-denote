@@ -50,10 +50,11 @@ Open the Citar interface (=citar-create-note=), select the entry you want to cre
 ** Title format
 The default name for a new note is the title of the bibliographic entry. You can modify this behaviour with the =citar-denote-title-format= variable. Four options are available:
 
-1. ="title"=: Extract the title from the bibliographic item (default)
-2. ="author-year"=: Use citation format as "author(s) (year)" (or editors when no authors are defined)
-3. ="full"=: Full citation of the entry.
-4.  =nil= or any other string: The plain citation key
+1. =title=: Extract the title from the bibliographic item (default)
+2. =author-year=: Use citation format as "author(s) (year)" (or editors when no authors are defined)
+3. =author-year-title=: Concatenate the first two options
+4. =full=: Full citation of the entry
+5. =nil= or any other string: The plain citation key
 
 Using "author-year" for entries with one or more authors are as respectively:
 - Benjamin (2018)
@@ -66,7 +67,7 @@ For example: Coppa, Hass, Peck, Burger (2008) /Performing Magic on the Western S
 - "Coppa et al. (2008)": Default behaviour
 - "Coppa, Hass & Peck et al. (2008)": Three authors and "&" as connecting term
 
-If =citar-denote-title-format-authors= is greater than the number of actual authors, all authors will be listed. For example: "Coppa, Hass, Pech and Burger (2008)" when maximum authors greater or equal than 4.
+If =citar-denote-title-format-authors= is greater than the number of actual authors, all authors will be listed. For example: "Coppa, Hass, Pech and Burger (2008)" when maximum authors greater or equal than four.
 
 ** File type
 The package uses the default file type set by the =denote-file-type= variable, which you can override with =citar-denote-file-type= to use a different file type for bibliographic notes. 
@@ -124,12 +125,8 @@ This last command is the opposite of the previous one. This function identifies 
 This package is available in MELPA. You can install it with  John Wiegley's [[https://github.com/jwiegley/use-package][Use-Package]]:
 
 #+begin_src elisp
-  (use-package citar-denote
-    :after citar denote
-    :config
-    (citar-denote-mode)
-    :custom
-    (citar-open-always-create-notes t))
+  (require 'citar-denote)
+  (citar-denote-mode)
 #+end_src
 
 You can bind the available commands to your preferred keyboard shortcuts, following the suggestion in the [[https://protesilaos.com/emacs/denote#h:5d16932d-4f7b-493d-8e6a-e5c396b15fd6][Denote manual]], you could use:
