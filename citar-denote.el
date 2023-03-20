@@ -397,7 +397,7 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
             (insert (concat ";" references))
             (save-buffer))
         ;; Add new citation keys
-        (progn (citar-denote-add-reference references file-type)
+        (progn (citar-denote-add-reference references)
                (denote-keywords-add (list citar-denote-keyword))
                (save-buffer)))
     (user-error "Buffer is not a Denote file")))
@@ -424,7 +424,7 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
           ;; Add new line or remove file tags when applicable
           (if (> (length new-citekeys) 0)
               (citar-denote-add-reference
-               (mapconcat 'identity new-citekeys ";") file-type)
+               (mapconcat 'identity new-citekeys ";"))
             (citar-denote-remove-bibkey file))
           (save-buffer))
       (user-error "Buffer is not a Denote file"))))
