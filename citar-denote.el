@@ -259,9 +259,6 @@ See documentation for `citar-has-notes'."
      file-type)
     (denote-rename-file-using-front-matter file t)))
 
-(citar-denote-extract-citations)
-
-
 (defun citar-denote-extract-citations ()
   "Extract citations from all Denote files."
   ;; Extract lines with citations
