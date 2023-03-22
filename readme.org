@@ -75,7 +75,7 @@ The package uses the default file type set by the =denote-file-type= variable, w
 ** Keywords
 The =bib= file tag is added by default. This tag is required to minimise the search space when caching notes. The =citar-denote-keyword= variable lets you change the tag to something else. If you change the default, you must update existing bibliographic notes, as the package only recognises a single string.
 
-The =citar-denote-use-bib-keywords= variable lets you include keywords defined in the bibliography as Denote keywords. When set to a non-nil value, the package extracts the available keywords from the BibTeX file.
+The =citar-denote-use-bib-keywords= variable lets you include keywords defined in the bibliography as Denote keywords. When set to a non-nil value, the package extracts the available keywords from the BibTeX file =keywords= field.
 
 ** Subdirectory
 If you like storing your bibliographic notes in a specific subdirectory, set the =citar-denote-subdir= variable to =t=. When this variable is non-nil, Denote asks for a subdirectory when creating a new bibliographic note.
