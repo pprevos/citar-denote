@@ -300,7 +300,7 @@ Based on `citar-denote-title-format'."
            (let* ((citar-denote-title-format "author-year")
                   (author-year (citar-denote-generate-title citekey))
                   (title (citar-get-value "title" citekey)))
-             (concat author-year ". " title)))
+             (concat author-year " " title)))
           ((equal citar-denote-title-format "full")
            (let ((ref (citar-format-reference (list citekey))))
              (substring ref 0 (- (length ref) 2))))
@@ -488,7 +488,7 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
   "1.6")
 
 ;;;###autoload
-(defun citar-denote-note-nocite ()
+(defun citar-denote-reference-nocite ()
   "Create note for bibliographic entries not cited or referenced in Denote files."
   (interactive)
   (citar-create-note (car (citar-denote-get-nocite))))
