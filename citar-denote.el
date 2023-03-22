@@ -259,6 +259,9 @@ See documentation for `citar-has-notes'."
      file-type)
     (denote-rename-file-using-front-matter file t)))
 
+(citar-denote-extract-citations)
+
+
 (defun citar-denote-extract-citations ()
   "Extract citations from all Denote files."
   ;; Extract lines with citations
@@ -272,7 +275,7 @@ See documentation for `citar-has-notes'."
      (mapcar
       (lambda (cite)
         (replace-regexp-in-string
-         "\\[cite:\\|@\\|\\]\\|\\;" ""
+         "@\\|\\].*\\|;" ""
          (substring
           cite (string-match citar-denote-citekey-regex cite))))
       citations))))
@@ -440,6 +443,7 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
     (find-file (denote-get-path-by-id
                 (denote-extract-id-from-string
                  (denote-link--find-file-prompt files))))
+    (goto-char (point-min))
     (search-forward citekey)))
 
 ;;;###autoload
@@ -462,7 +466,7 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
             (find-file (denote-get-path-by-id
                         (denote-extract-id-from-string
                          (denote-link--find-file-prompt files))))
-            (beginning-of-buffer)
+            (goto-char (point-min))
             (search-forward citekey))
            ((null citekey)
             (when (yes-or-no-p
