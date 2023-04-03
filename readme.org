@@ -33,16 +33,18 @@ The =citar-denote= minor mode configures Citar to use the Citar-Denote functiona
 * Functionality
 Citar-Denote integrates with Citar and provides a series of commands specific to Denote files:
 
-1. Create a new bibliographic note: =citar-create-note=
-2. Open existing bibliographic note: =citar-denote-open-note=
-3. Open attachments, URLs or other associated notes: =citar-denote-dwim=
-4. Convert existing notes to bibliographic notes: =citar-denote-add-citekey=
-5. Removing references from bibliographic notes: =citar-denote-remove-citekey=
-6. Open bibliographic entry: =citar-denote-open-reference-entry=
-7. Find Denote file citing the current reference(s): =citar-denote-find-reference=
-8. Find a citation in Denote files: =citar-denote-find-citation=
-9. Cite entries not referenced or cited in any note =citar-denote-cite-nocite=
-10. Create a new note for entries not referenced or cited in any note: =citar-denote-reference-nocite=
+1. 
+2. Create a new bibliographic note: =citar-create-note=
+3. Open existing bibliographic note: =citar-denote-open-note=
+4. Open attachments, URLs or other associated notes: =citar-denote-dwim=
+5. Open bibliographic entry: =citar-denote-open-reference-entry=
+6. Convert existing notes to bibliographic notes: =citar-denote-add-citekey=
+7. Removing references from bibliographic notes: =citar-denote-remove-citekey=
+   1. Find Denote file citing the current reference(s): =citar-denote-find-reference=
+   2. Find a citation in Denote files: =citar-denote-find-citation=
+   3. Link to a bibliographic note: =citar-denote-link-reference=
+   4. Cite entries not referenced or cited in any note =citar-denote-cite-nocite=
+   5. Create a new note for entries not referenced or cited in any note: =citar-denote-reference-nocite=
 
 * Create bibliographic notes
 Open the Citar interface (=citar-create-note=), select the entry you want to create a note for, and hit =ENTER=.
@@ -109,19 +111,22 @@ You remove citation references with the =citar-denote-remove-citekey= command.
 
 The bibliography keyword is also removed when removing the last reference, and the file is renamed to reflect this change.
 
-** Find Denote file citing the current reference(s)
-When reviewing bibliographic notes, finding where the references are cited within other notes can be helpful. The =citar-denote-find-reference= function searches all Denote notes to find instances where the selected reference is cited.
+** Find Denote files with references or citations
+When reviewing bibliographic notes, finding where the references are cited within other notes can be helpful.
+
+The =citar-denote-find-reference= function searches all finds instances where the selected reference from the current buffer is cited.
+
+The =citar-denote-find-citation= function finds Denote files that cite a bibliographic entry.
+
+** Link to a bibliographic note
+You might want to create a Denote link that links to a file that references a bibliographic entry. The =citar-denote-link-reference= asks you to select a bibliographic entry for which a note exists.
+
+If more than one note exists for the selected entry, then you also need to choose the relevant note to link to.
 
 * Citation management
-The Citar package can manage citations in Org Mode, Markdown and LaTeX. The Citar documentation explains how to configure these.
+Two functions are available to find bibliographic references that are not cited or referenced in any note: =citar-denote-cite-nocite= and =citar-denote-reference-nocite=.
 
-Denote works with Org Mode, Markdown and plain text files. 
-
-** Find a citation in Denote files
-Two functions are available to work with bibliographic references that are not cited or referenced in any note: =citar-denote-cite-citation= and =citar-denote-reference-nocite=. The first function lets you select and cite unused entries in a Denote file. The second function creates a new bibliographic note for the first entry chosen.
-
-** Find citations not referenced or cited in any note
-This last command is the opposite of the previous one. This function identifies all bibliographic entries not cited or referenced in any Denote file. The =citar-denote-find-nocite= function shows the list of these entries. Hitting enter adds a citation to the current buffer.
+Both functions provide a list of all bibliographic entries that are neither cited nor referenced in your Denote files. You can then add one or more of these as a citation or a new bibliographic note.
 
 * Installation
 This package is available in MELPA. You can install it with  John Wiegley's [[https://github.com/jwiegley/use-package][Use-Package]]:

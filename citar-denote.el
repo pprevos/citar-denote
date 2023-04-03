@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 1.6
+;; Version: 1.7
 ;; Package-Requires: ((emacs "28.1") (citar "1.1") (denote "1.2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -27,25 +27,15 @@
 ;;
 ;; A minor-mode integrating 'citar' and 'denote'.
 ;;
-;; Provides the following interactive functions:
-;;
-;; 1. Create a new bibliographic note: `citar-create-note'
-;; 2. Open existing bibliographic note: `citar-denote-open-note'
-;; 3. Open attachments, URLs or other associated notes: `citar-denote-dwim'
-;; 4. Convert existing notes to bibliographic notes: `citar-denote-add-citekey'
-;; 5. Removing references from bibliographic notes: `citar-denote-remove-citekey'
-;; 6. Open bibliographic entry: `citar-denote-open-reference-entry'
-;; 7. Find Denote file citing the current reference(s): `citar-denote-find-reference'
-;; 8. Find a citation in Denote files: `citar-denote-find-citation'
-;; 9. Cite entries not referenced or cited in any note `citar-denote-cite-nocite'
-;; 10. Create a new note for entries not referenced or cited in any note: `citar-denote-reference-nocite'
+;; This package provides functions create and work with bibliographic notes.
 ;;
 ;;; Code:
 
 (require 'denote)
 (require 'dash)
 (require 'citar)
-(eval-when-compile (require 'subr-x))
+(eval-when-compile
+  (require 'subr-x))
 
 (defgroup citar-denote ()
   "Creating and accessing bibliography files with Citar and Denote."
@@ -166,7 +156,7 @@ Configurable with `citar-denote-keyword'.")
   "Prompt for one or more keywords and include `citar-denote-keyword'.
 
   When `citar-denote-use-keywords' is not nil, also use keywords
-  from bibliographic entry."
+  from bibliographic entry with CITEKEY."
   (let* ((choice (append (list citar-denote-keyword)
                          (denote-keywords-prompt)))
          (keywords (if citar-denote-use-bib-keywords
@@ -430,20 +420,6 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
       (user-error "Buffer is not a Denote file"))))
 
 ;;;###autoload
-(defun citar-denote-find-citation ()
-  "Find a citation in Denote files."
-  (interactive)
-  (let* ((citations (citar-denote-extract-citations))
-         (citekey (citar-select-ref
-                   :filter (citar-denote-has-citekeys citations)))
-         (files (citar-denote-retrieve-cite-files citekey)))
-    (find-file (denote-get-path-by-id
-                (denote-extract-id-from-string
-                 (denote-link--find-file-prompt files))))
-    (goto-char (point-min))
-    (search-forward citekey)))
-
-;;;###autoload
 (defun citar-denote-find-reference ()
   "Find Denote file(s) citing the current reference(s)."
   (interactive)
@@ -456,8 +432,9 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
                             (citar-select-ref
                              :filter
                              (citar-denote-has-citekeys citekeys)))))
-               (files (delete file
-                              (citar-denote-retrieve-cite-files citekey))))
+               (files
+                (delete file
+                        (citar-denote-retrieve-cite-files citekey))))
           (cond
            (files
             (find-file (denote-get-path-by-id
@@ -473,6 +450,37 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
            (t
             (user-error "No citation found in other Denote files"))))
       (user-error "Buffer is not a Denote file"))))
+
+;;;###autoload
+(defun citar-denote-link-reference ()
+  ;; https://github.com/pprevos/citar-denote/issues/20
+  "Insert a Denote link to a bibliographic note."
+  (interactive)
+  (let* ((citekey (citar-select-refs
+		      :filter (citar-denote-has-notes)
+		      :multiple nil))
+	    (files (gethash (car citekey)
+			    (citar-denote-get-notes citekey)))
+	    (file (if (= (length files) 1)
+		      (car files)
+		    (funcall project-read-file-name-function
+			     "Select note: "
+			     files nil nil nil))))
+      (denote-link file)))
+
+;;;###autoload
+(defun citar-denote-find-citation ()
+  "Find a citation in Denote files."
+  (interactive)
+  (let* ((citations (citar-denote-extract-citations))
+         (citekey (citar-select-ref
+                   :filter (citar-denote-has-citekeys citations)))
+         (files (citar-denote-retrieve-cite-files citekey)))
+    (find-file (denote-get-path-by-id
+                (denote-extract-id-from-string
+                 (denote-link--find-file-prompt files))))
+    (goto-char (point-min))
+    (search-forward citekey)))
 
 ;;;###autoload
 (defun citar-denote-cite-nocite ()
