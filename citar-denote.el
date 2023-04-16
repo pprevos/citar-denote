@@ -305,9 +305,9 @@ Based on `citar-denote-title-format'."
          (all-citations
           (delete-dups (append used-citations references)))
          (unused (-difference all-items all-citations)))
-     (citar-select-refs
-      :multiple t
-      :filter (citar-denote-has-citekeys unused))))
+    (citar-select-refs
+     :multiple t
+     :filter (citar-denote-has-citekeys unused))))
 
 ;;;###autoload
 (defun citar-denote-create-note (citekey &optional _entry)
@@ -342,9 +342,9 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
   ;; Any citation keys in the note?
   (if-let* ((keys (citar-denote-retrieve-references (buffer-file-name)))
             (key (if (= (length keys) 1)
-                    (car keys)
-                  (citar-select-ref
-                   :filter (citar-denote-has-citekeys keys)))))
+                     (car keys)
+                   (citar-select-ref
+                    :filter (citar-denote-has-citekeys keys)))))
       (citar-open (list key))
     (if (denote-file-is-note-p (buffer-file-name))
         (when (yes-or-no-p "Current buffer does not reference a citation key.  Add a reference? ")
@@ -358,9 +358,9 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
   (interactive)
   (if-let* ((keys (citar-denote-retrieve-references (buffer-file-name)))
             (key (if (= (length keys) 1)
-                    (car keys)
-                  (citar-select-ref
-                   :filter (citar-denote-has-citekeys keys)))))
+                     (car keys)
+                   (citar-select-ref
+                    :filter (citar-denote-has-citekeys keys)))))
       (citar-open-entry key)
     (if (denote-file-is-note-p (buffer-file-name))
         (when (yes-or-no-p "Current buffer does not reference a citation key.  Add a reference? ")
@@ -394,30 +394,29 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
 
 ;;;###autoload
 (defun citar-denote-remove-citekey ()
-  "Remove a reference from a bibliographic note."
   (interactive)
-  (let* ((file (buffer-file-name))
-         (file-type (denote-filetype-heuristics file))
-         (citekeys (citar-denote-retrieve-references file))
-         (selected (if (< (length citekeys) 2)
-                       (car citekeys)
-                     (citar-select-ref
-                      :filter (citar-denote-has-citekeys citekeys))))
-         (new-citekeys (delete selected citekeys)))
-    (if (denote-file-is-note-p file)
-        (save-excursion
-          ;; Remove references line
-          (goto-char (point-min))
-          (re-search-forward (citar-denote-reference-regex file-type))
-          (move-beginning-of-line nil)
-          (kill-line 1)
-          ;; Add new line or remove file tags when applicable
-          (if (> (length new-citekeys) 0)
-              (citar-denote-add-reference
-               (mapconcat 'identity new-citekeys ";"))
-            (citar-denote-remove-bibkey file))
-          (save-buffer))
-      (user-error "Buffer is not a Denote file"))))
+  (if-let* ((file (buffer-file-name))
+	    (citekeys (citar-denote-retrieve-references file))
+	    (selected (if (< (length citekeys) 2)
+			  (car citekeys)
+			(citar-select-ref
+			 :filter
+			 (citar-denote-has-citekeys citekeys)))))
+      (let ((new-citekeys (delete selected citekeys)))
+      (save-excursion
+	;; Remove references line
+	(goto-char (point-min))
+	(re-search-forward
+	 (citar-denote-reference-regex file-type))
+	(move-beginning-of-line nil)
+	(kill-line 1)
+	;; Add new line or remove file tags when applicable
+	(if (> (length new-citekeys) 0)
+	    (citar-denote-add-reference
+	     (mapconcat 'identity new-citekeys ";"))
+	  (citar-denote-remove-bibkey file))
+	(save-buffer)))
+    (user-error "No references in this buffer, or not a Denote file")))
 
 ;;;###autoload
 (defun citar-denote-find-reference ()
@@ -457,16 +456,16 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
   "Insert a Denote link to a bibliographic note."
   (interactive)
   (let* ((citekey (citar-select-refs
-		      :filter (citar-denote-has-notes)
-		      :multiple nil))
-	    (files (gethash (car citekey)
-			    (citar-denote-get-notes citekey)))
-	    (file (if (= (length files) 1)
-		      (car files)
-		    (funcall project-read-file-name-function
-			     "Select note: "
-			     files nil nil nil))))
-      (denote-link file)))
+		   :filter (citar-denote-has-notes)
+		   :multiple nil))
+	 (files (gethash (car citekey)
+			 (citar-denote-get-notes citekey)))
+	 (file (if (= (length files) 1)
+		   (car files)
+		 (funcall project-read-file-name-function
+			  "Select note: "
+			  files nil nil nil))))
+    (denote-link file)))
 
 ;;;###autoload
 (defun citar-denote-find-citation ()
@@ -497,7 +496,9 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
 
 ;;;###autoload
 (defun citar-denote-reference-nocite ()
-  "Create note for bibliographic entries not cited or referenced in Denote files."
+  "Create note for bibliographic entries not cited or referenced in Denote files.
+
+If multiple entries are selected, the note is created for the first entry."
   (interactive)
   (citar-create-note (car (citar-denote-get-nocite))))
 
