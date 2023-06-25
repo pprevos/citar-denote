@@ -1,3 +1,4 @@
 /citar-denote-dev.el
 /*.elc
 /.Rhistory
+/minimum-config.el

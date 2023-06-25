@@ -1,0 +1,16 @@
+[[https://melpa.org/#/citar-denote][file:https://melpa.org/packages/citar-denote-badge.svg]]    [[https://stable.melpa.org/#/citar-denote][file:https://stable.melpa.org/packages/citar-denote-badge.svg]]
+
+A minor-mode integrating the Emacs [[https://github.com/emacs-citar/citar][Citar]] and [[https://protesilaos.com/emacs/denote][Denote]] packages to enable managing bibliographic notes and citations.
+
+Provides the following interactive functions:
+
+1. Create a new bibliographic note: =citar-create-note=
+2. Add citation key(s) to existing or convert to bibliographic note: =citar-denote-add-citekey=
+3. Remove a reference from a bibliographic note: =citar-denote-remove-citekey=
+4. Open a note related to a bibliographic entry: =citar-denote-open-note=
+5. Access attachments, notes and links related to the references associated with a bibliographic note: =citar-denote-dwim=
+6. Find Denote file(s) citing the current reference(s): =citar-denote-find-reference=
+7. Find a citation in Denote files: =citar-denote-find-citation=
+8. Find bibliographic entries not cited or referenced in Denote files: =citar-denote-find-nocite=
+
+For more information read the [[http://lucidmanager.org/productivity/citar-denote-managing-bibliographic-notes-in-emacs/][citar-denote manual]].
