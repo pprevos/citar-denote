@@ -33,18 +33,17 @@ The =citar-denote= minor mode configures Citar to use the Citar-Denote functiona
 * Functionality
 Citar-Denote integrates with Citar and provides a series of commands specific to Denote files:
 
-1. 
-2. Create a new bibliographic note: =citar-create-note=
-3. Open existing bibliographic note: =citar-denote-open-note=
-4. Open attachments, URLs or other associated notes: =citar-denote-dwim=
-5. Open bibliographic entry: =citar-denote-open-reference-entry=
-6. Convert existing notes to bibliographic notes: =citar-denote-add-citekey=
-7. Removing references from bibliographic notes: =citar-denote-remove-citekey=
-   1. Find Denote file citing the current reference(s): =citar-denote-find-reference=
-   2. Find a citation in Denote files: =citar-denote-find-citation=
-   3. Link to a bibliographic note: =citar-denote-link-reference=
-   4. Cite entries not referenced or cited in any note =citar-denote-cite-nocite=
-   5. Create a new note for entries not referenced or cited in any note: =citar-denote-reference-nocite=
+1. Create a new bibliographic note: =citar-create-note=
+2. Open existing bibliographic note: =citar-denote-open-note=
+3. Open attachments, URLs or other associated notes: =citar-denote-dwim=
+4. Open bibliographic source file: =citar-denote-open-reference-entry=
+5. Convert existing notes to bibliographic notes: =citar-denote-add-citekey=
+6. Removing references from bibliographic notes: =citar-denote-remove-citekey=
+7. Find Denote file citing the current reference(s): =citar-denote-find-reference=
+8. Find a citation in Denote files: =citar-denote-find-citation=
+9. Link to a bibliographic note: =citar-denote-link-reference=
+10. Cite entries not referenced or cited in any note =citar-denote-cite-nocite=
+11. Create a new note for entries not referenced or cited in any note: =citar-denote-reference-nocite=
 
 * Create bibliographic notes
 Open the Citar interface (=citar-create-note=), select the entry you want to create a note for, and hit =ENTER=.
@@ -56,13 +55,13 @@ The default name for a new note is the title of the bibliographic entry. You can
 2. =author-year=: Use citation format as "author(s) (year)" (or editors when no authors are defined)
 3. =author-year-title=: Concatenate the first two options
 4. =full=: Full citation of the entry
-5. =nil= or any other string: The plain citation key
+5. =nil= or any other string: The BibTeX citation key
 
-Using "author-year" for entries with one or more authors results in respectively:
+Using ="author-year"= for entries with one or more authors results in respectively:
 - Benjamin (2018)
 - Rensink and Kuhn (2015)
 
-For entries with three or more authors, you can specify the maximum number of names (=citar-denote-title-format-authors=) and the connecting term (=citar-denote-title-format-andstr=), which is "and" by default.
+For entries with three or more authors, you can specify the maximum number of names (=citar-denote-title-format-authors=), which is 1 by default, and the connecting term (=citar-denote-title-format-andstr=), which is "and" by default.
 
 For example, Coppa, Hass, Peck, Burger (2008) /Performing Magic on the Western Stage: From the Eighteenth Century to the Present/, Palgrave Macmillan. The full citation has four authors. This is rendered as:
 
@@ -71,7 +70,7 @@ For example, Coppa, Hass, Peck, Burger (2008) /Performing Magic on the Western S
 
 All authors will be listed if =citar-denote-title-format-authors= is greater than the number of actual authors. For example: "Coppa, Hass, Pech and Burger (2008)" when the maximum number of authors is equal to or greater than four.
 
-** File type
+** Default File type
 The package uses the default file type set by the =denote-file-type= variable, which you can override with =citar-denote-file-type= to use a different file type for bibliographic notes. 
 
 ** Keywords
@@ -153,11 +152,11 @@ You can bind the available commands to your preferred keyboard shortcuts, follow
 #+end_src
 
 ** Citar Configuration
-You can use the standard Citar configuration, and there is no need to change any settings related to bibliographic notes, as this is done by Citar-Denote.
+You can use the standard Citar configuration, and there is no need to change any settings (including templates) related to bibliographic notes, as Citar-Denote takes over the note-taking functionality in Citar. 
 
 * Acknowledgements
 This code would only have existed with the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus.
 
-In addition, Joel Lööw and Noboru Ota added significant contributions, without which this package would be useless. Finally, Guillermo Navarro, Colin McLear, Lucas Gruss, and Adrian Adermon provided valuable suggestions to extend the functionality.
+In addition, Joel Lööw and Noboru Ota added significant contributions, without which this package would be useless. Finally, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon, and Jonathan Sahar provided valuable suggestions to extend the functionality.
 
 Feel free to raise an issue here on GitHub if you have any questions or find bugs or suggestions for enhanced functionality.

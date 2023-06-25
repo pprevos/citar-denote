@@ -76,9 +76,9 @@ can use Markdown or plain text for their bibliographic notes."
 - \"author-year\": Author-year citation style
 - \"author-year-title\": Combine author, year and title
 - \"full\": Full citation
-- nil: Citekey as-is
+- nil: BibTeX citekey
 
-For \"author-year\" you can configure:
+For \"author-year\" and \"author-year-title\" you can configure:
 - `citar-denote-title-format-authors'
 - `citar-denote-title-format-andstr'."
   :group 'citar-denote
