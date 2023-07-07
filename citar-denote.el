@@ -396,6 +396,7 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
 (defun citar-denote-remove-citekey ()
   (interactive)
   (if-let* ((file (buffer-file-name))
+            (file-type (denote-filetype-heuristics file))
 	    (citekeys (citar-denote-retrieve-references file))
 	    (selected (if (< (length citekeys) 2)
 			  (car citekeys)
