@@ -37,6 +37,8 @@
 (eval-when-compile
   (require 'subr-x))
 
+;; Customisable variables
+
 (defgroup citar-denote ()
   "Creating and accessing bibliography files with Citar and Denote."
   :group 'files)
@@ -155,7 +157,7 @@ Configurable with `citar-denote-keyword'.")
 (defun citar-denote-keywords-prompt (citekey)
   "Prompt for one or more keywords and include `citar-denote-keyword'.
 
-  When `citar-denote-use-keywords' is not nil, also use keywords
+  When `citar-denote-use-bib-keywords' is not nil, also use keywords
   from bibliographic entry with CITEKEY."
   (let* ((choice (append (list citar-denote-keyword)
                          (denote-keywords-prompt)))
@@ -243,7 +245,7 @@ See documentation for `citar-has-notes'."
   "Remove `citar-denote-bibkey' from FILE."
   (let* ((file-type (denote-filetype-heuristics file))
          (keywords (denote-retrieve-keywords-value file file-type)))
-    (denote--rewrite-keywords
+    (denote-rewrite-keywords
      file
      (delete citar-denote-keyword keywords)
      file-type)
@@ -503,6 +505,14 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
 If multiple entries are selected, the note is created for the first entry."
   (interactive)
   (citar-create-note (car (citar-denote-get-nocite))))
+
+;;;###autoload
+(defun citar-denote-nocite ()
+  "Open Citar showing bibliographic entries not cited or referenced in Denote."
+  (interactive)
+  (citar-open (citar-denote-get-nocite)))
+
+(citar-open (citar-denote-get-nocite))
 
 ;; Citar integration
 
