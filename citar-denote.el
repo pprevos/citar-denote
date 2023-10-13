@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 1.7
+;; Version: 1.8
 ;; Package-Requires: ((emacs "28.1") (citar "1.1") (denote "1.2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -29,6 +29,8 @@
 ;;
 ;; This package provides functions create and work with bibliographic notes.
 ;;
+;; https://lucidmanager.org/productivity/bibliographic-notes-in-emacs-with-citar-denote/
+;;
 ;;; Code:
 
 (require 'denote)
@@ -49,15 +51,18 @@
   :type 'string)
 
 (defcustom citar-denote-use-bib-keywords nil
-  "Include bibliographic keywords as Denote keywords."
+  "Extract bibliographic keywords from bibliography and use as Denote keywords."
   ;; https://github.com/pprevos/citar-denote/issues/17
   :group 'citar-denote
   :type  'boolean)
 
 (defcustom citar-denote-file-type (or denote-file-type 'org)
   "File Type used by Citar-Denote.
+
 Default is `denote-file-type' or org if the former is nil.  Users
-can use Markdown or plain text for their bibliographic notes."
+can use Markdown or plain text for their bibliographic notes.
+
+Please note that citations are not supported in plain text."
   :group 'citar-denote
   :type '(choice
           (const :tag "Org mode (default)" org)
@@ -66,13 +71,15 @@ can use Markdown or plain text for their bibliographic notes."
           (const :tag "Plain text" text)))
 
 (defcustom citar-denote-subdir 'nil
-  "Ask for a subdirectory when creating a new bibliographic note."
+  "Ask for a subdirectory when creating a new bibliographic note.
+
+When creating a new bibliographic note, the user will be asked for a directory."
   ;; https://github.com/pprevos/citar-denote/issues/11
   :group 'citar-denote
   :type 'boolean)
 
 (defcustom citar-denote-title-format "title"
-  "Title for new bibliographic notes.
+  "Title format for new bibliographic notes.
 
 - \"title\": Extract title (or short title) from entry
 - \"author-year\": Author-year citation style
@@ -92,12 +99,12 @@ For \"author-year\" and \"author-year-title\" you can configure:
            (const :tag "Citekey" nil)))
 
 (defcustom citar-denote-title-format-authors 1
-  "Maximum authors in \"author-year\" for `citar-denote-title-format`."
+  "Maximum number of authors in \"author-year\" for `citar-denote-title-format`."
   :group 'citar-denote
   :type  'integer)
 
 (defcustom citar-denote-title-format-andstr "and"
-  "Connecting authors in \"author-year\" for `citar-denote-note-title`."
+  "Connecting string for authors in \"author-year\" for `citar-denote-note-title`."
   :group 'citar-denote
   :type  'string)
 
@@ -125,29 +132,30 @@ PROPERTY-LIST is a plist that consists of two elements:
 - `:reference-regex' Regexp to look for the citekey in a bibliographic notes.")
 
 (defvar citar-denote-files-regexp (concat "_" citar-denote-keyword)
-  "Regexp used to look for file names of bibliographic notes.
+  "Regular expression used to look for file names of bibliographic notes.
+
 The default assumes \"_bib\" tag is part of the file name.
 Configurable with `citar-denote-keyword'.")
 
 (defvar citar-denote-citekey-regex "@[a-zA-Z0-9:?-]+"
-  "Regular expression to extract citation keys.")
+  "Regular expression to extract citation keys from a text.")
 
 ;; Auxiliary functions
 
 (defun citar-denote-reference-format (file-type)
-  "Return the reference format associated to FILE-TYPE."
+  "Return the reference format associated to FILE-TYPE from `citar-denote-file-types'."
   (plist-get
    (alist-get file-type citar-denote-file-types)
    :reference-format))
 
 (defun citar-denote-reference-regex (file-type)
-  "Return the reference regex associated to FILE-TYPE."
+  "Return the reference regex associated to FILE-TYPE from `citar-denote-file-types'."
   (plist-get
    (alist-get file-type citar-denote-file-types)
    :reference-regex))
 
 (defun citar-denote-extract-keywords (citekey)
-  "Extract keywords of CITEKEY bibliographic item."
+  "Extract keywords of CITEKEY from the bibliography."
   (if-let* ((KeyWords (citar-get-value "keywords" citekey))
             (keywords (downcase KeyWords))
             (filetags (split-string keywords ", *")))
@@ -168,7 +176,7 @@ Configurable with `citar-denote-keyword'.")
     (delete-dups keywords)))
 
 (defun citar-denote-add-reference (citekey)
-  "Add reference property with CITEKEY in front matter of FILE-TYPE file.
+  "Add reference line with CITEKEY in the front matter of the Denote file.
 
 `citar-denote-add-citekey' is the interactive version of this function."
   (let ((file-type citar-denote-file-type))
@@ -182,7 +190,7 @@ Configurable with `citar-denote-keyword'.")
        (format (citar-denote-reference-format file-type) citekey)))))
 
 (defun citar-denote-retrieve-references (file)
-  "Return reference key value(s) from FILE front matter."
+  "Return reference citekey(s) from FILE front matter."
   (with-temp-buffer
     (insert-file-contents file)
     (goto-char (point-min))
@@ -196,8 +204,8 @@ Configurable with `citar-denote-keyword'.")
           trims trims) ";")))))
 
 (defun citar-denote-get-notes (&optional citekeys)
-  ;; TODO: Use xref to find references
-  "Return Denote files associated with the CITEKEYS citation keys.
+  ;; TODO: Use xref to find references?
+  "Return has table of Denote files associated with the CITEKEYS citation keys.
 If CITEKEYS is omitted, return all Denote files tagged with
 `citar-denote-keyword'."
   (let ((files (make-hash-table :test 'equal)))
@@ -216,7 +224,7 @@ If CITEKEYS is omitted, return all Denote files tagged with
          (puthash key (nreverse filelist) files)) files))))
 
 (defun citar-denote-retrieve-cite-files (citekey)
-  "Return unique file names containing CITEKEY."
+  "Return names of Denote files that contain CITEKEY."
   (let ((files (denote-directory-text-only-files)))
     (delete-dups
      (mapcar
@@ -225,14 +233,15 @@ If CITEKEYS is omitted, return all Denote files tagged with
               (xref-matches-in-files (format "@%s" citekey) files))))))
 
 (defun citar-denote-has-notes ()
-  "Return predicate testing whether entry has associated denote files.
+  "Return a list of all citekeys referenced in a Denote file.
+
 See documentation for `citar-has-notes'."
   (let ((notes (citar-denote-get-notes)))
     (unless (hash-table-empty-p notes)
       (lambda (citekey) (and (gethash citekey notes) t)))))
 
 (defun citar-denote-has-citekeys (citekeys)
-  "Return predicate testing whether entry has associated CITEKEYS."
+  "Return hash table of citar entries with associated CITEKEYS."
   (let ((citar-entries (citar-get-entries))
         (citekey-entries (make-hash-table :test 'equal)))
     (mapc (lambda (key)
@@ -242,7 +251,7 @@ See documentation for `citar-has-notes'."
       (lambda (citekey) (and (gethash citekey citekey-entries) t)))))
 
 (defun citar-denote-remove-bibkey (file)
-  "Remove `citar-denote-bibkey' from FILE."
+  "Remove `citar-denote-bibkey' file tag from FILE."
   (let* ((file-type (denote-filetype-heuristics file))
          (keywords (denote-retrieve-keywords-value file file-type)))
     (denote-rewrite-keywords
@@ -271,6 +280,7 @@ See documentation for `citar-has-notes'."
 
 (defun citar-denote-generate-title (citekey)
   "Generate title for new bibliographic note using CITEKEY.
+
 Either title, author/year, full reference or citation key.
 Based on `citar-denote-title-format'."
   ;; https://github.com/pprevos/citar-denote/issues/15
@@ -299,7 +309,7 @@ Based on `citar-denote-title-format'."
           (t citekey))))
 
 (defun citar-denote-get-nocite ()
-  "Find bibliographic entries not cited or referenced in Denote files."
+  "Return list of citekey(s) of Citar entries not cited or referenced in Denote files."
   (let* ((all-items (hash-table-keys (citar-get-entries)))
          (used-citations (citar-denote-extract-citations))
          (references
@@ -311,12 +321,15 @@ Based on `citar-denote-title-format'."
      :multiple t
      :filter (citar-denote-has-citekeys unused))))
 
+;; Interactive functions
+
 ;;;###autoload
 (defun citar-denote-create-note (citekey &optional _entry)
-  "Create a bibliography note for CITEKEY with properties ENTRY.
+  "Create a bibliographic note for CITEKEY with properties ENTRY.
 
 The file type for the new note is determined by `citar-denote-file-type'.
 The title of the new note is set by `citar-denote-title-format'.
+
 When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
   (denote
    (read-string "Title: " (citar-denote-generate-title citekey))
@@ -325,11 +338,9 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
    (when citar-denote-subdir (denote-subdirectory-prompt)))
   (citar-denote-add-reference citekey))
 
-;; Interactive functions
-
 ;;;###autoload
 (defun citar-denote-open-note ()
-  "Open a bibliographic note."
+  "Open a bibliographic note using Citar."
   (interactive)
   (let* ((citekeys (citar-select-refs :filter (citar-denote-has-notes)))
          (file (citar--select-resource
@@ -338,9 +349,10 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
 
 ;;;###autoload
 (defun citar-denote-dwim ()
-  "Access attachments, notes and links of a bibliographic reference."
+  "Access attachments, notes and links of a bibliographic reference.
+
+When more than one bibliographic item is referenced, select item first."
   (interactive)
-  ;; TODO: Generalise this function with embark?
   ;; Any citation keys in the note?
   (if-let* ((keys (citar-denote-retrieve-references (buffer-file-name)))
             (key (if (= (length keys) 1)
@@ -356,7 +368,9 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
 
 ;;;###autoload
 (defun citar-denote-open-reference-entry ()
-  "Open bibliographic entry associated with a bibliographic reference."
+  "Open bibliographic source file associated with a bibliographic reference.
+
+When more than one bibliographic item is referenced, select item first."
   (interactive)
   (if-let* ((keys (citar-denote-retrieve-references (buffer-file-name)))
             (key (if (= (length keys) 1)
@@ -372,7 +386,7 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
 
 ;;;###autoload
 (defun citar-denote-add-citekey ()
-  "Add citation key(s) to existing or convert to bibliographic note."
+  "Add citation key(s) to existing note or convert to a bibliographic note."
   (interactive)
   (if-let* ((file (buffer-file-name))
             ((denote-file-is-note-p file))
@@ -424,7 +438,9 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
 
 ;;;###autoload
 (defun citar-denote-find-reference ()
-  "Find Denote file(s) citing the current reference(s)."
+  "Find Denote file(s) citing the current reference(s).
+
+When more than one bibliographic item is referenced, select item first."
   (interactive)
   (let ((file (buffer-file-name)))
     (if (denote-file-is-note-p file)
@@ -456,8 +472,8 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
 
 ;;;###autoload
 (defun citar-denote-link-reference ()
-  ;; https://github.com/pprevos/citar-denote/issues/20
   "Insert a Denote link to a bibliographic note."
+  ;; https://github.com/pprevos/citar-denote/issues/20
   (interactive)
   (let* ((citekey (citar-select-refs
 		   :filter (citar-denote-has-notes)
@@ -473,7 +489,7 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
 
 ;;;###autoload
 (defun citar-denote-find-citation ()
-  "Find a citation in Denote files."
+  "Find a Denote file that cites a bibliographic entry."
   (interactive)
   (let* ((citations (citar-denote-extract-citations))
          (citekey (citar-select-ref
@@ -511,8 +527,6 @@ If multiple entries are selected, the note is created for the first entry."
   "Open Citar showing bibliographic entries not cited or referenced in Denote."
   (interactive)
   (citar-open (citar-denote-get-nocite)))
-
-(citar-open (citar-denote-get-nocite))
 
 ;; Citar integration
 
