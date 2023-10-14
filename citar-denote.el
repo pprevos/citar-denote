@@ -176,7 +176,7 @@ Configurable with `citar-denote-keyword'.")
     (delete-dups keywords)))
 
 (defun citar-denote--add-reference (citekey)
-  "Add reference line with CITEKEY in the front matter of the Denote file.
+  "Add reference line with CITEKEY in front matter of the Denote file.
 
 `citar-denote-add-citekey' is the interactive version of this function."
   (let ((file-type citar-denote-file-type))
@@ -203,6 +203,7 @@ Configurable with `citar-denote-keyword'.")
           (buffer-substring-no-properties (point) (line-end-position))
           trims trims) ";")))))
 
+;;;###autoload
 (defun citar-denote--get-notes (&optional citekeys)
   "Return has table of Denote files associated with the CITEKEYS citation keys.
 If CITEKEYS is omitted, return all Denote files tagged with
@@ -231,6 +232,7 @@ If CITEKEYS is omitted, return all Denote files tagged with
       (mapcar #'xref-match-item-location
               (xref-matches-in-files (format "@%s" citekey) files))))))
 
+;;;###autoload
 (defun citar-denote--has-notes ()
   "Return a list of all citekeys referenced in a Denote file.
 
@@ -320,14 +322,13 @@ Based on `citar-denote-title-format'."
      :multiple t
      :filter (citar-denote--has-citekeys unused))))
 
-;; Interactive functions
-
 ;;;###autoload
-(defun citar-denote-create-note (citekey &optional _entry)
+(defun citar-denote--create-note (citekey &optional _entry)
   "Create a bibliographic note for CITEKEY with properties ENTRY.
 
-The file type for the new note is determined by `citar-denote-file-type'.
-The title of the new note is set by `citar-denote-title-format'.
+The file type is determined by `citar-denote-file-type'.
+
+The title format is set by `citar-denote-title-format'.
 
 When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
   (denote
@@ -336,6 +337,8 @@ When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
    citar-denote-file-type
    (when citar-denote-subdir (denote-subdirectory-prompt)))
   (citar-denote--add-reference citekey))
+
+;; Interactive functions
 
 ;;;###autoload
 (defun citar-denote-open-note ()
@@ -420,19 +423,19 @@ When more than one bibliographic item is referenced, select item first."
 			 :filter
 			 (citar-denote--has-citekeys citekeys)))))
       (let ((new-citekeys (delete selected citekeys)))
-      (save-excursion
-	;; Remove references line
-	(goto-char (point-min))
-	(re-search-forward
-	 (citar-denote--reference-regex file-type))
-	(move-beginning-of-line nil)
-	(kill-line 1)
-	;; Add new line or remove file tags when applicable
-	(if (> (length new-citekeys) 0)
-	    (citar-denote--add-reference
-	     (mapconcat 'identity new-citekeys ";"))
-	  (citar-denote--remove-bibkey file))
-	(save-buffer)))
+        (save-excursion
+	  ;; Remove references line
+	  (goto-char (point-min))
+	  (re-search-forward
+	   (citar-denote--reference-regex file-type))
+	  (move-beginning-of-line nil)
+	  (kill-line 1)
+	  ;; Add new line or remove file tags when applicable
+	  (if (> (length new-citekeys) 0)
+	      (citar-denote--add-reference
+	       (mapconcat 'identity new-citekeys ";"))
+	    (citar-denote--remove-bibkey file))
+	  (save-buffer)))
     (user-error "No references in this buffer, or not a Denote file")))
 
 ;;;###autoload
@@ -512,11 +515,9 @@ When more than one bibliographic item is referenced, select item first."
 
 ;;;###autoload
 (defun citar-denote-reference-nocite ()
-  "Create note for bibliographic entries not cited or referenced in Denote files.
-
-If multiple entries are selected, the note is created for the first entry."
+  "Create note for bibliographic entries not cited or referenced in Denote files."
   (interactive)
-  (citar-create-note (car (citar-denote--get-nocite))))
+  (citar-denote--create-note (citar-denote--get-nocite)))
 
 ;; Citar integration
 
@@ -526,7 +527,7 @@ If multiple entries are selected, the note is created for the first entry."
         :items #'citar-denote--get-notes
         :hasitems #'citar-denote--has-notes
         :open #'find-file
-        :create #'citar-denote-create-note)
+        :create #'citar-denote--create-note)
   "Instructing citar to use citar-denote functions.")
 
 (defconst citar-denote-orig-source
