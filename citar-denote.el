@@ -6,7 +6,7 @@
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
 ;; Version: 1.8
-;; Package-Requires: ((emacs "28.1") (citar "1.1") (denote "1.2.0") (dash "2.19.1"))
+;; Package-Requires: ((emacs "28.1") (citar "1.3") (denote "2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -137,7 +137,7 @@ PROPERTY-LIST is a plist that consists of two elements:
 The default assumes \"_bib\" tag is part of the file name.
 Configurable with `citar-denote-keyword'.")
 
-(defvar citar-denote-citekey-regex "@[a-zA-Z0-9:?-]+"
+(defvar citar-denote-citekey-regex "@[a-zA-Z0-9:?-_]+"
   "Regular expression to extract citation keys from a text.")
 
 ;; Auxiliary functions
@@ -204,7 +204,6 @@ Configurable with `citar-denote-keyword'.")
           trims trims) ";")))))
 
 (defun citar-denote--get-notes (&optional citekeys)
-  ;; TODO: Use xref to find references?
   "Return has table of Denote files associated with the CITEKEYS citation keys.
 If CITEKEYS is omitted, return all Denote files tagged with
 `citar-denote-keyword'."
@@ -438,7 +437,7 @@ When more than one bibliographic item is referenced, select item first."
 
 ;;;###autoload
 (defun citar-denote-find-reference ()
-  "Find Denote file(s) citing the current reference(s).
+  "Find Denote file(s) citing one of the current reference(s).
 
 When more than one bibliographic item is referenced, select item first."
   (interactive)
@@ -451,9 +450,7 @@ When more than one bibliographic item is referenced, select item first."
                             (citar-select-ref
                              :filter
                              (citar-denote--has-citekeys citekeys)))))
-               (files
-                (delete file
-                        (citar-denote--retrieve-cite-files citekey))))
+               (files (delete file (citar-denote--retrieve-cite-files citekey))))
           (cond
            (files
             (find-file (denote-get-path-by-id
@@ -463,16 +460,15 @@ When more than one bibliographic item is referenced, select item first."
             (search-forward citekey))
            ((null citekey)
             (when (yes-or-no-p
-                   "Current buffer does not reference a citation key.  Add a reference ?")
+                   "This is not a bibliographic note.  Add a reference ?")
               (citar-denote-add-citekey)
               (citar-denote-find-reference)))
-           (t
-            (user-error "No citation found in other Denote files"))))
+           (t (user-error "No citation found in other Denote files"))))
       (user-error "Buffer is not a Denote file"))))
 
 ;;;###autoload
 (defun citar-denote-link-reference ()
-  "Insert a Denote link to a bibliographic note."
+  "Insert a Denote link to a bibliographic note using Citar selection."
   ;; https://github.com/pprevos/citar-denote/issues/20
   (interactive)
   (let* ((citekey (citar-select-refs
@@ -565,4 +561,5 @@ If multiple entries are selected, the note is created for the first entry."
     (citar-denote-reset)))
 
 (provide 'citar-denote)
+
 ;;; citar-denote.el ends here
