@@ -310,7 +310,7 @@ Based on `citar-denote-title-format'."
           (t citekey))))
 
 (defun citar-denote--get-nocite ()
-  "Return list of citekey(s) of Citar entries not cited or referenced in Denote files."
+  "Select from Citar entries not cited or referenced in Denote files."
   (let* ((all-items (hash-table-keys (citar-get-entries)))
          (used-citations (citar-denote--extract-citations))
          (references
@@ -318,6 +318,15 @@ Based on `citar-denote-title-format'."
          (all-citations
           (delete-dups (append used-citations references)))
          (unused (-difference all-items all-citations)))
+    (citar-select-refs
+     :multiple t
+     :filter (citar-denote--has-citekeys unused))))
+
+(defun citar-denote--get-non-referenced (file)
+  "Select from Citar entries not already reference in FILE."
+  (let* ((all-items (hash-table-keys (citar-get-entries)))
+         (references (citar-denote--retrieve-references file))
+         (unused (-difference all-items references)))
     (citar-select-refs
      :multiple t
      :filter (citar-denote--has-citekeys unused))))
@@ -388,12 +397,14 @@ When more than one bibliographic item is referenced, select item first."
 
 ;;;###autoload
 (defun citar-denote-add-citekey ()
-  "Add citation key(s) to existing note or convert to a bibliographic note."
+  "Add citation key(s) to existing note.
+
+Convert note to a bibliographic note when no existing reference exists."
   (interactive)
   (if-let* ((file (buffer-file-name))
             ((denote-file-is-note-p file))
             (file-type (denote-filetype-heuristics file))
-            (citekeys (citar-select-refs))
+            (citekeys (citar-denote--get-non-referenced file))
             (references (mapconcat 'identity citekeys ";")))
       ;; Check whether reference line already exists
       (if-let (keys (citar-denote--retrieve-references file))
