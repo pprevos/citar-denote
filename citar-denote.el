@@ -1,11 +1,11 @@
-;;; citar-denote.el --- Minor mode to integrate Citar and Denote -*- lexical-binding: t -*-
+;;; citar-denote.el --- Minor mode integrating Citar and Denote -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022-2023 Peter Prevos
 
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 1.8
+;; Version: 1.8.1
 ;; Package-Requires: ((emacs "28.1") (citar "1.3") (denote "2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -27,7 +27,7 @@
 ;;
 ;; A minor-mode integrating 'citar' and 'denote'.
 ;;
-;; This package provides functions create and work with bibliographic notes.
+;; This package provides functions to create and manage bibliographic notes.
 ;;
 ;; https://lucidmanager.org/productivity/bibliographic-notes-in-emacs-with-citar-denote/
 ;;
@@ -71,10 +71,13 @@ Please note that citations are not supported in plain text."
           (const :tag "Plain text" text)))
 
 (defcustom citar-denote-subdir 'nil
-  "Ask for a subdirectory when creating a new bibliographic note.
-
-When creating a new bibliographic note, the user will be asked for a directory."
+  "Ask for a subdirectory when creating a new bibliographic note."
   ;; https://github.com/pprevos/citar-denote/issues/11
+  :group 'citar-denote
+  :type 'boolean)
+
+(defcustom citar-denote-signature 'nil
+  "Ask for a signature when creating a new bibliographic note."
   :group 'citar-denote
   :type 'boolean)
 
@@ -104,7 +107,7 @@ For \"author-year\" and \"author-year-title\" you can configure:
   :type  'integer)
 
 (defcustom citar-denote-title-format-andstr "and"
-  "Connecting string for authors in \"author-year\" for `citar-denote-note-title`."
+  "Connecting word for authors in \"author-year\" for `citar-denote-note-title`."
   :group 'citar-denote
   :type  'string)
 
@@ -143,13 +146,13 @@ Configurable with `citar-denote-keyword'.")
 ;; Auxiliary functions
 
 (defun citar-denote--reference-format (file-type)
-  "Return the reference format associated to FILE-TYPE from `citar-denote-file-types'."
+  "Return reference format for FILE-TYPE from `citar-denote-file-types'."
   (plist-get
    (alist-get file-type citar-denote-file-types)
    :reference-format))
 
 (defun citar-denote--reference-regex (file-type)
-  "Return the reference regex associated to FILE-TYPE from `citar-denote-file-types'."
+  "Return reference regex for FILE-TYPE from `citar-denote-file-types'."
   (plist-get
    (alist-get file-type citar-denote-file-types)
    :reference-regex))
@@ -335,16 +338,21 @@ Based on `citar-denote-title-format'."
 (defun citar-denote--create-note (citekey &optional _entry)
   "Create a bibliographic note for CITEKEY with properties ENTRY.
 
-The file type is determined by `citar-denote-file-type'.
+The note file type is determined by `citar-denote-file-type'.
 
 The title format is set by `citar-denote-title-format'.
 
-When `citar-denote-subdir' is non-nil, prompt for a subdirectory."
+When `citar-denote-subdir' is non-nil, prompt for a subdirectory.
+
+When `citar-denote-signature' is non-nil, prompt for a signature"
   (denote
    (read-string "Title: " (citar-denote--generate-title citekey))
    (citar-denote--keywords-prompt citekey)
    citar-denote-file-type
-   (when citar-denote-subdir (denote-subdirectory-prompt)))
+   (when citar-denote-subdir (denote-subdirectory-prompt))
+   nil
+   nil
+   (when citar-denote-signature (denote-signature-prompt)))
   (citar-denote--add-reference citekey))
 
 ;; Interactive functions
@@ -379,7 +387,7 @@ When more than one bibliographic item is referenced, select item first."
 
 ;;;###autoload
 (defun citar-denote-open-reference-entry ()
-  "Open bibliographic source file associated with a bibliographic reference.
+  "Open BibTeX or JSON file associated with a bibliographic reference.
 
 When more than one bibliographic item is referenced, select item first."
   (interactive)
@@ -512,6 +520,12 @@ When more than one bibliographic item is referenced, select item first."
     (search-forward citekey)))
 
 ;;;###autoload
+(defun citar-denote-nocite ()
+  "Open Citar with bibliographic entries not cited or referenced in Denote."
+  (interactive)
+  (citar-open (citar-denote--get-nocite)))
+
+;;;###autoload
 (defun citar-denote-cite-nocite ()
   "Cite bibliographic entries not cited or referenced in Denote files."
   (interactive)
@@ -524,11 +538,10 @@ When more than one bibliographic item is referenced, select item first."
   'citar-denote-cite-nocite
   "1.6")
 
-;;;###autoload
-(defun citar-denote-reference-nocite ()
-  "Create note for bibliographic entries not cited or referenced in Denote files."
-  (interactive)
-  (citar-denote--create-note (citar-denote--get-nocite)))
+(define-obsolete-function-alias
+  'citar-denote-reference-nocite
+  'citar-denote-nocite
+  "1.8.1")
 
 ;; Citar integration
 
