@@ -81,6 +81,11 @@ Please note that citations are not supported in plain text."
   :group 'citar-denote
   :type 'boolean)
 
+(defcustom citar-denote-template 'nil
+  "Ask for a template when creating a new bibliographic note."
+  :group 'citar-denote
+  :type 'boolean)
+
 (defcustom citar-denote-title-format "title"
   "Title format for new bibliographic notes.
 
@@ -178,19 +183,19 @@ Configurable with `citar-denote-keyword'.")
                      choice)))
     (delete-dups keywords)))
 
-(defun citar-denote--add-reference (citekey)
-  "Add reference line with CITEKEY in front matter of the Denote file.
+(defun citar-denote--add-reference (citekey file-type)
+  "Add reference with CITEKEY in front matter of the file with FILE-TYPE.
 
 `citar-denote-add-citekey' is the interactive version of this function."
-  (let ((file-type citar-denote-file-type))
-    (save-excursion
-      (goto-char (point-min))
-      (re-search-forward "^\n" nil t)
-      (forward-line -1)
-      (if (not (eq file-type 'org))
-          (forward-line -1))
-      (insert
-       (format (citar-denote--reference-format file-type) citekey)))))
+  (message citekey)
+  (save-excursion
+    (goto-char (point-min))
+    (re-search-forward "^\n" nil t)
+    (forward-line -1)
+    (if (not (eq file-type 'org))
+        (forward-line -1))
+    (insert
+     (format (citar-denote--reference-format file-type) citekey))))
 
 (defun citar-denote--retrieve-references (file)
   "Return reference citekey(s) from FILE front matter."
@@ -277,6 +282,7 @@ See documentation for `citar-has-notes'."
      (mapcar
       (lambda (cite)
         (replace-regexp-in-string
+         ;; Remove non-citation-text
          "@\\|\\].*\\|;" ""
          (substring
           cite (string-match citar-denote-citekey-regex cite))))
@@ -351,9 +357,9 @@ When `citar-denote-signature' is non-nil, prompt for a signature"
    citar-denote-file-type
    (when citar-denote-subdir (denote-subdirectory-prompt))
    nil
-   nil
+   (when citar-denote-template (denote-template-prompt))
    (when citar-denote-signature (denote-signature-prompt)))
-  (citar-denote--add-reference citekey))
+  (citar-denote--add-reference citekey citar-denote-file-type))
 
 ;; Interactive functions
 
@@ -410,21 +416,21 @@ When more than one bibliographic item is referenced, select item first."
 Convert note to a bibliographic note when no existing reference exists."
   (interactive)
   (if-let* ((file (buffer-file-name))
-            ((denote-file-is-note-p file))
             (file-type (denote-filetype-heuristics file))
+            ((denote-file-is-note-p file))
             (citekeys (citar-denote--get-non-referenced file))
             (references (mapconcat 'identity citekeys ";")))
       ;; Check whether reference line already exists
       (if-let (keys (citar-denote--retrieve-references file))
-          ;; Append reference list
+          ;; Append existing reference
           (save-excursion
             (goto-char (point-min))
             (re-search-forward (citar-denote--reference-regex file-type))
             (end-of-line)
             (insert (concat ";" references))
             (save-buffer))
-        ;; Add new citation keys
-        (progn (citar-denote--add-reference references)
+        ;; Add new reference line
+        (progn (citar-denote--add-reference references file-type)
                (denote-keywords-add (list citar-denote-keyword))
                (save-buffer)))
     (user-error "Buffer is not a Denote file")))
@@ -452,7 +458,8 @@ Convert note to a bibliographic note when no existing reference exists."
 	  ;; Add new line or remove file tags when applicable
 	  (if (> (length new-citekeys) 0)
 	      (citar-denote--add-reference
-	       (mapconcat 'identity new-citekeys ";"))
+	       (mapconcat 'identity new-citekeys ";")
+               file-type)
 	    (citar-denote--remove-bibkey file))
 	  (save-buffer)))
     (user-error "No references in this buffer, or not a Denote file")))

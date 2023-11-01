@@ -1,19 +1,22 @@
 [[https://melpa.org/#/citar-denote][file:https://melpa.org/packages/citar-denote-badge.svg]]    [[https://stable.melpa.org/#/citar-denote][file:https://stable.melpa.org/packages/citar-denote-badge.svg]]
 
-A minor-mode integrating the Emacs [[https://github.com/emacs-citar/citar][Citar]] and [[https://protesilaos.com/emacs/denote][Denote]] packages to enable managing bibliographic notes and citations.
+A minor-mode integrating the Emacs [[https://github.com/emacs-citar/citar][Citar]] and [[https://protesilaos.com/emacs/denote][Denote]] packages to enable create managing bibliographic notes and citations.
 
-For more information read the [[http://lucidmanager.org/productivity/citar-denote-managing-bibliographic-notes-in-emacs/][citar-denote manual]] as part of the /Emacs Writing Studio/.
+For more information read the [[http://lucidmanager.org/productivity/citar-denote-managing-bibliographic-notes-in-emacs/][citar-denote manual]], which is part of the /Emacs Writing Studio/.
 
 * Installation and configuration
-This package is available in MELPA. You can install it with  John Wiegley's [[https://github.com/jwiegley/use-package][Use-Package]]. The example below includes all configurable variables and the package defaults. You can either remove these entries or configure to your preferences. All these variables are also configurable with the customisation menu. The suggested keyboard bindings use the /Emacs Writing Studio/ keybinding prefix.
+This package is available in MELPA. The example below includes all configurable variables and the package defaults. You can either remove these entries or configure to your preferences.
 
-#+begin_src elisp
+#+begin_src elisp :results none
   (use-package citar-denote
     :custom
-    ;; Use package defaults
+    ;; Allow multiple notes per bibliographic entry
     (citar-open-always-create-notes nil)
+    ;; Use package defaults
     (citar-denote-file-type 'org)
     (citar-denote-subdir nil)
+    (citar-denote-signature nil)
+    (citar-denote-template nil)
     (citar-denote-keyword "bib")
     (citar-denote-use-bib-keywords nil)
     (citar-denote-title-format "title")
@@ -22,23 +25,50 @@ This package is available in MELPA. You can install it with  John Wiegley's [[ht
     :init
     (citar-denote-mode)
     ;; Bind all available commands
-    :bind (("C-c w c c" . citar-create-note)
-           ("C-c w c n" . citar-denote-open-note)
-           ("C-c w c d" . citar-denote-dwim)
-           ("C-c w c e" . citar-denote-open-reference-entry)
-           ("C-c w c a" . citar-denote-add-citekey)
-           ("C-c w c k" . citar-denote-remove-citekey)
-           ("C-c w c r" . citar-denote-find-reference)
-           ("C-c w c f" . citar-denote-find-citation)
-           ("C-c w c l" . citar-denote-link-reference)))
+    :bind (("C-c w c" . citar-create-note)
+           ("C-c w n" . citar-denote-open-note)
+           ("C-c w d" . citar-denote-dwim)
+           ("C-c w e" . citar-denote-open-reference-entry)
+           ("C-c w a" . citar-denote-add-citekey)
+           ("C-c w k" . citar-denote-remove-citekey)
+           ("C-c w r" . citar-denote-find-reference)
+           ("C-c w l" . citar-denote-link-reference)
+           ("C-c w f" . citar-denote-find-citation)
+           ("C-c w x" . citar-denote-nocite)
+           ("C-c w y" . citar-denote-cite-nocite)))
 #+end_src
 
-* Citar Configuration
-You can use the standard Citar configuration, and there is no need to change any settings (including templates) related to bibliographic notes, as Citar-Denote takes over the note-taking functionality in Citar. 
+You can use the standard configurations for Citar and Denote. Citar-Denote takes over the note-taking functionality in Citar.
+
+The =minimum-config.el= file in this repository provides a minimum working example for testing. It requires [[https://github.com/jwiegley/use-package][use-package]] to be available (built-in from Emacs 29).
 
 * Acknowledgements
 This code would only have existed with the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus.
 
-In addition, Joel Lööw and Noboru Ota added significant contributions, without which this package would be useless. Finally, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon, and Jonathan Sahar provided valuable suggestions to extend the functionality.
+In addition, Joel Lööw and Noboru Ota added significant contributions, without which this package would be useless. Finally, Troy Figiel , Taha Aziz Ben Ali, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon, and Jonathan Sahar provided valuable suggestions to extend the functionality.
 
 Feel free to raise an issue here on GitHub if you have any questions or find bugs or suggestions for enhanced functionality.
+
+* Change log
+** Version 1.8.1 <2023-11-01 Wed>
+- Commenced Change Log.
+- Added =minimum-config.el= to provide minimal configuration.
+- Added ~citar-denote-nocite~ function to open Citar menu with all bibliographic entries neither cited nor referenced in any Denote file. This negates the need for ~citar-denote-reference-nocite~ because notes can be created from within the Citar menu.
+- Existing reference removed from Citar selections when adding a new reference to a note.
+- Added ~citar-denote-signature~ variable to allow adding signatures to new notes.
+- Fixed bug in ~citar-denote-add-citekey~ and ~citar-denote-remove-citekey~ when using multiple file types.
+
+** Version 1.8
+- Fixing bugs and improve package documentation.
+- Marked private functions with double dash
+- Updated ~citar-denote-citekey-regex~ to detect citations with multiple entries
+- Updated Citar-Denote manual in [[https://lucidmanager.org/productivity/citar-denote-managing-bibliographic-notes-in-emacs/][Emacs Writing Studio]].
+
+** Version 1.7
+- Code refactoring and pretty-printing
+- Updated function documentation
+- Bug fix to ~citar-denote-remove-citekey~
+- Package documentation update
+- Code refactoring
+- Added ~citar-denote-link-reference~ to insert a Denote link to an existing bibliographic note.
+- Added ~citar-denote-find-citation~ to find a citation in your Denote files.
