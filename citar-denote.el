@@ -163,7 +163,7 @@ Configurable with `citar-denote-keyword'.")
    :reference-regex))
 
 (defun citar-denote--extract-keywords (citekey)
-  "Extract keywords of CITEKEY from the bibliography."
+  "Extract keywords of CITEKEY from BibTeX entry."
   (if-let* ((KeyWords (citar-get-value "keywords" citekey))
             (keywords (downcase KeyWords))
             (filetags (split-string keywords ", *")))
@@ -173,15 +173,13 @@ Configurable with `citar-denote-keyword'.")
 (defun citar-denote--keywords-prompt (citekey)
   "Prompt for one or more keywords and include `citar-denote-keyword'.
 
-  When `citar-denote-use-bib-keywords' is not nil, also use keywords
-  from bibliographic entry with CITEKEY."
-  (let* ((choice (append (list citar-denote-keyword)
-                         (denote-keywords-prompt)))
-         (keywords (if citar-denote-use-bib-keywords
-                       (append choice
-                               (citar-denote--extract-keywords citekey))
-                     choice)))
-    (delete-dups keywords)))
+When `citar-denote-use-bib-keywords' is not nil, use keywords from entry with CITEKEY."
+  (let ((keywords (if citar-denote-use-bib-keywords
+		     (citar-denote--extract-keywords citekey)
+		     (denote-keywords-sort (denote--keywords-crm
+		       (delete citar-denote-keyword
+			       (denote-keywords)))))))
+    (append keywords (list citar-denote-keyword))))
 
 (defun citar-denote--add-reference (citekey file-type)
   "Add reference with CITEKEY in front matter of the file with FILE-TYPE.
@@ -214,6 +212,7 @@ Configurable with `citar-denote-keyword'.")
 ;;;###autoload
 (defun citar-denote--get-notes (&optional citekeys)
   "Return hash table of Denote files associated with CITEKEYS.
+
 If CITEKEYS is omitted, return all Denote files tagged with
 `citar-denote-keyword'."
   (let ((files (make-hash-table :test 'equal)))
