@@ -213,7 +213,7 @@ Configurable with `citar-denote-keyword'.")
 
 ;;;###autoload
 (defun citar-denote--get-notes (&optional citekeys)
-  "Return has table of Denote files associated with the CITEKEYS citation keys.
+  "Return hash table of Denote files associated with CITEKEYS.
 If CITEKEYS is omitted, return all Denote files tagged with
 `citar-denote-keyword'."
   (let ((files (make-hash-table :test 'equal)))
@@ -275,18 +275,21 @@ See documentation for `citar-has-notes'."
   (let* ((xrefs (xref-matches-in-files
                  citar-denote-citekey-regex
                  (denote-directory-text-only-files)))
-         (citations (mapcar #'substring-no-properties
-                            (mapcar #'xref-match-item-summary xrefs))))
-    ;; Clean results
-    (delete-dups
-     (mapcar
-      (lambda (cite)
-        (replace-regexp-in-string
-         ;; Remove non-citation-text
-         "@\\|\\].*\\|;" ""
-         (substring
-          cite (string-match citar-denote-citekey-regex cite))))
-      citations))))
+         (citation-lines (mapcar #'substring-no-properties
+                                 (mapcar #'xref-match-item-summary
+                                         xrefs)))
+         (citations (delete-dups
+		     (mapcar
+		      (lambda (cite) (replace-regexp-in-string
+				      ;; Remove non-citation-text
+				      "@\\|\\].*\\|;" ""
+				      (substring cite
+						 (string-match
+						  citar-denote-citekey-regex
+						  cite))))
+		      citation-lines))))
+    (cl-intersection (hash-table-keys (citar-get-entries))
+                     citations :test 'string=)))
 
 (defun citar-denote--generate-title (citekey)
   "Generate title for new bibliographic note using CITEKEY.
