@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 1.8.1
+;; Version: 1.9
 ;; Package-Requires: ((emacs "28.1") (citar "1.3") (denote "2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -352,7 +352,8 @@ The title format is set by `citar-denote-title-format'.
 
 When `citar-denote-subdir' is non-nil, prompt for a subdirectory.
 
-When `citar-denote-signature' is non-nil, prompt for a signature"
+When `citar-denote-signature' is non-nil, prompt for a signature. If no
+signature is entered, use the CITEKEY."
   (denote
    (read-string "Title: " (citar-denote--generate-title citekey))
    (citar-denote--keywords-prompt citekey)
@@ -360,7 +361,9 @@ When `citar-denote-signature' is non-nil, prompt for a signature"
    (when citar-denote-subdir (denote-subdirectory-prompt))
    nil
    (when citar-denote-template (denote-template-prompt))
-   (when citar-denote-signature (denote-signature-prompt)))
+   (when citar-denote-signature (denote-signature-prompt
+                                 citekey
+                                 "Signature (empty to use citation key)")))
   (citar-denote--add-reference citekey citar-denote-file-type))
 
 ;; Interactive functions
