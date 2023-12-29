@@ -50,13 +50,22 @@ In addition, Joel Lööw and Noboru Ota added significant contributions, without
 Feel free to raise an issue here on GitHub if you have any questions or find bugs or suggestions for enhanced functionality.
 
 * Change log
-** Version 1.8.1 <2023-11-01 Wed>
+** Version 2.0
 - Commenced Change Log.
-- Added =minimum-config.el= to provide minimal configuration.
-- Added ~citar-denote-nocite~ function to open Citar menu with all bibliographic entries neither cited nor referenced in any Denote file. This negates the need for ~citar-denote-reference-nocite~ because notes can be created from within the Citar menu.
-- Existing reference removed from Citar selections when adding a new reference to a note.
-- Added ~citar-denote-signature~ variable to allow adding signatures to new notes.
-- Fixed bug in ~citar-denote-add-citekey~ and ~citar-denote-remove-citekey~ when using multiple file types.
+- Updated all functions for full compatibility with Denote 2.2
+- Added =minimum-config.el= to provide minimal configuration example.
+- Added ~citar-denote-signature~ variable to add signatures for new bibliographic notes. When entering an empty string as signature, the citation key is used as signature.
+- The ~citar-denote-template~ variable defines whether a not template is used.
+- Added ~citar-denote-nocite~ function to open Citar completion menu with all bibliographic entries neither cited nor referenced in any Denote file. This negates the need for ~citar-denote-reference-nocite~ because notes can be created from within the Citar menu.
+- Existing reference removed from Citar completion menu when adding a new reference to a note.
+- Fixed a bug in ~citar-denote-add-citekey~ and ~citar-denote-remove-citekey~ when using multiple file types.
+- Removed false positives from ~citar-denote--extract-citations~.
+- Behaviour of ~citar-denote-use-bib-keywords~ changed. When not-nil, don't prompt for keywords and only use those in the bibliography.
+- The ~citar-denote-keyword~ ("bib") is removed from the keyword completion menu to avoid confusion.
+- Resolved bug for when ~citar-denote-keyword~ is =nil=.
+- ~citar-denote-link-reference~ check that file is a Denote file and fixed linking bug.
+- Added ~citar-denote--select-file-using-title~ to select a Denote filename using their title in the completion menu.
+- When only one candidate available in ~citar-denote-find-citation~, skip the section menu.
 
 ** Version 1.8
 - Fixing bugs and improve package documentation.
