@@ -595,13 +595,13 @@ When more than one bibliographic item is referenced, select item first."
 
 ;; Initialise minor mode
 
-(defun citar-denote-setup ()
+(defun citar-denote--setup ()
   "Setup `citar-denote-mode'."
   (citar-register-notes-source
    'citar-denote-source citar-denote-config)
   (setq citar-notes-source 'citar-denote-source))
 
-(defun citar-denote-reset ()
+(defun citar-denote--reset ()
   "Reset citar to default values."
   (setq citar-notes-source citar-denote-orig-source)
   (citar-remove-notes-source 'citar-denote))
@@ -613,8 +613,8 @@ When more than one bibliographic item is referenced, select item first."
   :group 'citar
   :lighter " citar-denote"
   (if citar-denote-mode
-      (citar-denote-setup)
-    (citar-denote-reset)))
+      (citar-denote--setup)
+    (citar-denote--reset)))
 
 (provide 'citar-denote)
 ;;; citar-denote.el ends here
