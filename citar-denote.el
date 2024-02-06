@@ -220,8 +220,7 @@ If CITEKEYS is omitted, return all Denote files tagged with
 `citar-denote-keyword'."
   (let ((files (make-hash-table :test 'equal)))
     (prog1 files
-      (dolist (file (denote-directory-files-matching-regexp
-                     citar-denote-files-regexp))
+      (dolist (file (denote-directory-files citar-denote-files-regexp))
         (let ((keys-in-file (citar-denote--retrieve-references file)))
           (dolist (key keys-in-file)
             (if citekeys
