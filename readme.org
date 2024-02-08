@@ -9,6 +9,7 @@ This package is available in MELPA. The example below includes all configurable 
 
 #+begin_src elisp :results none
   (use-package citar-denote
+    :after citar denote embark
     :custom
     ;; Allow multiple notes per bibliographic entry
     (citar-open-always-create-notes nil)
@@ -50,6 +51,10 @@ In addition, Joel Lööw and Noboru Ota added significant contributions, without
 Feel free to raise an issue here on GitHub if you have any questions or find bugs or suggestions for enhanced functionality.
 
 * Change log
+** Version 2.0.1
+- Updated minor mode definition
+- Updated =readme.org= and =minimum-config.el= to define order or installation
+
 ** Version 2.0
 - Commenced Change Log.
 - Updated all functions for full compatibility with Denote 2.2
