@@ -577,19 +577,18 @@ When more than one bibliographic item is referenced, select item first."
 
 (defconst citar-denote-config
   (list :name "Denote"
-        :category 'file
+        :category 'citar-denote-mode
         :items #'citar-denote--get-notes
         :hasitems #'citar-denote--has-notes
         :open #'find-file
         :create #'citar-denote--create-note)
   "Instructing citar to use citar-denote functions.")
 
-(defconst citar-denote-orig-source
+(defvar citar-denote--orig-source
   citar-notes-source
   "Store the `citar-notes-source' value prior to enabling `citar-denote-mode'.")
 
 (defvar citar-notes-source)
-
 (defvar citar-notes-sources)
 
 ;; Initialise minor mode
@@ -602,7 +601,7 @@ When more than one bibliographic item is referenced, select item first."
 
 (defun citar-denote--reset ()
   "Reset citar to default values."
-  (setq citar-notes-source citar-denote-orig-source)
+  (setq citar-notes-source citar-denote--orig-source)
   (citar-remove-notes-source 'citar-denote))
 
 ;;;###autoload
