@@ -1,12 +1,12 @@
 ;;; citar-denote.el --- Minor mode integrating Citar and Denote -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022-2023 Peter Prevos
+;; Copyright (C) 2022-2024 Peter Prevos
 
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 2.0.1
-;; Package-Requires: ((emacs "28.1") (citar "1.3") (denote "2.0") (dash "2.19.1"))
+;; Version: 2.0.2
+;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -27,8 +27,8 @@
 ;;
 ;; A minor-mode integrating 'citar' and 'denote'.
 ;;
-;; This package provides functions to create and manage bibliographic notes.
-;;
+;; Provides functions to create and manage bibliographic notes.
+;; Manual:
 ;; https://lucidmanager.org/productivity/bibliographic-notes-in-emacs-with-citar-denote/
 ;;
 ;;; Code:
@@ -43,15 +43,18 @@
 
 (defgroup citar-denote ()
   "Creating and accessing bibliography files with Citar and Denote."
-  :group 'files)
+  :group 'files
+  :link '(url-link :tag "Homepage" "https://lucidmanager.org/productivity/bibliographic-notes-in-emacs-with-citar-denote/"))
 
 (defcustom citar-denote-keyword "bib"
-  "Denote keyword (file tag) to indicate bibliographical notes."
+  "Denote keyword (file tag) to indicate bibliographical notes.
+Minimises the search space for connecting notes to a bibliography."
   :group 'citar-denote
   :type 'string)
 
 (defcustom citar-denote-use-bib-keywords nil
-  "Extract bibliographic keywords from bibliography and use as Denote keywords."
+  "Extract bibliographic keywords from bibliography and use as Denote keywords.
+Extracts keywords from comma-separated list in the `keywords' BibTeX field."
   ;; https://github.com/pprevos/citar-denote/issues/17
   :group 'citar-denote
   :type  'boolean)
@@ -61,12 +64,9 @@
 
 Default is `denote-file-type', or org if the former is nil.
 
-When the value is the symbol markdown-yaml, the file type is
-that of Markdown mode with front matter in YAML notation.
-Similarly, markdown-toml is Markdown with TOML syntax for the
-front matter.
-
-When the value is ‘text’, the file will be in text mode."
+When the value is markdown-yaml, the file type is of Markdown mode with front
+matter in YAML notation.  Similarly, markdown-toml is Markdown with TOML syntax
+as front matter.  When the value is ‘text’, the file will be in text mode."
   :group 'citar-denote
   :type '(choice
           (const :tag "Org mode (default)" org)
@@ -81,20 +81,21 @@ When the value is ‘text’, the file will be in text mode."
   :type 'boolean)
 
 (defcustom citar-denote-signature nil
-  "Ask for a signature when creating a new bibliographic note."
+  "Ask for a signature when creating a new bibliographic note.
+When no signature is entered, use the citation key."
   :group 'citar-denote
   :type 'boolean)
 
 (defcustom citar-denote-template nil
-  "Ask for a template when creating a new bibliographic note."
+  "Use a template when creating a new bibliographic note."
   :group 'citar-denote
   :type 'boolean)
 
 (defcustom citar-denote-title-format "title"
   "Title format for new bibliographic notes.
 
-- \"title\": Extract title (or short title) from entry
-- \"author-year\": Author-year citation style
+- \"title\": Extract title (or short title) from bibliographic entry
+- \"author-year\": Author-year citation style, e.g. Stallman (1981)
 - \"author-year-title\": Combine author, year and title
 - \"full\": Full citation
 - nil: BibTeX citekey
@@ -141,16 +142,17 @@ one of those specified in `citar-denote-file-type'.
 PROPERTY-LIST is a plist that consists of two elements:
 
 - `:reference-format' Front matter identifier for citation key.
-- `:reference-regex' Regexp to look for the citekey in a bibliographic notes.")
+- `:reference-regex' Regex to look for the citekey in front matter.")
 
 (defvar citar-denote-files-regexp (concat "_" citar-denote-keyword)
-  "Regular expression used to look for file names of bibliographic notes.
+  "Regular expression to look for file names of bibliographic notes.
 
 The default assumes \"_bib\" tag is part of the file name.
 Configurable with `citar-denote-keyword'.")
 
 (defvar citar-denote-citekey-regex "@[a-zA-Z0-9:?-_]+"
-  "Regular expression to extract citation keys from a text.")
+  "Regular expression to extract citation keys from a text.
+Matrices both Org mode and Markdown citations.")
 
 ;; Auxiliary functions
 
@@ -168,8 +170,7 @@ Configurable with `citar-denote-keyword'.")
 
 (defun citar-denote--extract-keywords (citekey)
   "Extract keywords of CITEKEY from BibTeX entry."
-  (if-let* ((KeyWords (citar-get-value "keywords" citekey))
-            (keywords (downcase KeyWords))
+  (if-let* ((keywords (downcase (citar-get-value "keywords" citekey)))
             (filetags (split-string keywords ", *")))
       (mapcar (lambda (kwd) (replace-regexp-in-string " " "-" kwd))
               filetags)))
@@ -177,7 +178,8 @@ Configurable with `citar-denote-keyword'.")
 (defun citar-denote--keywords-prompt (citekey)
   "Prompt for one or more keywords and include `citar-denote-keyword'.
 
-When `citar-denote-use-bib-keywords' is not nil, use keywords from entry with CITEKEY."
+When `citar-denote-use-bib-keywords' is not nil, use keywords from entry with
+citation key CITEKEY."
   (let ((keywords (if citar-denote-use-bib-keywords
 		      (citar-denote--extract-keywords citekey)
 		    (denote-keywords-sort (denote--keywords-crm
@@ -346,7 +348,7 @@ Based on `citar-denote-title-format'."
 
 (defun citar-denote--select-file-using-title (files)
   "Select a file name based on a list of note titles from a list of FILES."
-  (let* ((description-file-alist 
+  (let* ((description-file-alist
           (mapcar
            (lambda (file)
              (let ((file-type (denote-filetype-heuristics file)))
@@ -355,7 +357,6 @@ Based on `citar-denote-title-format'."
          (selected-description (completing-read "Select note: " description-file-alist))
          (selected-file (cdr (assoc selected-description description-file-alist))))
     selected-file))
-
 
 ;;;###autoload
 (defun citar-denote--create-note (citekey &optional _entry)
@@ -367,14 +368,14 @@ The title format is set by `citar-denote-title-format'.
 
 When `citar-denote-subdir' is non-nil, prompt for a subdirectory.
 
-When `citar-denote-signature' is non-nil, prompt for a signature. If no
+When `citar-denote-signature' is non-nil, prompt for a signature.  If no
 signature is entered, use the CITEKEY."
   (denote
    (read-string "Title: " (citar-denote--generate-title citekey))
    (citar-denote--keywords-prompt citekey)
    citar-denote-file-type
    (when citar-denote-subdir (denote-subdirectory-prompt))
-   nil 
+   nil
    (when citar-denote-template (denote-template-prompt))
    (when citar-denote-signature (denote-signature-prompt
                                  citekey
@@ -385,7 +386,8 @@ signature is entered, use the CITEKEY."
 
 ;;;###autoload
 (defun citar-denote-open-note ()
-  "Open a bibliographic note using Citar."
+  "Open a bibliographic note using Citar.
+Provides a selection list of all bibliographic entries with notes."
   (interactive)
   (let* ((citekeys (citar-select-refs :filter (citar-denote--has-notes)))
          (file (citar--select-resource
@@ -394,7 +396,8 @@ signature is entered, use the CITEKEY."
 
 ;;;###autoload
 (defun citar-denote-find-citation ()
-  "Find a Denote file that cites a bibliographic entry."
+  "Find a Denote file that cites a bibliographic entry.
+Provides a selection list of all bibliographic entries cities in Denote files."
   (interactive)
   (let* ((citations (citar-denote--extract-citations))
          (citekey (citar-select-ref
@@ -590,16 +593,13 @@ When more than one bibliographic item is referenced, select item first."
   citar-notes-source
   "Store the `citar-notes-source' value prior to enabling `citar-denote-mode'.")
 
-(defvar citar-notes-source)
-(defvar citar-notes-sources)
-
 ;; Initialise minor mode
 
 (defun citar-denote--setup ()
   "Setup `citar-denote-mode'."
   (citar-register-notes-source
-   'citar-denote-source citar-denote-config)
-  (setq citar-notes-source 'citar-denote-source))
+   'citar-denote citar-denote-config)
+  (setq citar-notes-source 'citar-denote))
 
 (defun citar-denote--reset ()
   "Reset citar to default values."
