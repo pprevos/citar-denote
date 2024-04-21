@@ -270,27 +270,40 @@ See documentation for `citar-has-notes'."
      file-type)
     (denote-rename-file-using-front-matter file t)))
 
+(defun citar-denote--extract-citations-blocks (line)
+  "Extract all Org mode citation blocks from LINE."
+  (let ((org-cite-regex "\\[\\(?:cite\\(?:/[a-z]\\)?\\)\\:@\\([^]]+\\)\\]")
+	(citation-blocks '())
+        (start 0))
+    (while (string-match org-cite-regex line start)
+      (push (match-string 0 line) citation-blocks)
+      (setq start (match-end 0)))
+    citation-blocks))
+
+(defun citar-denote--extract-citation-keys (string)
+  "Extracts all strings that match the regex '@[a-zA-Z0-9-_:?]+' from the given string.
+  Removes the '@' character from each match."
+  (let ((matches '())
+        (pos 0))
+    (while (string-match "@\\([a-zA-Z0-9-_:?]+\\)" string pos)
+      (setq matches (cons (match-string 1 string) matches))
+      (setq pos (match-end 0)))
+    (reverse matches)))
+
 (defun citar-denote--extract-citations ()
   "Extract citations from all Denote files."
   ;; Extract lines with citations
-  (let* ((xrefs (xref-matches-in-files
-                 citar-denote-citekey-regex
+  (let* ((xrefs (xref-matches-in-files "\\[cite:@.*\\]"
                  (denote-directory-text-only-files)))
          (citation-lines (mapcar #'substring-no-properties
                                  (mapcar #'xref-match-item-summary
                                          xrefs)))
-         (citations (delete-dups
-		     (mapcar
-		      (lambda (cite) (replace-regexp-in-string
-				      ;; Remove non-citation-text
-				      "@\\|\\].*\\|;" ""
-				      (substring cite
-						 (string-match
-						  citar-denote-citekey-regex
-						  cite))))
-		      citation-lines))))
-    (cl-intersection (hash-table-keys (citar-get-entries))
-                     citations :test 'string=)))
+         (citation-blocks (mapcar #'citar-denote--extract-citations-blocks
+				       citation-lines))
+	 (citation-blocks-flat  (apply #'append citation-blocks))
+	 (citations (mapcar #'citar-denote--extract-citation-keys
+			    citation-blocks-flat)))
+	 (apply #'append citations)))
 
 (defun citar-denote--generate-title (citekey)
   "Generate title for new bibliographic note using CITEKEY.
@@ -324,16 +337,15 @@ Based on `citar-denote-title-format'."
 
 (defun citar-denote--get-nocite ()
   "Select from Citar entries not cited or referenced in Denote files."
-  (let* ((all-items (hash-table-keys (citar-get-entries)))
-         (used-citations (citar-denote--extract-citations))
-         (references
-          (hash-table-keys (citar-denote--get-notes)))
-         (all-citations
-          (delete-dups (append used-citations references)))
-         (unused (-difference all-items all-citations)))
-    (citar-select-refs
-     :multiple t
-     :filter (citar-denote--has-citekeys unused))))
+  (if-let* ((all-items (hash-table-keys (citar-get-entries)))
+            (citations (citar-denote--extract-citations))
+            (references (hash-table-keys (citar-denote--get-notes)))
+            (all-citations (delete-dups (append used-citations references)))
+            (unused (-difference all-items all-citations)))
+      (citar-select-refs
+       :multiple t
+       :filter (citar-denote--has-citekeys unused))
+    nil))
 
 (defun citar-denote--get-non-referenced (file)
   "Select from Citar entries not already reference in FILE."
@@ -562,8 +574,10 @@ When more than one bibliographic item is referenced, select item first."
   "Cite bibliographic entries not cited or referenced in Denote files."
   (interactive)
   (if (denote-file-is-note-p (buffer-file-name))
-      (citar-insert-citation (citar-denote--get-nocite))
-    (user-error "Buffer is not a Denote file")))
+      (if-let (citations (citar-denote--get-nocite))
+	  (citar-insert-citation citations)
+	(message "All bibliogary entries have been cited or referenced"))
+    (message "Buffer is not a Denote file")))
 
 (define-obsolete-function-alias
   'citar-denote-find-nocite
