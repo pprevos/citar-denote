@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 2.0.2
+;; Version: 2.0.3
 ;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -214,7 +214,6 @@ citation key CITEKEY."
           (buffer-substring-no-properties (point) (line-end-position))
           trims trims) ";")))))
 
-;;;###autoload
 (defun citar-denote--get-notes (&optional citekeys)
   "Return hash table of Denote files associated with CITEKEYS.
 
@@ -243,7 +242,6 @@ If CITEKEYS is omitted, return all Denote files tagged with
       (mapcar #'xref-match-item-location
               (xref-matches-in-files (format "@%s" citekey) files))))))
 
-;;;###autoload
 (defun citar-denote--has-notes ()
   "Return a list of all citekeys referenced in a Denote file.
 
@@ -358,7 +356,6 @@ Based on `citar-denote-title-format'."
          (selected-file (cdr (assoc selected-description description-file-alist))))
     selected-file))
 
-;;;###autoload
 (defun citar-denote--create-note (citekey &optional _entry)
   "Create a bibliographic note for CITEKEY with properties ENTRY.
 
