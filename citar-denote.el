@@ -438,7 +438,7 @@ When more than one bibliographic item is referenced, select item first."
 Add a reference? ")
           (citar-denote-add-citekey)
           (citar-denote-dwim))
-      (user-error "Buffer is not a Denote file"))))
+      (message "Buffer is not a Denote file"))))
 
 ;;;###autoload
 (defun citar-denote-open-reference-entry ()
@@ -457,7 +457,7 @@ When more than one bibliographic item is referenced, select item first."
 Add a reference? ")
           (citar-denote-add-citekey)
           (citar-denote-open-reference-entry))
-      (user-error "Buffer is not a Denote file"))))
+      (message "Buffer is not a Denote file"))))
 
 ;;;###autoload
 (defun citar-denote-add-citekey ()
@@ -483,7 +483,7 @@ Convert note to a bibliographic note when no existing reference exists."
         (progn (citar-denote--add-reference references file-type)
                (denote-keywords-add (list citar-denote-keyword))
                (save-buffer)))
-    (user-error "Buffer is not a Denote file")))
+    (message "Buffer is not a Denote file")))
 
 ;;;###autoload
 (defun citar-denote-remove-citekey ()
@@ -512,7 +512,7 @@ Convert note to a bibliographic note when no existing reference exists."
                file-type)
 	    (citar-denote--remove-bibkey file))
 	  (save-buffer)))
-    (user-error "No references in this buffer, or not a Denote file")))
+    (message "No references in this buffer, or not a Denote file")))
 
 ;;;###autoload
 (defun citar-denote-find-reference ()
@@ -538,9 +538,9 @@ When more than one bibliographic item is referenced, select item first."
             (goto-char (point-min))
             (search-forward citekey))
            ((null citekey)
-            (user-error "This is not a bibliographic note"))
-           (t (user-error "No citation found in other Denote files"))))
-      (user-error "Buffer is not a Denote file"))))
+            (message "This is not a bibliographic note"))
+           (t (message "No citation found in other Denote files"))))
+      (message "Buffer is not a Denote file"))))
 
 ;;;###autoload
 (defun citar-denote-link-reference ()
@@ -561,7 +561,7 @@ When more than one bibliographic item is referenced, select item first."
                            "Description: "
                            (denote--link-get-description file file-type))))
         (denote-link file file-type description))
-    (user-error "Buffer is not a Denote file")))
+    (message "Buffer is not a Denote file")))
 
 ;;;###autoload
 (defun citar-denote-nocite ()
