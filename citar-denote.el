@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 2.0.3
+;; Version: 2.1
 ;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -303,7 +303,7 @@ See documentation for `citar-has-notes'."
 	 (citation-blocks-flat  (apply #'append citation-blocks))
 	 (citations (mapcar #'citar-denote--extract-citation-keys
 			    citation-blocks-flat)))
-	 (apply #'append citations)))
+	 (delete-dups (apply #'append citations))))
 
 (defun citar-denote--generate-title (citekey)
   "Generate title for new bibliographic note using CITEKEY.
@@ -336,15 +336,15 @@ Based on `citar-denote-title-format'."
           (t citekey))))
 
 (defun citar-denote--get-nocite ()
-  "Select from Citar entries not cited or referenced in Denote files."
-  (if-let* ((all-items (hash-table-keys (citar-get-entries)))
+  "Select item(s) from Citar entries not cited or referenced in Denote files."
+  (if-let* ((bibliography (hash-table-keys (citar-get-entries)))
             (citations (citar-denote--extract-citations))
             (references (hash-table-keys (citar-denote--get-notes)))
-            (all-citations (delete-dups (append used-citations references)))
-            (unused (-difference all-items all-citations)))
+	    (union (cl-union citations references))
+	    (nocite (cl-set-difference bibliography union :test #'string=)))
       (citar-select-refs
        :multiple t
-       :filter (citar-denote--has-citekeys unused))
+       :filter (citar-denote--has-citekeys nocite))
     nil))
 
 (defun citar-denote--get-non-referenced (file)
@@ -578,6 +578,17 @@ When more than one bibliographic item is referenced, select item first."
 	  (citar-insert-citation citations)
 	(message "All bibliogary entries have been cited or referenced"))
     (message "Buffer is not a Denote file")))
+
+;;;###autoload
+(defun citar-denote-no-bibliography ()
+  "List citation keys referenced or cited in Denote, but not in bibliography."
+  (let* ((bibliography (hash-table-keys (citar-get-entries)))
+         (citations (citar-denote--extract-citations))
+         (setqreferences (hash-table-keys (citar-denote--get-notes)))
+	 (union (cl-union citations references))
+	 (nobib (cl-set-difference union bibliography :test #'string=)))
+    (message "Citations not in bibliography: %s"
+             (mapconcat #'identity nobib ", "))))
 
 (define-obsolete-function-alias
   'citar-denote-find-nocite
