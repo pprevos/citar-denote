@@ -2,7 +2,7 @@
 
 A minor-mode integrating the Emacs [[https://github.com/emacs-citar/citar][Citar]] and [[https://protesilaos.com/emacs/denote][Denote]] packages to enable create managing bibliographic notes and citations.
 
-For more information read the [[http://lucidmanager.org/productivity/citar-denote-managing-bibliographic-notes-in-emacs/][citar-denote manual]], which is part of the /Emacs Writing Studio/.
+For more information read the [[file:citar-denote.org][Citar-Denote Manual]] in this repository.
 
 * Installation and configuration
 This package is available in MELPA. The example below includes all configurable variables and the package defaults. You can either remove these entries or configure to your preferences.
@@ -13,7 +13,7 @@ This package is available in MELPA. The example below includes all configurable 
     :custom
     ;; Allow multiple notes per bibliographic entry
     (citar-open-always-create-notes nil)
-    ;; Use package defaults
+    ;; Package defaults
     (citar-denote-file-type 'org)
     (citar-denote-subdir nil)
     (citar-denote-signature nil)
@@ -32,6 +32,7 @@ This package is available in MELPA. The example below includes all configurable 
            ("C-c w e" . citar-denote-open-reference-entry)
            ("C-c w a" . citar-denote-add-citekey)
            ("C-c w k" . citar-denote-remove-citekey)
+           ("C-c w n" . citar-denote-no-bibliography)
            ("C-c w r" . citar-denote-find-reference)
            ("C-c w l" . citar-denote-link-reference)
            ("C-c w f" . citar-denote-find-citation)
@@ -41,7 +42,7 @@ This package is available in MELPA. The example below includes all configurable 
 
 You can use the standard configurations for Citar and Denote. Citar-Denote takes over the note-taking functionality in Citar.
 
-The =minimum-config.el= file in this repository provides a minimum working example for testing. It requires [[https://github.com/jwiegley/use-package][use-package]] to be available (built-in from Emacs 29).
+The =init.el= file in this =test= folder of this repository provides a minimum working example for testing. It requires [[https://github.com/jwiegley/use-package][use-package]] to be available (built-in from Emacs 29).
 
 * Acknowledgements
 This code would only have existed with the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus.
@@ -50,7 +51,13 @@ In addition, Joel Lööw and Noboru Ota added significant contributions, without
 
 Feel free to raise an issue here on GitHub if you have any questions or find bugs or suggestions for enhanced functionality.
 
-* Change log
+* Change Log
+** Version 2.1
+- Bug fixes in regex to find citations.
+- New function: ~citar-denote-no-bibliography~ lists all citations that do not appear in the global bibliography in the =*Messages*= buffer.
+- Updated function documentation.
+- Included Texinfo manual.
+  
 ** Version 2.02
 - Improved function docstrings
 - Updated example config
