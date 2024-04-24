@@ -580,14 +580,16 @@ When more than one bibliographic item is referenced, select item first."
     (message "Buffer is not a Denote file")))
 
 ;;;###autoload
-(defun citar-denote-no-bibliography ()
+(defun citar-denote-nobib ()
   "List citation keys referenced or cited in Denote, but not in bibliography."
+  (interactive)
   (let* ((bibliography (hash-table-keys (citar-get-entries)))
          (citations (citar-denote--extract-citations))
          (setqreferences (hash-table-keys (citar-denote--get-notes)))
 	 (union (cl-union citations references))
 	 (nobib (cl-set-difference union bibliography :test #'string=)))
-    (message "Citations not in bibliography: %s"
+    (message "%s citations not in bibliography: %s"
+             (length nobib)
              (mapconcat #'identity nobib ", "))))
 
 (define-obsolete-function-alias
@@ -603,7 +605,7 @@ When more than one bibliographic item is referenced, select item first."
 ;; Citar integration
 
 (defconst citar-denote-config
-  (list :name "Denote"
+  (list :name "Denote file"
         :category 'citar-denote-mode
         :items #'citar-denote--get-notes
         :hasitems #'citar-denote--has-notes
