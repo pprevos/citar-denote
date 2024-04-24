@@ -185,9 +185,9 @@ Configurable with `citar-denote-keyword'.")
   "Extract keywords of CITEKEY from BibTeX entry.
 
 Used when `citar-denote-use-bib-keywords' is non-nil."
-  (if-let* ((keywords (downcase (citar-get-value "keywords" citekey)))
+  (if-let* ((keywords (citar-get-value "keywords" citekey))
             (filetags (split-string keywords ", *")))
-      (mapcar (lambda (kwd) (replace-regexp-in-string " " "-" kwd))
+      (mapcar (lambda (kwd) (denote-sluggify-keyword kwd))
               filetags)))
 
 (defun citar-denote--keywords-prompt (citekey)
