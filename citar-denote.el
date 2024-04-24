@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 2.1
+;; Version: 2.1.1
 ;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -25,12 +25,27 @@
 
 ;;; Commentary:
 ;;
-;; A minor-mode integrating 'citar' and 'denote'.
+;; A minor-mode integrating 'citar' and 'denote' to create and manage
+;; bibliographic notes.
 ;;
-;; Provides functions to create and manage bibliographic notes.
-;; Manual:
-;; https://lucidmanager.org/productivity/bibliographic-notes-in-emacs-with-citar-denote/
+;; 
 ;;
+;; Taking notes about the articles and books you read is essential to
+;; intellectual life.  Many note-taking systems can connect to a
+;; bibliographic database (such as a plain text BibTeX file or external
+;; software such as Zotero).  These databases are helpful when you need to
+;; add citations to your writing.  Electronic bibliographies also help you
+;; create and find notes related to your literature collection and provide
+;; access to related materials, such as online sources and files stored on
+;; your computer.
+
+;; Citar-Denote integrates the Citar bibliography package with the Denote
+;; note-taking system.  Citar lets you browse and act on bibliographic data
+;; in BibTeX, BibLaTeX or JSON format.  Denote is a versatile Emacs package
+;; for taking and managing notes. Combining these two packages enables
+;; linking notes in your Denote collection to your bibliography, providing
+;; a complete solution for documenting literature reviews.
+
 ;;; Code:
 
 (require 'denote)
@@ -53,7 +68,7 @@ Minimises the search space for connecting notes to a bibliography."
   :type 'string)
 
 (defcustom citar-denote-use-bib-keywords nil
-  "Extract bibliographic keywords from bibliography and use as Denote keywords.
+  "Extract keywords from bibliography and use as Denote keywords.
 Extracts keywords from comma-separated list in the `keywords' BibTeX field."
   ;; https://github.com/pprevos/citar-denote/issues/17
   :group 'citar-denote
@@ -64,9 +79,10 @@ Extracts keywords from comma-separated list in the `keywords' BibTeX field."
 
 Default is `denote-file-type', or org if the former is nil.
 
-When the value is markdown-yaml, the file type is of Markdown mode with front
-matter in YAML notation.  Similarly, markdown-toml is Markdown with TOML syntax
-as front matter.  When the value is ‘text’, the file will be in text mode."
+When the value is `markdown-yaml', the file type is Markdown mode with front
+matter in YAML notation.  Similarly, `markdown-toml' is Markdown with TOML
+syntax as front matter.  When the value is `text', the file will be in
+text mode."
   :group 'citar-denote
   :type '(choice
           (const :tag "Org mode (default)" org)
@@ -94,13 +110,13 @@ When no signature is entered, use the citation key."
 (defcustom citar-denote-title-format "title"
   "Title format for new bibliographic notes.
 
-- \"title\": Extract title (or short title) from bibliographic entry
-- \"author-year\": Author-year citation style, e.g. Stallman (1981)
-- \"author-year-title\": Combine author, year and title
-- \"full\": Full citation
-- nil: BibTeX citekey
+- `title': Extract title (or short title) from bibliographic entry
+- `author-year': Author-year citation style, e.g. Stallman (1981)
+- `author-year-title': Combine author, year and title
+- `full': Full citation
+- `nil': BibTeX citekey
 
-For \"author-year\" and \"author-year-title\" you can configure:
+For `author-year' and `author-year-title' you can configure:
 - `citar-denote-title-format-authors'
 - `citar-denote-title-format-andstr'."
   :group 'citar-denote
@@ -112,12 +128,12 @@ For \"author-year\" and \"author-year-title\" you can configure:
            (const :tag "Citekey" nil)))
 
 (defcustom citar-denote-title-format-authors 1
-  "Maximum number of authors in \"author-year\" for `citar-denote-title-format`."
+  "Maximum number of authors in `author-year' for `citar-denote-title-format'."
   :group 'citar-denote
   :type  'integer)
 
 (defcustom citar-denote-title-format-andstr "and"
-  "Connecting word for authors in \"author-year\" for `citar-denote-note-title`."
+  "Connecting word for authors in `author-year' for `citar-denote-note-title'."
   :group 'citar-denote
   :type  'string)
 
@@ -142,17 +158,16 @@ one of those specified in `citar-denote-file-type'.
 PROPERTY-LIST is a plist that consists of two elements:
 
 - `:reference-format' Front matter identifier for citation key.
-- `:reference-regex' Regex to look for the citekey in front matter.")
+- `:reference-regex' Regular expression for the citekey in
+  front matter.")
 
 (defvar citar-denote-files-regexp (concat "_" citar-denote-keyword)
   "Regular expression to look for file names of bibliographic notes.
 
-The default assumes \"_bib\" tag is part of the file name.
+The default assumes `_bib' tag is part of the file name.
 Configurable with `citar-denote-keyword'.")
 
-(defvar citar-denote-citekey-regex "@[a-zA-Z0-9:?-_]+"
-  "Regular expression to extract citation keys from a text.
-Matrices both Org mode and Markdown citations.")
+(make-obsolete-variable 'citar-denote-citekey-regex "" "2.1.1")
 
 ;; Auxiliary functions
 
@@ -169,7 +184,9 @@ Matrices both Org mode and Markdown citations.")
    :reference-regex))
 
 (defun citar-denote--extract-keywords (citekey)
-  "Extract keywords of CITEKEY from BibTeX entry."
+  "Extract keywords of CITEKEY from BibTeX entry.
+
+Used when `citar-denote-use-bib-keywords' is non-nil."
   (if-let* ((keywords (downcase (citar-get-value "keywords" citekey)))
             (filetags (split-string keywords ", *")))
       (mapcar (lambda (kwd) (replace-regexp-in-string " " "-" kwd))
@@ -215,7 +232,7 @@ citation key CITEKEY."
           trims trims) ";")))))
 
 (defun citar-denote--get-notes (&optional citekeys)
-  "Return hash table of Denote files associated with CITEKEYS.
+  "Generate hash table of Denote files associated with CITEKEYS.
 
 If CITEKEYS is omitted, return all Denote files tagged with
 `citar-denote-keyword'."
@@ -252,6 +269,7 @@ See documentation for `citar-has-notes'."
 
 (defun citar-denote--has-citekeys (citekeys)
   "Return hash table of citar entries with associated CITEKEYS."
+  ;; TODO: Is this function doing the same thing as cetar-denote--get-notes?
   (let ((citar-entries (citar-get-entries))
         (citekey-entries (make-hash-table :test 'equal)))
     (mapc (lambda (key)
@@ -281,8 +299,7 @@ See documentation for `citar-has-notes'."
     citation-blocks))
 
 (defun citar-denote--extract-citation-keys (string)
-  "Extracts all strings that match the regex '@[a-zA-Z0-9-_:?]+' from the given string.
-  Removes the '@' character from each match."
+  "Extracts all citation keys from the given STRING."
   (let ((matches '())
         (pos 0))
     (while (string-match "@\\([a-zA-Z0-9-_:?]+\\)" string pos)
@@ -309,7 +326,7 @@ See documentation for `citar-has-notes'."
   "Generate title for new bibliographic note using CITEKEY.
 
 Either title, author/year, full reference or citation key.
-Based on `citar-denote-title-format'."
+Based on the `citar-denote-title-format' variable."
   ;; https://github.com/pprevos/citar-denote/issues/15
   (let ((title (citar-get-value "title" citekey))
         (author-names (or (citar-get-value "author" citekey)
@@ -348,7 +365,7 @@ Based on `citar-denote-title-format'."
     nil))
 
 (defun citar-denote--get-non-referenced (file)
-  "Select from Citar entries not already reference in FILE."
+  "Select Citar entry not already referenced in FILE."
   (let* ((all-items (hash-table-keys (citar-get-entries)))
          (references (citar-denote--retrieve-references file))
          (unused (-difference all-items references)))
@@ -378,7 +395,7 @@ The title format is set by `citar-denote-title-format'.
 When `citar-denote-subdir' is non-nil, prompt for a subdirectory.
 
 When `citar-denote-signature' is non-nil, prompt for a signature.  If no
-signature is entered, use the CITEKEY."
+signature is entered, use the CITEKEY as signature."
   (denote
    (read-string "Title: " (citar-denote--generate-title citekey))
    (citar-denote--keywords-prompt citekey)
@@ -396,6 +413,7 @@ signature is entered, use the CITEKEY."
 ;;;###autoload
 (defun citar-denote-open-note ()
   "Open a bibliographic note using Citar.
+
 Provides a selection list of all bibliographic entries with notes."
   (interactive)
   (let* ((citekeys (citar-select-refs :filter (citar-denote--has-notes)))
@@ -406,7 +424,8 @@ Provides a selection list of all bibliographic entries with notes."
 ;;;###autoload
 (defun citar-denote-find-citation ()
   "Find a Denote file that cites a bibliographic entry.
-Provides a selection list of all bibliographic entries cities in Denote files."
+
+Provides a selection list of all bibliographic entries cited in Denote files."
   (interactive)
   (let* ((citations (citar-denote--extract-citations))
          (citekey (citar-select-ref
@@ -487,7 +506,9 @@ Convert note to a bibliographic note when no existing reference exists."
 
 ;;;###autoload
 (defun citar-denote-remove-citekey ()
-  "Remove a reference from a bibliographic note."
+  "Remove a reference from a bibliographic note.
+
+If the only or last reference is removed, remove `_bib' keyword."
   (interactive)
   (if-let* ((file (buffer-file-name))
             (file-type (denote-filetype-heuristics file))

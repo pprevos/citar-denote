@@ -116,8 +116,8 @@ like this:
 
    The package also provides insight into citations used in the Denote
 collections.  You can cite a bibliographic entry in a Denote Org mode
-note with the ‘org-cite-insert’ function.  Refer to the *note Org mode
-manual: (org)Citations. to learn more about citations.
+note with the ‘org-cite-insert’ function.  *note Org mode citations:
+(org)Citations.
 
 
 File: citar-denote.info,  Node: Create bibliographic notes,  Next: Working with existing notes,  Prev: Principles,  Up: Top
@@ -185,9 +185,7 @@ variable.  Four options are available:
    For example, using this citation: Coppa, Hass, Peck, Burger (2008)
 _Performing Magic on the Western Stage: From the Eighteenth Century to
 the Present_, Palgrave Macmillan
-(<https://doi.org/10.1057/9780230617124>).
-
-   The five options result in:
+<https://doi.org/10.1057/9780230617124>.  The five options result in:
 
   1. ‘title’: "Performing Magic on the Western Stage: From the
      Eighteenth Century to the Present".
@@ -274,8 +272,7 @@ meta notes, or whatever else you might need.
 
    The example below lets the user choose between a note with two
 headings (Abstract and Review) or a plain note without any template
-content.  For more details on using templates, see the *note Denote
-manual: (denote)The denote-templates option. for more information.
+content, *note Denote templates: (denote)The denote-templates option.
 
      (setq denote-templates
            '((biblio . "* Abstract\n\n* Review")
@@ -300,9 +297,9 @@ expression for the block.
    Other options include creating a meta note for an author or a
 specific subject matter.  You can use dynamic blocks as long as the
 relevant notes all include the same character string in their file
-names, which you can fetch with a regular expression.
-
-   See for details on writing meta notes.
+names, which you can fetch with a regular expression.  For more
+information on meta notes, *note Writing metanotes: (denote)Writing
+metanotes.
 
 
 File: citar-denote.info,  Node: Working with existing notes,  Next: Relationships between bibliographic notes,  Prev: Create bibliographic notes,  Up: Top
@@ -561,25 +558,25 @@ General Public License for more details.
 Tag Table:
 Node: Top85
 Node: Principles1909
-Node: Create bibliographic notes4674
-Node: Default file type5734
-Node: Bibliographic note title6366
-Node: Bibliographic keywords8552
-Node: Subdirectory9551
-Node: Signature9917
-Node: Create notes using templates10531
-Node: Literature meta notes11433
-Node: Working with existing notes12384
-Node: Open existing bibliographic notes13139
-Node: Open attachments links and notes14314
-Node: Open bibliographic entry15083
-Node: Convert existing notes to bibliographic notes15520
-Node: Remove references from bibliographic notes16185
-Node: Relationships between bibliographic notes16842
-Node: Citation management18095
-Node: Installation and Example Configuration19702
-Node: Acknowledgements21888
-Node: License22603
+Node: Create bibliographic notes4633
+Node: Default file type5693
+Node: Bibliographic note title6325
+Node: Bibliographic keywords8506
+Node: Subdirectory9505
+Node: Signature9871
+Node: Create notes using templates10485
+Node: Literature meta notes11322
+Node: Working with existing notes12319
+Node: Open existing bibliographic notes13074
+Node: Open attachments links and notes14249
+Node: Open bibliographic entry15018
+Node: Convert existing notes to bibliographic notes15455
+Node: Remove references from bibliographic notes16120
+Node: Relationships between bibliographic notes16777
+Node: Citation management18030
+Node: Installation and Example Configuration19637
+Node: Acknowledgements21823
+Node: License22538
 
 End Tag Table
 

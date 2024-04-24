@@ -87,7 +87,7 @@ The front matter for a bibliographic Org mode note looks something like this:
 #+reference:  marcuse_1969_essay
 @end example
 
-The package also provides insight into citations used in the Denote collections. You can cite a bibliographic entry in a Denote Org mode note with the @code{org-cite-insert} function. Refer to the @ref{Citations,Org mode manual,,org,} to learn more about citations.
+The package also provides insight into citations used in the Denote collections. You can cite a bibliographic entry in a Denote Org mode note with the @code{org-cite-insert} function. @ref{Citations,Org mode citations,,org,}
 
 @node Create bibliographic notes
 @chapter Create bibliographic notes
@@ -135,9 +135,7 @@ The default name for a new note is the title of the bibliographic entry. You can
 Fallback option or @samp{nil}: The citation key
 @end enumerate
 
-For example, using this citation: Coppa, Hass, Peck, Burger (2008) @emph{Performing Magic on the Western Stage: From the Eighteenth Century to the Present}, Palgrave Macmillan (@uref{https://doi.org/10.1057/9780230617124}).
-
-The five options result in:
+For example, using this citation: Coppa, Hass, Peck, Burger (2008) @emph{Performing Magic on the Western Stage: From the Eighteenth Century to the Present}, Palgrave Macmillan @uref{https://doi.org/10.1057/9780230617124}. The five options result in:
 
 @enumerate
 @item
@@ -186,7 +184,7 @@ Denote allows you to create templates for various types of notes. You could have
 
 To include templates in new bibliographic notes, set the @code{citar-denote-template} to non-nil and define a template.
 
-The example below lets the user choose between a note with two headings (Abstract and Review) or a plain note without any template content. For more details on using templates, see the @ref{The denote-templates option,Denote manual,,denote,} for more information.
+The example below lets the user choose between a note with two headings (Abstract and Review) or a plain note without any template content, @ref{The denote-templates option,Denote templates,,denote,}
 
 @lisp
 (setq denote-templates
@@ -201,9 +199,7 @@ If you have a set of notes from the same book and use Org mode, you can create a
 
 The best way to create a meta note that combines literature notes from a single publication is to add the citation key in the signature, as explained above. You can then use the signature as the regular expression for the block. 
 
-Other options include creating a meta note for an author or a specific subject matter. You can use dynamic blocks as long as the relevant notes all include the same character string in their file names, which you can fetch with a regular expression.
-
-See for details on writing meta notes.
+Other options include creating a meta note for an author or a specific subject matter. You can use dynamic blocks as long as the relevant notes all include the same character string in their file names, which you can fetch with a regular expression. For more information on meta notes, @ref{Writing metanotes,Writing metanotes,,denote,}
 
 @node Working with existing notes
 @chapter Working with existing notes
