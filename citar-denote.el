@@ -28,8 +28,6 @@
 ;; A minor-mode integrating 'citar' and 'denote' to create and manage
 ;; bibliographic notes.
 ;;
-;; 
-;;
 ;; Taking notes about the articles and books you read is essential to
 ;; intellectual life.  Many note-taking systems can connect to a
 ;; bibliographic database (such as a plain text BibTeX file or external
@@ -427,17 +425,18 @@ Provides a selection list of all bibliographic entries with notes."
 
 Provides a selection list of all bibliographic entries cited in Denote files."
   (interactive)
-  (let* ((citations (citar-denote--extract-citations))
-         (citekey (citar-select-ref
-                   :filter (citar-denote--has-citekeys citations)))
-         (files (citar-denote--retrieve-cite-files citekey)))
-    (find-file (denote-get-path-by-id
-                (denote-extract-id-from-string
-                 (if (= (length files) 1)
-                     (car files)
-                   (denote-link--find-file-prompt files)))))
-    (goto-char (point-min))
-    (search-forward citekey)))
+  (if-let* ((citations (citar-denote--extract-citations))
+            (citekey (citar-select-ref
+                      :filter (citar-denote--has-citekeys citations)))
+            (files (citar-denote--retrieve-cite-files citekey)))
+      (progn (find-file (denote-get-path-by-id
+                         (denote-extract-id-from-string
+                          (if (= (length files) 1)
+                              (car files)
+                            (denote-link--find-file-prompt files)))))
+             (goto-char (point-min))
+             (search-forward citekey))
+    (message "Not citations found in Denote file")))
 
 ;;;###autoload
 (defun citar-denote-dwim ()
