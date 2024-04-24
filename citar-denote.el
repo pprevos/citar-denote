@@ -606,7 +606,7 @@ When more than one bibliographic item is referenced, select item first."
   (interactive)
   (let* ((bibliography (hash-table-keys (citar-get-entries)))
          (citations (citar-denote--extract-citations))
-         (setqreferences (hash-table-keys (citar-denote--get-notes)))
+         (references (hash-table-keys (citar-denote--get-notes)))
 	 (union (cl-union citations references))
 	 (nobib (cl-set-difference union bibliography :test #'string=)))
     (message "%s citations not in bibliography: %s"
