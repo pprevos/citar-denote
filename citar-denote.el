@@ -89,15 +89,17 @@ text mode."
           (const :tag "Plain text" text)))
 
 (defcustom citar-denote-subdir nil
-  "Ask for or save in a subdirectory when creating a new bibliographic note.
-
+  "Save new bibliographic notes in a chosen or defined subdirectory.
+Options:
 - `nil', note is stored in `denote-directory'.
 - `t', Denote asks for subdirectory to store the note.
-- `string': When entering a string, the note is save in a subdirectory under
-  `denote-directory'."
+- `string': When entering a string, the note is save in a subdirectory
+  under `denote-directory'."
   ;; https://github.com/pprevos/citar-denote/issues/11
   :group 'citar-denote
-  :type  'boolean)
+  :type  '(choice (const  :tag "Store in `denote-directory'" nil)
+                  (const  :tag "Ask for subdirectory to store note" t)
+                  (string :tag "Save in named subdirectory")))
 
 (defcustom citar-denote-signature nil
   "Ask for a signature when creating a new bibliographic note.
