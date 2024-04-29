@@ -655,7 +655,7 @@ When more than one bibliographic item is referenced, select item first."
   "Toggle integration between Citar and Denote."
   :global t
   :group 'citar
-  :lighter " citar-denote"
+  :lighter nil
   (if citar-denote-mode
       (citar-denote--setup)
     (citar-denote--reset)))
