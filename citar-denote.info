@@ -246,7 +246,9 @@ the ‘citar-denote-subdir’ variable to ‘t’.  Denote now asks for a
 subdirectory when creating a new bibliographic note.
 
    When the content of this variable is a string, Denote saves the note
-in a subdirectory with the name 'string' under ‘denote-directory’.
+in a subdirectory with that name under ‘denote-directory’.  For example,
+if this variable is set at "literature", then all bibliographic notes
+are stored under ‘denote-directory/literature/’.
 
 
 File: citar-denote.info,  Node: Signature,  Next: Create notes using templates,  Prev: Subdirectory,  Up: Create bibliographic notes
@@ -254,13 +256,15 @@ File: citar-denote.info,  Node: Signature,  Next: Create notes using templates, 
 2.5 Signature
 =============
 
-When the ‘citar-denote-signature’ variable is ‘t’, Denote will ask for a
-signature when creating a new bibliographic note.
+When the ‘citar-denote-signature’ variable is ‘'ask’, Denote will ask
+for a signature when creating a new bibliographic note.
 
-   If you enter an empty line for a signature, then the citation key is
-used.  Please note that Denote changes or remove punctuation marks in
-the citation key to enforce compliance with its file naming convention.
-For example, when the citation key is ‘einstein_1905’, the signature
+   When this variable is set at ‘'citekey’, the citation key forms the
+basis of the signature.  Please note that Denote changes or remove
+punctuation marks in the citation key with ‘denote-sluggify-signature’
+to enforce compliance with its file naming convention.
+
+   For example, when the citation key is ‘einstein_1905’, the signature
 becomes ‘einstein=2005’.
 
 
@@ -569,20 +573,20 @@ Node: Default file type5693
 Node: Bibliographic note title6325
 Node: Bibliographic keywords8506
 Node: Subdirectory9505
-Node: Signature10092
-Node: Create notes using templates10706
-Node: Literature meta notes11543
-Node: Working with existing notes12540
-Node: Open existing bibliographic notes13295
-Node: Open attachments links and notes14470
-Node: Open bibliographic entry15239
-Node: Convert existing notes to bibliographic notes15676
-Node: Remove references from bibliographic notes16341
-Node: Relationships between bibliographic notes16998
-Node: Citation management18251
-Node: Installation and example configuration19858
-Node: Acknowledgements22044
-Node: License22759
+Node: Signature10221
+Node: Create notes using templates10900
+Node: Literature meta notes11737
+Node: Working with existing notes12734
+Node: Open existing bibliographic notes13489
+Node: Open attachments links and notes14664
+Node: Open bibliographic entry15433
+Node: Convert existing notes to bibliographic notes15870
+Node: Remove references from bibliographic notes16535
+Node: Relationships between bibliographic notes17192
+Node: Citation management18445
+Node: Installation and example configuration20052
+Node: Acknowledgements22238
+Node: License22953
 
 End Tag Table
 

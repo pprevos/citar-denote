@@ -1,19 +1,20 @@
 [[https://melpa.org/#/citar-denote][file:https://melpa.org/packages/citar-denote-badge.svg]]    [[https://stable.melpa.org/#/citar-denote][file:https://stable.melpa.org/packages/citar-denote-badge.svg]]
 
-A minor-mode integrating the Emacs [[https://github.com/emacs-citar/citar][Citar]] and [[https://protesilaos.com/emacs/denote][Denote]] packages to enable create managing bibliographic notes and citations.
+Citar-Denote is a minor-mode integrating the Emacs [[https://github.com/emacs-citar/citar][Citar]] and [[https://protesilaos.com/emacs/denote][Denote]] packages to enable create managing bibliographic notes and citations.
 
-For more information read the [[file:citar-denote.org][Citar-Denote Manual]] in this repository with =C-h R= (~info-display-manual~) and selection  =citar-denote=.
+For more information read the [[file:citar-denote.org][Citar-Denote Manual]] in this repository with =C-h R= (~info-display-manual~) and select =citar-denote=.
 
 * Change Log
 ** Version 2.2
-- =citar-denote-subdir= has additional options:
+- ~citar-denote-subdir~ has additional options:
   - =nil=: No subdirectory
   - =t=: Ask for subdirectory
-  - ="folder"= : When using a string, save in subdirectory under =denote-directory=
-
+  - =string= : When using any string, save in a subdirectory with that name under ~denote-directory~
+- Modified behaviour of ~citar-denote-signature~. Users can choose between manually adding a signature or using citation key without prompting.
+    
 ** Version 2.1.2
 - Removed lighter string to not clobber the mode line
-- Bug fixed when using non-standard =citar-denote-keyword=
+- Bug fixed when using non-standard ~citar-denote-keyword~
   
 ** Version 2.1.1
 - Updated the manual

@@ -82,12 +82,14 @@ All new notes are stored in the location specified by =denote-directory=.
 
 If you like storing your bibliographic notes in a subdirectory, set the ~citar-denote-subdir~ variable to =t=. Denote now asks for a subdirectory when creating a new bibliographic note.
 
-When the content of this variable is a string, Denote saves the note in a subdirectory with the name 'string' under =denote-directory=.
+When the content of this variable is a string, Denote saves the note in a subdirectory with that name under =denote-directory=. For example, if this variable is set at "literature", then all bibliographic notes are stored under =denote-directory/literature/=.
 
 ** Signature
-When the ~citar-denote-signature~ variable is =t=, Denote will ask for a signature when creating a new bibliographic note.
+When the ~citar-denote-signature~ variable is ='ask=, Denote will ask for a signature when creating a new bibliographic note.
 
-If you enter an empty line for a signature, then the citation key is used. Please note that Denote changes or remove punctuation marks in the citation key to enforce compliance with its file naming convention. For example, when the citation key is =einstein_1905=, the signature becomes =einstein=2005=.
+When this variable is set at ='citekey=, the citation key forms the basis of the signature. Please note that Denote changes or remove punctuation marks in the citation key with ~denote-sluggify-signature~ to enforce compliance with its file naming convention.
+
+For example, when the citation key is =einstein_1905=, the signature becomes =einstein=2005=.
 
 ** Create notes using templates
 Denote allows you to create templates for various types of notes. You could have standard headings for bibliographic notes, other headings for meta notes, or whatever else you might need.
@@ -214,7 +216,7 @@ You can also install this package directly from GitHub to enjoy the latest versi
 * Acknowledgements
 This code would only have existed with the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus.
 
-In addition, Joel Lööw and Noboru Ota made significant contributions, without which this package would not exist. Troy Figiel, Taha Aziz, Ben Ali, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon, and Jonathan Sahar provided valuable suggestions to extend the functionality.
+In addition, Joel Lööw and Noboru Ota made significant contributions, without which this package would not exist. Troy Figiel, Taha Aziz, Ben Ali, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon, Jonathan Sahar, and Samuel Flint provided valuable suggestions to extend functionality.
 
 Feel free to raise an issue here on GitHub if you have any questions or find bugs or suggestions for enhanced functionality.
 

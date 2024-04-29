@@ -172,14 +172,16 @@ All new notes are stored in the location specified by @samp{denote-directory}.
 
 If you like storing your bibliographic notes in a subdirectory, set the @code{citar-denote-subdir} variable to @samp{t}. Denote now asks for a subdirectory when creating a new bibliographic note.
 
-When the content of this variable is a string, Denote saves the note in a subdirectory with the name 'string' under @samp{denote-directory}.
+When the content of this variable is a string, Denote saves the note in a subdirectory with that name under @samp{denote-directory}. For example, if this variable is set at ``literature'', then all bibliographic notes are stored under @samp{denote-directory/literature/}.
 
 @node Signature
 @section Signature
 
-When the @code{citar-denote-signature} variable is @samp{t}, Denote will ask for a signature when creating a new bibliographic note.
+When the @code{citar-denote-signature} variable is @samp{'ask}, Denote will ask for a signature when creating a new bibliographic note.
 
-If you enter an empty line for a signature, then the citation key is used. Please note that Denote changes or remove punctuation marks in the citation key to enforce compliance with its file naming convention. For example, when the citation key is @samp{einstein_1905}, the signature becomes @samp{einstein=2005}.
+When this variable is set at @samp{'citekey}, the citation key forms the basis of the signature. Please note that Denote changes or remove punctuation marks in the citation key with @code{denote-sluggify-signature} to enforce compliance with its file naming convention.
+
+For example, when the citation key is @samp{einstein_1905}, the signature becomes @samp{einstein=2005}.
 
 @node Create notes using templates
 @section Create notes using templates
