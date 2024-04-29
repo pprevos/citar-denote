@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 2.1.1
+;; Version: 2.1.2
 ;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -309,7 +309,7 @@ See documentation for `citar-has-notes'."
   "Extract citations from all Denote files."
   ;; Extract lines with citations
   (let* ((xrefs (xref-matches-in-files "\\[cite:@.*\\]"
-                 (denote-directory-text-only-files)))
+                 (denote-directory-files nil nil t)))
          (citation-lines (mapcar #'substring-no-properties
                                  (mapcar #'xref-match-item-summary
                                          xrefs)))
@@ -377,7 +377,7 @@ Based on the `citar-denote-title-format' variable."
           (mapcar
            (lambda (file)
              (let ((file-type (denote-filetype-heuristics file)))
-               (cons (denote--link-get-description file file-type) file)))
+               (cons (denote--link-get-description file) file)))
            files))
          (selected-description (completing-read "Select note: " description-file-alist))
          (selected-file (cdr (assoc selected-description description-file-alist))))
@@ -579,7 +579,7 @@ When more than one bibliographic item is referenced, select item first."
              (file-type (denote-filetype-heuristics file))
              (description (read-string
                            "Description: "
-                           (denote--link-get-description file file-type))))
+                           (denote--link-get-description file))))
         (denote-link file file-type description))
     (message "Buffer is not a Denote file")))
 
