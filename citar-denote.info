@@ -537,8 +537,8 @@ developer of Denote and Citar developer Bruce D'Arcus.
 
    In addition, Joel Lööw and Noboru Ota made significant contributions,
 without which this package would not exist.  Troy Figiel, Taha Aziz, Ben
-Ali, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon, and
-Jonathan Sahar provided valuable suggestions to extend the
+Ali, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon,
+Jonathan Sahar, and Samuel Flint provided valuable suggestions to extend
 functionality.
 
    Feel free to raise an issue here on GitHub if you have any questions
@@ -586,7 +586,7 @@ Node: Relationships between bibliographic notes17192
 Node: Citation management18445
 Node: Installation and example configuration20052
 Node: Acknowledgements22238
-Node: License22953
+Node: License22963
 
 End Tag Table
 
