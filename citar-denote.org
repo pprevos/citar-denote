@@ -78,7 +78,11 @@ Changing the default keyword requires updating all your bibliographic notes beca
 The ~citar-denote-use-bib-keywords~ variable lets you include any keywords defined in the bibliography as Denote keywords. When set to =t=, Citar-Denote extracts the available keywords from the BibTeX =keywords= field and uses these as Denote file tags.
 
 ** Subdirectory
-If you like storing your bibliographic notes in a specific subdirectory, set the ~citar-denote-subdir~ variable to =t=. Denote asks for a subdirectory when creating a new bibliographic note.
+All new notes are stored in the location specified by =denote-directory=.
+
+If you like storing your bibliographic notes in a subdirectory, set the ~citar-denote-subdir~ variable to =t=. Denote now asks for a subdirectory when creating a new bibliographic note.
+
+When the content of this variable is a string, Denote saves the note in a subdirectory with the name 'string' under =denote-directory=.
 
 ** Signature
 When the ~citar-denote-signature~ variable is =t=, Denote will ask for a signature when creating a new bibliographic note.
@@ -159,7 +163,7 @@ Lastly, the ~citar-denote-no-bibliography~ function lists all references and cit
 
 The citations search mechanism uses the =xref= system. You can improve the search process by installing the faster [[https://github.com/BurntSushi/ripgrep][ripgrep]] program and setting ~xref-search-program~ to =ripgrep=.
 
-* Installation and Example Configuration
+* Installation and example configuration
 This package is available in MELPA. The example below includes all configurable variables and the package defaults. You can either remove these entries or configure them to your preferences.
 
 #+begin_src elisp :results none

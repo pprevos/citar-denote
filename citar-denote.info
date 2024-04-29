@@ -32,7 +32,7 @@ documenting literature reviews.
 * Working with existing notes::
 * Relationships between bibliographic notes::
 * Citation management::
-* Installation and Example Configuration::
+* Installation and example configuration::
 * Acknowledgements::
 * License::
 
@@ -238,9 +238,15 @@ File: citar-denote.info,  Node: Subdirectory,  Next: Signature,  Prev: Bibliogra
 2.4 Subdirectory
 ================
 
-If you like storing your bibliographic notes in a specific subdirectory,
-set the ‘citar-denote-subdir’ variable to ‘t’.  Denote asks for a
+All new notes are stored in the location specified by
+‘denote-directory’.
+
+   If you like storing your bibliographic notes in a subdirectory, set
+the ‘citar-denote-subdir’ variable to ‘t’.  Denote now asks for a
 subdirectory when creating a new bibliographic note.
+
+   When the content of this variable is a string, Denote saves the note
+in a subdirectory with the name 'string' under ‘denote-directory’.
 
 
 File: citar-denote.info,  Node: Signature,  Next: Create notes using templates,  Prev: Subdirectory,  Up: Create bibliographic notes
@@ -430,7 +436,7 @@ note exists for the selected publication, you first choose which note
 you like to link to.
 
 
-File: citar-denote.info,  Node: Citation management,  Next: Installation and Example Configuration,  Prev: Relationships between bibliographic notes,  Up: Top
+File: citar-denote.info,  Node: Citation management,  Next: Installation and example configuration,  Prev: Relationships between bibliographic notes,  Up: Top
 
 5 Citation management
 *********************
@@ -463,9 +469,9 @@ improve the search process by installing the faster ripgrep
 ‘xref-search-program’ to ‘ripgrep’.
 
 
-File: citar-denote.info,  Node: Installation and Example Configuration,  Next: Acknowledgements,  Prev: Citation management,  Up: Top
+File: citar-denote.info,  Node: Installation and example configuration,  Next: Acknowledgements,  Prev: Citation management,  Up: Top
 
-6 Installation and Example Configuration
+6 Installation and example configuration
 ****************************************
 
 This package is available in MELPA.  The example below includes all
@@ -517,7 +523,7 @@ latest version (assuming you use Emacs 29 or above.
         :url "https://github.com/pprevos/citar-denote/")))
 
 
-File: citar-denote.info,  Node: Acknowledgements,  Next: License,  Prev: Installation and Example Configuration,  Up: Top
+File: citar-denote.info,  Node: Acknowledgements,  Next: License,  Prev: Installation and example configuration,  Up: Top
 
 7 Acknowledgements
 ******************
@@ -563,20 +569,20 @@ Node: Default file type5693
 Node: Bibliographic note title6325
 Node: Bibliographic keywords8506
 Node: Subdirectory9505
-Node: Signature9871
-Node: Create notes using templates10485
-Node: Literature meta notes11322
-Node: Working with existing notes12319
-Node: Open existing bibliographic notes13074
-Node: Open attachments links and notes14249
-Node: Open bibliographic entry15018
-Node: Convert existing notes to bibliographic notes15455
-Node: Remove references from bibliographic notes16120
-Node: Relationships between bibliographic notes16777
-Node: Citation management18030
-Node: Installation and Example Configuration19637
-Node: Acknowledgements21823
-Node: License22538
+Node: Signature10092
+Node: Create notes using templates10706
+Node: Literature meta notes11543
+Node: Working with existing notes12540
+Node: Open existing bibliographic notes13295
+Node: Open attachments links and notes14470
+Node: Open bibliographic entry15239
+Node: Convert existing notes to bibliographic notes15676
+Node: Remove references from bibliographic notes16341
+Node: Relationships between bibliographic notes16998
+Node: Citation management18251
+Node: Installation and example configuration19858
+Node: Acknowledgements22044
+Node: License22759
 
 End Tag Table
 

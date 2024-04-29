@@ -5,6 +5,16 @@ A minor-mode integrating the Emacs [[https://github.com/emacs-citar/citar][Citar
 For more information read the [[file:citar-denote.org][Citar-Denote Manual]] in this repository with =C-h R= (~info-display-manual~) and selection  =citar-denote=.
 
 * Change Log
+** Version 2.2
+- =citar-denote-subdir= has additional options:
+  - =nil=: No subdirectory
+  - =t=: Ask for subdirectory
+  - ="folder"= : When using a string, save in subdirectory under =denote-directory=
+
+** Version 2.1.2
+- Removed lighter string to not clobber the mode line
+- Bug fixed when using non-standard =citar-denote-keyword=
+  
 ** Version 2.1.1
 - Updated the manual
 - Minor code updates
