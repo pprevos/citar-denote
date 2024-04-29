@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 2.1.2
+;; Version: 2.2
 ;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -89,7 +89,12 @@ text mode."
           (const :tag "Plain text" text)))
 
 (defcustom citar-denote-subdir nil
-  "Ask for a subdirectory when creating a new bibliographic note."
+  "Ask for or save in a subdirectory when creating a new bibliographic note.
+
+- `nil', note is stored in `denote-directory'.
+- `t', Denote asks for subdirectory to store the note.
+- `string': When entering a string, the note is save in a subdirectory under
+  `denote-directory'."
   ;; https://github.com/pprevos/citar-denote/issues/11
   :group 'citar-denote
   :type  'boolean)
@@ -394,7 +399,11 @@ signature is entered, use the CITEKEY as signature."
    (read-string "Title: " (citar-denote--generate-title citekey))
    (citar-denote--keywords-prompt citekey)
    citar-denote-file-type
-   (when citar-denote-subdir (denote-subdirectory-prompt))
+   (when citar-denote-subdir
+     (if (stringp citar-denote-subdir)
+         (expand-file-name
+          (concat denote-directory citar-denote-subdir))
+       (denote-subdirectory-prompt)))
    nil
    (when citar-denote-template (denote-template-prompt))
    (when citar-denote-signature (denote-signature-prompt
