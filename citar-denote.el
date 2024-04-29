@@ -159,13 +159,8 @@ PROPERTY-LIST is a plist that consists of two elements:
 - `:reference-regex' Regular expression for the citekey in
   front matter.")
 
-(defvar citar-denote-files-regexp (concat "_" citar-denote-keyword)
-  "Regular expression to look for file names of bibliographic notes.
-
-The default assumes `_bib' tag is part of the file name.
-Configurable with `citar-denote-keyword'.")
-
 (make-obsolete-variable 'citar-denote-citekey-regex "" "2.1.1")
+(make-obsolete-variable 'citar-denote-files-regex "" "2.1.2")
 
 ;; Auxiliary functions
 
