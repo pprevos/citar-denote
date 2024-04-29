@@ -57,13 +57,13 @@
 (defgroup citar-denote ()
   "Creating and accessing bibliography files with Citar and Denote."
   :group 'files
-  :link '(url-link :tag "Homepage" "https://lucidmanager.org/productivity/bibliographic-notes-in-emacs-with-citar-denote/"))
+  :link  '(url-link :tag "Homepage" "https://lucidmanager.org/productivity/bibliographic-notes-in-emacs-with-citar-denote/"))
 
 (defcustom citar-denote-keyword "bib"
   "Denote keyword (file tag) to indicate bibliographical notes.
 Minimises the search space for connecting notes to a bibliography."
   :group 'citar-denote
-  :type 'string)
+  :type  'string)
 
 (defcustom citar-denote-use-bib-keywords nil
   "Extract keywords from bibliography and use as Denote keywords.
@@ -92,18 +92,18 @@ text mode."
   "Ask for a subdirectory when creating a new bibliographic note."
   ;; https://github.com/pprevos/citar-denote/issues/11
   :group 'citar-denote
-  :type 'boolean)
+  :type  'boolean)
 
 (defcustom citar-denote-signature nil
   "Ask for a signature when creating a new bibliographic note.
 When no signature is entered, use the citation key."
   :group 'citar-denote
-  :type 'boolean)
+  :type  'boolean)
 
 (defcustom citar-denote-template nil
   "Use a template when creating a new bibliographic note."
   :group 'citar-denote
-  :type 'boolean)
+  :type  'boolean)
 
 (defcustom citar-denote-title-format "title"
   "Title format for new bibliographic notes.
@@ -236,7 +236,8 @@ If CITEKEYS is omitted, return all Denote files tagged with
 `citar-denote-keyword'."
   (let ((files (make-hash-table :test 'equal)))
     (prog1 files
-      (dolist (file (denote-directory-files citar-denote-files-regexp))
+      (dolist (file (denote-directory-files
+                     (concat "_" citar-denote-keyword)))
         (let ((keys-in-file (citar-denote--retrieve-references file)))
           (dolist (key keys-in-file)
             (if citekeys
