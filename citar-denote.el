@@ -102,10 +102,11 @@ Options:
                   (string :tag "Save in named subdirectory")))
 
 (defcustom citar-denote-signature nil
-  "Ask for a signature when creating a new bibliographic note.
-When no signature is entered, use the citation key."
+  "Ask for a signature, or use citation key when saving new bibliographic notes."
   :group 'citar-denote
-  :type  'boolean)
+  :type  '(choice (const :tag "No signature" nil)
+                  (const :tag "Ask for signature" ask)
+                  (const :tag "Use citation key as signature" citekey)))
 
 (defcustom citar-denote-template nil
   "Use a template when creating a new bibliographic note."
@@ -395,8 +396,8 @@ The title format is set by `citar-denote-title-format'.
 
 When `citar-denote-subdir' is non-nil, prompt for a subdirectory.
 
-When `citar-denote-signature' is non-nil, prompt for a signature.  If no
-signature is entered, use the CITEKEY as signature."
+When `citar-denote-signature' is non-nil, prompt for a signature or
+use citation key."
   (denote
    (read-string "Title: " (citar-denote--generate-title citekey))
    (citar-denote--keywords-prompt citekey)
@@ -408,9 +409,12 @@ signature is entered, use the CITEKEY as signature."
        (denote-subdirectory-prompt)))
    nil
    (when citar-denote-template (denote-template-prompt))
-   (when citar-denote-signature (denote-signature-prompt
-                                 citekey
-                                 "Signature (empty to use citation key)")))
+   (cond ((eq citar-denote-signature 'ask)
+          (denote-signature-prompt nil "Signature: "))
+         ((eq citar-denote-signature 'citekey)
+          citekey)
+         (nil nil))
+   )
   (citar-denote--add-reference citekey citar-denote-file-type))
 
 ;; Interactive functions
