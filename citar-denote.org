@@ -216,7 +216,7 @@ You can also install this package directly from GitHub to enjoy the latest versi
 * Acknowledgements
 This code would only have existed with the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus.
 
-In addition, Joel Lööw and Noboru Ota made significant contributions, without which this package would not exist. Troy Figiel, Taha Aziz, Ben Ali, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon, Jonathan Sahar, and Samuel Flint provided valuable suggestions to extend functionality.
+In addition, Joel Lööw and Noboru Ota made significant contributions, without which this package would not exist. Troy Figiel, Taha Aziz, Ben Ali, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon, Jonathan Sahar, and Samuel W. Flint provided valuable suggestions to extend functionality.
 
 Feel free to raise an issue here on GitHub if you have any questions or find bugs or suggestions for enhanced functionality.
 
