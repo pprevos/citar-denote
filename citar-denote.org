@@ -71,9 +71,9 @@ The default term between authors is "and", which can be changed by customising ~
 For example, when using up to three authors and "&" as a connecting term, the title for the example above becomes "Coppa, Hass & Peck et al. (2008)." 
 
 ** Bibliographic keywords
-Every new bibliographic note includes the =bib= file tag. This tag minimises the search space when caching notes to accelerate the process. The ~citar-denote-keyword~ variable lets you change the tag to something else. For example, if your primary language is Welsh, you might want to change it to =lly=.
+Every new bibliographic note includes the =bib= file tag. This tag minimises the search space when caching notes to accelerate the process. The ~citar-denote-keyword~ variable lets you change the tag to something else. For example, if your primary language is Welsh, you might want to change it to =llenyddiaeth= (literature).
 
-Changing the default keyword requires updating all your bibliographic notes because the package only recognises a single string. The Denote-Explore package provides a function to rename Denote keywords.
+Changing the default keyword requires updating all your bibliographic notes because the package only recognises a single string. The Denote-Explore package provides a function to rename Denote keywords. [[info:denote-explore#Managing Keywords][Denote-Explore]]
 
 The ~citar-denote-use-bib-keywords~ variable lets you include any keywords defined in the bibliography as Denote keywords. When set to =t=, Citar-Denote extracts the available keywords from the BibTeX =keywords= field and uses these as Denote file tags.
 
@@ -94,7 +94,10 @@ For example, when the citation key is =einstein_1905=, the signature becomes =ei
 ** Create notes using templates
 Denote allows you to create templates for various types of notes. You could have standard headings for bibliographic notes, other headings for meta notes, or whatever else you might need.
 
-To include templates in new bibliographic notes, set the ~citar-denote-template~ to non-nil and define a template.
+To include templates in new bibliographic notes, set the ~citar-denote-template~ to either:
+
+- =t=: Ask for a template when creating a note.
+- The name of the default template for creating new notes
 
 The example below lets the user choose between a note with two headings (Abstract and Review) or a plain note without any template content, [[info:denote#The denote-templates option][Denote templates]]
 
@@ -103,6 +106,8 @@ The example below lets the user choose between a note with two headings (Abstrac
         '((biblio . "* Abstract\n\n* Review")
           (plain . nil)))
 #+end_src
+
+Setting ~citar-denote-template~ to =biblio= will always use this template for new literature notes.
 
 ** Literature meta notes
 If you have a set of notes from the same book and use Org mode, you can create a meta note to combine the relevant notes. This note can have automated links to all related references with dynamic blocks or transclude the note's content.
