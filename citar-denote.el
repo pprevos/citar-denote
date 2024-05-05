@@ -111,7 +111,9 @@ Options:
 (defcustom citar-denote-template nil
   "Use a template when creating a new bibliographic note."
   :group 'citar-denote
-  :type  'boolean)
+  :type  '(choice (const :tag "No template" nil)
+                  (const :tag "Ask for template" t)
+                  (symbol :tag "Specific template")))
 
 (defcustom citar-denote-title-format "title"
   "Title format for new bibliographic notes.
@@ -408,7 +410,10 @@ use citation key."
           (concat denote-directory citar-denote-subdir))
        (denote-subdirectory-prompt)))
    nil
-   (when citar-denote-template (denote-template-prompt))
+   (when citar-denote-template
+     (if (not (eq citar-denote-template))
+         citar-denote-template
+       (denote-template-prompt)))
    (cond ((eq citar-denote-signature 'ask)
           (denote-signature-prompt nil "Signature: "))
          ((eq citar-denote-signature 'citekey)
