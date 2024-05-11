@@ -1,5 +1,4 @@
-;; Minimum citar-denote configuration
-;; For texting
+;; Citar-Denote minimum configuration
 
 ;; Configure package manager and use-package
 (package-initialize)
@@ -11,72 +10,48 @@
   :init
   (vertico-mode))
 
-(use-package orderless
-  :ensure t
-  :custom
-  (completion-styles '(orderless basic)))
-
-;; Citar
 (use-package citar
   :ensure t
+  :defer t
   :custom
-  ;; Location of bibliography
-  (citar-bibliography (directory-files "~/documents/library/" t "bib$"))
-  :bind
-  (("C-c w o" . citar-open)))
+  ;; set bibliography's location
+  (citar-bibliography '("~/documents/library/magic-tricks.bib"))
+  ;; Allow multiple notes per bibliographic entry
+  (citar-open-always-create-notes nil)
+  :config
+  :bind ("C-c w c" . citar-create-note))
 
-;; Denote
 (use-package denote
-  :ensure t
+  :defer t
   :custom
-  ;; Folder where Denote files live
-  (denote-directory "~/documents/notes/")
-  :hook
-  ;; Pretty filenames
-  (dired-mode . denote-dired-mode))
+  (denote-directory "~/documents/notes"))
 
-;; Citar-denote
 (use-package citar-denote
-  :load-path
-  "~/documents/projects/citar-denote/"
-  :demand t
+  :ensure t
+  :after (:any citar denote)
   :custom
   ;; Package defaults
-  (citar-denote-keyword "bib")
   (citar-denote-file-type 'org)
-  (citar-denote-subdir nil)
+  (citar-denote-keyword "bib")
   (citar-denote-signature nil)
+  (citar-denote-subdir nil)
   (citar-denote-template nil)
-  (citar-denote-use-bib-keywords nil)
   (citar-denote-title-format "title")
-  (citar-denote-title-format-authors 1)
   (citar-denote-title-format-andstr "and")
-  ;; Allow multiple notes per entry
-  (citar-open-always-create-notes nil)
-  :init
+  (citar-denote-title-format-authors 1)
+  (citar-denote-use-bib-keywords nil)
+  :config
   (citar-denote-mode)
   ;; Bind all available commands
-  :bind (("C-c w c" . citar-create-note)
-         ("C-c w n" . citar-denote-open-note)
+  :bind (("C-c w n" . citar-denote-open-note)
          ("C-c w d" . citar-denote-dwim)
          ("C-c w e" . citar-denote-open-reference-entry)
          ("C-c w a" . citar-denote-add-citekey)
          ("C-c w k" . citar-denote-remove-citekey)
+         ("C-c w n" . citar-denote-no-bibliography)
          ("C-c w r" . citar-denote-find-reference)
-         ("C-c w f" . citar-denote-find-citation)
          ("C-c w l" . citar-denote-link-reference)
+         ("C-c w f" . citar-denote-find-citation)
          ("C-c w x" . citar-denote-nocite)
-         ("C-c w y" . citar-denote-cite-nocite)))
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages '(denote citar orderless vertico)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:family "Source Code Pro" :foundry "ADBO" :slant normal :weight regular :height 120 :width normal)))))
+         ("C-c w y" . citar-denote-cite-nocite)
+         ("C-c w z" . citar-denote-nobib)))
