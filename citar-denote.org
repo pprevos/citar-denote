@@ -174,8 +174,16 @@ The citations search mechanism uses the =xref= system. You can improve the searc
 This package is available in MELPA. The example below includes all configurable variables and the package defaults. You can either remove these entries or configure them to your preferences.
 
 #+begin_src elisp :results none
+  (use-package citar
+    :defer t
+    :init
+    (setq citar-bibliography '("reference.bib")) # set bibliography's location
+    :config
+    :bind ("C-c w c" . citar-create-note))
+
   (use-package citar-denote
     :demand t ;; Ensure minor mode is loaded
+    :after (:any citar denote)
     :custom
     ;; Allow multiple notes per bibliographic entry
     (citar-open-always-create-notes nil)
@@ -192,8 +200,7 @@ This package is available in MELPA. The example below includes all configurable 
     :config
     (citar-denote-mode)
     ;; Bind all available commands
-    :bind (("C-c w c" . citar-create-note)
-           ("C-c w n" . citar-denote-open-note)
+    :bind (("C-c w n" . citar-denote-open-note)
            ("C-c w d" . citar-denote-dwim)
            ("C-c w e" . citar-denote-open-reference-entry)
            ("C-c w a" . citar-denote-add-citekey)
