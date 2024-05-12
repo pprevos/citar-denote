@@ -221,11 +221,12 @@ Every new bibliographic note includes the ‘bib’ file tag.  This tag
 minimises the search space when caching notes to accelerate the process.
 The ‘citar-denote-keyword’ variable lets you change the tag to something
 else.  For example, if your primary language is Welsh, you might want to
-change it to ‘lly’.
+change it to ‘llenyddiaeth’ (literature).
 
    Changing the default keyword requires updating all your bibliographic
 notes because the package only recognises a single string.  The
 Denote-Explore package provides a function to rename Denote keywords.
+*note Denote-Explore: (denote-explore)Managing Keywords.
 
    The ‘citar-denote-use-bib-keywords’ variable lets you include any
 keywords defined in the bibliography as Denote keywords.  When set to
@@ -278,7 +279,10 @@ could have standard headings for bibliographic notes, other headings for
 meta notes, or whatever else you might need.
 
    To include templates in new bibliographic notes, set the
-‘citar-denote-template’ to non-nil and define a template.
+‘citar-denote-template’ to either:
+
+   • ‘t’: Ask for a template when creating a note.
+   • The name of the default template for creating new notes
 
    The example below lets the user choose between a note with two
 headings (Abstract and Review) or a plain note without any template
@@ -287,6 +291,9 @@ content, *note Denote templates: (denote)The denote-templates option.
      (setq denote-templates
            '((biblio . "* Abstract\n\n* Review")
              (plain . nil)))
+
+   Setting ‘citar-denote-template’ to ‘biblio’ will always use this
+template for new literature notes.
 
 
 File: citar-denote.info,  Node: Literature meta notes,  Prev: Create notes using templates,  Up: Create bibliographic notes
@@ -461,11 +468,11 @@ minibuffer: "No associated resources".
 entry.  This function only works when the active buffer is a Denote Org
 mode note.
 
-   Lastly, the ‘citar-denote-no-bibliography’ function lists all
-references and citations in your Denote collection that are absent in
-the global bibliography in the ‘*Messages*’ buffer.  Note that this list
-excludes any local bibliographies.  The output of this function is a
-list of citation keys used in Denote that need to be added or corrected.
+   Lastly, the ‘citar-denote-nobib’ function lists all references and
+citations in your Denote collection that are absent in the global
+bibliography in the ‘*Messages*’ buffer.  Note that this list excludes
+any local bibliographies.  The output of this function is a list of
+citation keys used in Denote that need to be added or corrected.
 
    The citations search mechanism uses the ‘xref’ system.  You can
 improve the search process by installing the faster ripgrep
@@ -478,35 +485,58 @@ File: citar-denote.info,  Node: Installation and example configuration,  Next: A
 6 Installation and example configuration
 ****************************************
 
-This package is available in MELPA.  The example below includes all
-configurable variables and the package defaults.  You can either remove
-these entries or configure them to your preferences.
+This package is available in MELPA.  The example below provides a
+minimum configuration for Citar and Denote.  The minimum required
+configuration for Citar is to set the list of bibliography files.  If
+you use Org mode citations, you can set this variable the same as
+‘org-cite-global-bibliography’.  This configuration also sets Citar to
+accept multiple notes per reference.
 
-     (use-package citar-denote
-       :demand t ;; Ensure minor mode is loaded
+   The citar-Denote configuration includes all configurable variables
+with their package defaults.  You can either remove these entries or
+configure them to your preferences.  This configuration example also
+binds all available Citar-Denote commands.  You will need to change the
+directory paths to suits your preferences.
+
+     (use-package citar
+       :ensure t
+       :defer t
        :custom
+       ;; set bibliography's location
+       (citar-bibliography '("~/documents/library/magic-tricks.bib"))
        ;; Allow multiple notes per bibliographic entry
        (citar-open-always-create-notes nil)
+       :bind ("C-c w c" . citar-create-note))
+
+       (use-package denote
+       :defer t
+       :custom
+       (denote-directory "~/documents/notes"))
+
+       (use-package citar-denote
+       :ensure t
+       :demand t ;; Ensure minor mode loads
+       :after (:any citar denote)
+       :custom
        ;; Package defaults
        (citar-denote-file-type 'org)
-       (citar-denote-subdir nil)
-       (citar-denote-signature nil)
-       (citar-denote-template nil)
        (citar-denote-keyword "bib")
-       (citar-denote-use-bib-keywords nil)
+       (citar-denote-signature nil)
+       (citar-denote-subdir nil)
+       (citar-denote-template nil)
        (citar-denote-title-format "title")
-       (citar-denote-title-format-authors 1)
        (citar-denote-title-format-andstr "and")
-       :config
+       (citar-denote-title-format-authors 1)
+       (citar-denote-use-bib-keywords nil)
+       :preface
+       (bind-key "C-c w n" #'citar-denote-open-note)
+       :init
        (citar-denote-mode)
        ;; Bind all available commands
-       :bind (("C-c w c" . citar-create-note)
-              ("C-c w n" . citar-denote-open-note)
-              ("C-c w d" . citar-denote-dwim)
+       :bind (("C-c w d" . citar-denote-dwim)
               ("C-c w e" . citar-denote-open-reference-entry)
               ("C-c w a" . citar-denote-add-citekey)
               ("C-c w k" . citar-denote-remove-citekey)
-              ("C-c w n" . citar-denote-no-bibliography)
               ("C-c w r" . citar-denote-find-reference)
               ("C-c w l" . citar-denote-link-reference)
               ("C-c w f" . citar-denote-find-citation)
@@ -538,8 +568,8 @@ developer of Denote and Citar developer Bruce D'Arcus.
    In addition, Joel Lööw and Noboru Ota made significant contributions,
 without which this package would not exist.  Troy Figiel, Taha Aziz, Ben
 Ali, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon,
-Jonathan Sahar, and Samuel Flint provided valuable suggestions to extend
-functionality.
+Jonathan Sahar, Samuel W.  Flint, and Yejun Su provided valuable
+suggestions to extend functionality.
 
    Feel free to raise an issue here on GitHub if you have any questions
 or find bugs or suggestions for enhanced functionality.
@@ -572,21 +602,21 @@ Node: Create bibliographic notes4633
 Node: Default file type5693
 Node: Bibliographic note title6325
 Node: Bibliographic keywords8506
-Node: Subdirectory9505
-Node: Signature10221
-Node: Create notes using templates10900
-Node: Literature meta notes11737
-Node: Working with existing notes12734
-Node: Open existing bibliographic notes13489
-Node: Open attachments links and notes14664
-Node: Open bibliographic entry15433
-Node: Convert existing notes to bibliographic notes15870
-Node: Remove references from bibliographic notes16535
-Node: Relationships between bibliographic notes17192
-Node: Citation management18445
-Node: Installation and example configuration20052
-Node: Acknowledgements22238
-Node: License22963
+Node: Subdirectory9584
+Node: Signature10300
+Node: Create notes using templates10979
+Node: Literature meta notes12026
+Node: Working with existing notes13023
+Node: Open existing bibliographic notes13778
+Node: Open attachments links and notes14953
+Node: Open bibliographic entry15722
+Node: Convert existing notes to bibliographic notes16159
+Node: Remove references from bibliographic notes16824
+Node: Relationships between bibliographic notes17481
+Node: Citation management18734
+Node: Installation and example configuration20331
+Node: Acknowledgements23323
+Node: License24062
 
 End Tag Table
 
