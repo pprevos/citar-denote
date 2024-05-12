@@ -184,6 +184,8 @@ This package is available in MELPA. The example below includes all configurable 
   (use-package citar-denote
     :demand t ;; Ensure minor mode is loaded
     :after (:any citar denote)
+    :preface
+    (bind-key "C-c w n" #'citar-denote-open-note)
     :custom
     ;; Allow multiple notes per bibliographic entry
     (citar-open-always-create-notes nil)
@@ -200,8 +202,7 @@ This package is available in MELPA. The example below includes all configurable 
     :config
     (citar-denote-mode)
     ;; Bind all available commands
-    :bind (("C-c w n" . citar-denote-open-note)
-           ("C-c w d" . citar-denote-dwim)
+    :bind (("C-c w d" . citar-denote-dwim)
            ("C-c w e" . citar-denote-open-reference-entry)
            ("C-c w a" . citar-denote-add-citekey)
            ("C-c w k" . citar-denote-remove-citekey)
