@@ -166,7 +166,7 @@ The ~citar-denote-nocite~ function opens the Citar menu. It shows all items in y
 
 The ~citar-denote-cite-nocite~ function cites an unused bibliographic entry. This function only works when the active buffer is a Denote Org mode note.
 
-Lastly, the ~citar-denote-no-bibliography~ function lists all references and citations in your Denote collection that are absent in the global bibliography in the =*Messages*= buffer. Note that this list excludes any local bibliographies. The output of this function is a list of citation keys used in Denote that need to be added or corrected.
+Lastly, the ~citar-denote-nobib~ function lists all references and citations in your Denote collection that are absent in the global bibliography in the =*Messages*= buffer. Note that this list excludes any local bibliographies. The output of this function is a list of citation keys used in Denote that need to be added or corrected.
 
 The citations search mechanism uses the =xref= system. You can improve the search process by installing the faster [[https://github.com/BurntSushi/ripgrep][ripgrep]] program and setting ~xref-search-program~ to =ripgrep=.
 
@@ -184,6 +184,8 @@ This package is available in MELPA. The example below includes all configurable 
   (use-package citar-denote
     :demand t ;; Ensure minor mode is loaded
     :after (:any citar denote)
+    :preface
+    (bind-key "C-c w n" #'citar-denote-open-note)
     :custom
     ;; Allow multiple notes per bibliographic entry
     (citar-open-always-create-notes nil)
@@ -200,12 +202,10 @@ This package is available in MELPA. The example below includes all configurable 
     :config
     (citar-denote-mode)
     ;; Bind all available commands
-    :bind (("C-c w n" . citar-denote-open-note)
-           ("C-c w d" . citar-denote-dwim)
+    :bind (("C-c w d" . citar-denote-dwim)
            ("C-c w e" . citar-denote-open-reference-entry)
            ("C-c w a" . citar-denote-add-citekey)
            ("C-c w k" . citar-denote-remove-citekey)
-           ("C-c w n" . citar-denote-no-bibliography)
            ("C-c w r" . citar-denote-find-reference)
            ("C-c w l" . citar-denote-link-reference)
            ("C-c w f" . citar-denote-find-citation)
