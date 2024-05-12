@@ -166,7 +166,7 @@ The ~citar-denote-nocite~ function opens the Citar menu. It shows all items in y
 
 The ~citar-denote-cite-nocite~ function cites an unused bibliographic entry. This function only works when the active buffer is a Denote Org mode note.
 
-Lastly, the ~citar-denote-no-bibliography~ function lists all references and citations in your Denote collection that are absent in the global bibliography in the =*Messages*= buffer. Note that this list excludes any local bibliographies. The output of this function is a list of citation keys used in Denote that need to be added or corrected.
+Lastly, the ~citar-denote-nobib~ function lists all references and citations in your Denote collection that are absent in the global bibliography in the =*Messages*= buffer. Note that this list excludes any local bibliographies. The output of this function is a list of citation keys used in Denote that need to be added or corrected.
 
 The citations search mechanism uses the =xref= system. You can improve the search process by installing the faster [[https://github.com/BurntSushi/ripgrep][ripgrep]] program and setting ~xref-search-program~ to =ripgrep=.
 
@@ -185,6 +185,7 @@ The citations search mechanism uses the =xref= system. You can improve the searc
     (vertico-mode))
 #+end_src
 
+<<<<<<< HEAD
 This package is available in MELPA. The example below provides a minimum configuration for Citar and Denote. The minimum configuration for Citar is to set the list of bibliography files. If you use Org mode citations, you can set this variable the same as ~org-cite-global-bibliography~. This configuration also sets Citar to accept multiple notes per reference.
 
 The citar-Denote configuration includes all configurable variables with the package defaults. You can either remove these entries or configure them to your preferences. This configuration example also binds all available commands in Citar-Denote.
@@ -193,6 +194,13 @@ The citar-Denote configuration includes all configurable variables with the pack
   (use-package citar
     :ensure t
     :defer t
+=======
+  (use-package citar-denote
+    :demand t ;; Ensure minor mode is loaded
+    :after (:any citar denote)
+    :preface
+    (bind-key "C-c w n" #'citar-denote-open-note)
+>>>>>>> 542614e5b191f2215eb0ccdca2826b59368f6a01
     :custom
     ;; set bibliography's location
     (citar-bibliography '("~/documents/library/magic-tricks.bib"))
@@ -221,12 +229,14 @@ The citar-Denote configuration includes all configurable variables with the pack
     :init
     (citar-denote-mode)
     ;; Bind all available commands
-    :bind (("C-c w n" . citar-denote-open-note)
-           ("C-c w d" . citar-denote-dwim)
+    :bind (("C-c w d" . citar-denote-dwim)
            ("C-c w e" . citar-denote-open-reference-entry)
            ("C-c w a" . citar-denote-add-citekey)
            ("C-c w k" . citar-denote-remove-citekey)
+<<<<<<< HEAD
            ("C-c w b" . citar-denote-nobib)
+=======
+>>>>>>> 542614e5b191f2215eb0ccdca2826b59368f6a01
            ("C-c w r" . citar-denote-find-reference)
            ("C-c w l" . citar-denote-link-reference)
            ("C-c w f" . citar-denote-find-citation)
