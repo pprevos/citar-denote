@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 2.2.1
+;; Version: 2.2.2
 ;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -375,6 +375,7 @@ Based on the `citar-denote-title-format' variable."
   (let* ((description-file-alist
           (mapcar
            (lambda (file)
+             ;; TODO: Unsued lexical variable file-type
              (let ((file-type (denote-filetype-heuristics file)))
                (cons (denote--link-get-description file) file)))
            files))
@@ -404,6 +405,7 @@ use citation key."
        (denote-subdirectory-prompt)))
    nil
    (when citar-denote-template
+     ;; TODO: eq requires two arguments!
      (if (not (eq citar-denote-template))
          citar-denote-template
        (denote-template-prompt)))
@@ -445,7 +447,7 @@ Provides a selection list of all bibliographic entries cited in Denote files."
                             (denote-link--find-file-prompt files)))))
              (goto-char (point-min))
              (search-forward citekey))
-    (message "Not citations found in Denote file")))
+    (message "No citations found in Denote files")))
 
 ;;;###autoload
 (defun citar-denote-dwim ()
@@ -568,7 +570,7 @@ When more than one bibliographic item is referenced, select item first."
             (search-forward citekey))
            ((null citekey)
             (message "This is not a bibliographic note"))
-           (t (message "No citation found in other Denote files"))))
+           (t (message "Reference not cited in Denote files"))))
       (message "Buffer is not a Denote file"))))
 
 ;;;###autoload
@@ -594,7 +596,7 @@ When more than one bibliographic item is referenced, select item first."
 
 ;;;###autoload
 (defun citar-denote-nocite ()
-  "Open Citar with bibliographic entries not cited or referenced in Denote."
+  "Open bibliographic entries not cited or referenced in Denote files with Citar."
   (interactive)
   (citar-open (citar-denote--get-nocite)))
 
