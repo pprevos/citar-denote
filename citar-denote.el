@@ -431,15 +431,18 @@ Provides a selection list of all bibliographic entries with notes."
     (find-file (cdr file))))
 
 ;;;###autoload
-(defun citar-denote-find-citation ()
-  "Find a Denote file that cites a bibliographic entry.
+(defun citar-denote-find-citation (citekey)
+  "Find Denote files that cite a bibliographic entry CITEKEY.
 
-Provides a selection list of all bibliographic entries cited in Denote files."
-  (interactive)
-  (if-let* ((citations (citar-denote--extract-citations))
-            (citekey (citar-select-ref
-                      :filter (citar-denote--has-citekeys citations)))
-            (files (citar-denote--retrieve-cite-files citekey)))
+When called interactively, select an entry from a list with all
+bibliographic entries cited in Denote files."
+  (interactive
+    (if-let* ((citations (citar-denote--extract-citations))
+              (citekey (citar-select-ref
+                        :filter (citar-denote--has-citekeys citations))))
+        (list citekey)
+      (user-error "No citations found in Denote files.")))
+  (if-let ((files (citar-denote--retrieve-cite-files citekey)))
       (progn (find-file (denote-get-path-by-id
                          (denote-extract-id-from-string
                           (if (= (length files) 1)
@@ -447,7 +450,7 @@ Provides a selection list of all bibliographic entries cited in Denote files."
                             (denote-link--find-file-prompt files)))))
              (goto-char (point-min))
              (search-forward citekey))
-    (message "No citations found in Denote files")))
+    (message "No citations of %s found in Denote files" citekey)))
 
 ;;;###autoload
 (defun citar-denote-dwim ()
