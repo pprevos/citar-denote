@@ -138,6 +138,14 @@ For `author-year' and `author-year-title' you can configure:
   :group 'citar-denote
   :type  'string)
 
+(defcustom citar-denote-cite-includes-reference nil
+  "Include reference notes in cite search.
+When non-nil, searching for files citing a bibtex key will
+include Denote files that only contain the citekey in the
+reference front matter (and not as a @-style citation)."
+  :group 'citar-denote
+  :type  'boolean)
+
 (defvar citar-denote-file-types
   `((org
      :reference-format "#+reference:  %s\n"
@@ -248,13 +256,21 @@ If CITEKEYS is omitted, return all Denote files tagged with
          (puthash key (nreverse filelist) files)) files))))
 
 (defun citar-denote--retrieve-cite-files (citekey)
-  "Return names of Denote files that contain CITEKEY."
-  (let ((files (denote-directory-files nil nil t)))
+  "Return names of Denote files that contain CITEKEY.
+
+If `citar-denote-cite-includes-reference' is non-nil, the results
+will include Denote files with CITEKEY only in the reference
+front matter."
+  (let ((cite-sign (if citar-denote-cite-includes-reference "" "@"))
+                    ;; Include '@' in the xref query only when front
+                    ;; matter '#+reference:' to bibtex keyword should
+                    ;; not be included in the results
+        (files (denote-directory-files nil nil t)))
     (delete-dups
      (mapcar
       #'xref-location-group
       (mapcar #'xref-match-item-location
-              (xref-matches-in-files (format "@%s" citekey) files))))))
+              (xref-matches-in-files (format "%s%s" cite-sign citekey) files))))))
 
 (defun citar-denote--has-notes ()
   "Return a list of all citekeys referenced in a Denote file.
