@@ -238,9 +238,17 @@ Use @code{citar-denote-open-note} to open the Citar menu with only entries with 
 
 Citar provides a list of resources for the selected entry: attachments, existing notes, links and an option to create an additional note. Select the note you seek, hit @samp{RET} again and select the Denote file you want to open. 
 
-The previous function shows all literature with one or more bibliographic note(s). The @code{citar-denote-find-citation} function lists all bibliographic entries cited inside your Denote collection, from which you can open the relevant note. Some of these will also have their own bibliographic note, indicated in the Citar menu sidebar.
+The previous function shows all literature with one or more bibliographic note(s). The @code{citar-denote-find-citation} function lists all bibliographic entries cited inside your Denote collection, from which you can open the relevant note.
 
-Depending on the size of your digital garden, searching through all your notes for citations can take a moment.
+Some of these will also have their own bibliographic note, indicated in the Citar menu sidebar.
+
+Setting the @code{citar-denote-cite-includes-reference} to non-nil will include references in the search list when searching for files citing a bibtex key.
+
+When using the @code{citar-embark} package, then you can activate this function with Embark after you create a keyboard shortcut.
+
+@code{(define-key citar-embark-citation-map "c" 'citar-denote-find-citation)}
+
+Depending on the size of your digital garden, searching through all your notes for citations can take a moment. The citations search mechanism uses the @samp{xref} system. You can improve the search process by installing the faster @uref{https://github.com/BurntSushi/ripgrep, ripgrep} program and setting @code{xref-search-program} to @samp{ripgrep}.
 
 @node Open attachments links and notes
 @section Open attachments, links and notes
@@ -292,14 +300,10 @@ The @code{citar-denote-cite-nocite} function cites an unused bibliographic entry
 
 Lastly, the @code{citar-denote-nobib} function lists all references and citations in your Denote collection that are absent in the global bibliography in the @samp{*Messages*} buffer. Note that this list excludes any local bibliographies. The output of this function is a list of citation keys used in Denote that need to be added or corrected.
 
-The citations search mechanism uses the @samp{xref} system. You can improve the search process by installing the faster @uref{https://github.com/BurntSushi/ripgrep, ripgrep} program and setting @code{xref-search-program} to @samp{ripgrep}.
-
 @node Installation and example configuration
 @chapter Installation and example configuration
 
 This package is available in MELPA@. The example below provides a minimum configuration for Citar and Denote. The minimum required configuration for Citar is to set the list of bibliography files. If you use Org mode citations, you can set this variable the same as @code{org-cite-global-bibliography}. This configuration also sets Citar to accept multiple notes per reference.
-
-The citar-Denote configuration includes all configurable variables with their package defaults. You can either remove these entries or configure them to your preferences. This configuration example also binds all available Citar-Denote commands. You will need to change the directory paths to suits your preferences.
 
 @lisp
 (use-package citar
@@ -310,43 +314,49 @@ The citar-Denote configuration includes all configurable variables with their pa
   (citar-bibliography '("~/documents/library/magic-tricks.bib"))
   ;; Allow multiple notes per bibliographic entry
   (citar-open-always-create-notes nil)
+  :init
+  (fido-vertical-mode 1)
   :bind ("C-c w c" . citar-create-note))
 
-  (use-package denote
+(use-package denote
   :defer t
   :custom
   (denote-directory "~/documents/notes"))
+@end lisp
 
-  (use-package citar-denote
-  :ensure t
-  :demand t ;; Ensure minor mode loads
-  :after (:any citar denote)
-  :custom
-  ;; Package defaults
-  (citar-denote-file-type 'org)
-  (citar-denote-keyword "bib")
-  (citar-denote-signature nil)
-  (citar-denote-subdir nil)
-  (citar-denote-template nil)
-  (citar-denote-title-format "title")
-  (citar-denote-title-format-andstr "and")
-  (citar-denote-title-format-authors 1)
-  (citar-denote-use-bib-keywords nil)
-  :preface
-  (bind-key "C-c w n" #'citar-denote-open-note)
-  :init
-  (citar-denote-mode)
-  ;; Bind all available commands
-  :bind (("C-c w d" . citar-denote-dwim)
-         ("C-c w e" . citar-denote-open-reference-entry)
-         ("C-c w a" . citar-denote-add-citekey)
-         ("C-c w k" . citar-denote-remove-citekey)
-         ("C-c w r" . citar-denote-find-reference)
-         ("C-c w l" . citar-denote-link-reference)
-         ("C-c w f" . citar-denote-find-citation)
-         ("C-c w x" . citar-denote-nocite)
-         ("C-c w y" . citar-denote-cite-nocite)
-         ("C-c w z" . citar-denote-nobib)))
+The citar-Denote configuration includes all configurable variables with their package defaults. You can either remove these entries or configure them to your preferences. This configuration example also binds all available Citar-Denote commands. You will need to change the directory paths to suits your preferences.
+
+@lisp
+(use-package citar-denote
+:ensure t
+:demand t ;; Ensure minor mode loads
+:after (:any citar denote)
+:custom
+;; Package defaults
+(citar-denote-file-type 'org)
+(citar-denote-keyword "bib")
+(citar-denote-signature nil)
+(citar-denote-subdir nil)
+(citar-denote-template nil)
+(citar-denote-title-format "title")
+(citar-denote-title-format-andstr "and")
+(citar-denote-title-format-authors 1)
+(citar-denote-use-bib-keywords nil)
+:preface
+(bind-key "C-c w n" #'citar-denote-open-note)
+:init
+(citar-denote-mode)
+;; Bind all available commands
+:bind (("C-c w d" . citar-denote-dwim)
+       ("C-c w e" . citar-denote-open-reference-entry)
+       ("C-c w a" . citar-denote-add-citekey)
+       ("C-c w k" . citar-denote-remove-citekey)
+       ("C-c w r" . citar-denote-find-reference)
+       ("C-c w l" . citar-denote-link-reference)
+       ("C-c w f" . citar-denote-find-citation)
+       ("C-c w x" . citar-denote-nocite)
+       ("C-c w y" . citar-denote-cite-nocite)
+       ("C-c w z" . citar-denote-nobib)))
 @end lisp
 
 You can use the standard configurations for Citar and Denote. Citar-Denote takes over the note-taking functionality in Citar with a minor mode.
@@ -365,7 +375,7 @@ You can also install this package directly from GitHub to enjoy the latest versi
 
 This code would only have existed with the help of Protesilaos Stavrou, developer of Denote and Citar developer Bruce D'Arcus.
 
-In addition, Joel Lööw and Noboru Ota made significant contributions, without which this package would not exist. Troy Figiel, Taha Aziz, Ben Ali, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon, Jonathan Sahar, Samuel W@. Flint, and Yejun Su provided valuable suggestions to extend functionality.
+In addition, Joel Lööw and Noboru Ota made significant contributions, without which this package would not exist. Troy Figiel, Taha Aziz, Ben Ali, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon, Jonathan Sahar, Samuel W@. Flint, Yejun Su, and Elias Storms provided valuable suggestions to extend functionality.
 
 Feel free to raise an issue here on GitHub if you have any questions or find bugs or suggestions for enhanced functionality.
 

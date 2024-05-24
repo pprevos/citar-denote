@@ -5,6 +5,12 @@ Citar-Denote is a minor-mode integrating the Emacs [[https://github.com/emacs-ci
 For more information read the [[file:citar-denote.org][Citar-Denote Manual]] in this repository with =C-h R= (~info-display-manual~) and select =citar-denote=.
 
 * Change Log
+** Version 2.2.2
+- Integration with ~citar-embark~.
+ - Added ~citar-denote-cite-includes-reference~ variable to include referneces when searching for citations.
+- Updated manual and function docstrings.
+- Bug fixes (compilation errors)
+  
 ** Version 2.2.1
 - ~citar-denote-template~ has additional options:
   - =nil=: No template

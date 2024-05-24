@@ -143,6 +143,7 @@ For `author-year' and `author-year-title' you can configure:
 When non-nil, searching for files citing a bibtex key will
 include Denote files that only contain the citekey in the
 reference front matter (and not as a @-style citation)."
+  ;; https://github.com/pprevos/citar-denote/issues/34
   :group 'citar-denote
   :type  'boolean)
 
@@ -270,7 +271,8 @@ front matter."
      (mapcar
       #'xref-location-group
       (mapcar #'xref-match-item-location
-              (xref-matches-in-files (format "%s%s" cite-sign citekey) files))))))
+              (xref-matches-in-files
+               (format "%s%s" cite-sign citekey) files))))))
 
 (defun citar-denote--has-notes ()
   "Return a list of all citekeys referenced in a Denote file.
@@ -387,13 +389,11 @@ Based on the `citar-denote-title-format' variable."
      :filter (citar-denote--has-citekeys unused))))
 
 (defun citar-denote--select-file-using-title (files)
-  "Select a file name based on a list of note titles from a list of FILES."
+  "Select a file based on a list of note titles from a list of FILES."
   (let* ((description-file-alist
           (mapcar
            (lambda (file)
-             ;; TODO: Unsued lexical variable file-type
-             (let ((file-type (denote-filetype-heuristics file)))
-               (cons (denote--link-get-description file) file)))
+             (cons (denote--link-get-description file) file))
            files))
          (selected-description (completing-read "Select note: " description-file-alist))
          (selected-file (cdr (assoc selected-description description-file-alist))))
@@ -408,6 +408,8 @@ The title format is set by `citar-denote-title-format'.
 
 When `citar-denote-subdir' is non-nil, prompt for a subdirectory.
 
+When `citar-denote-template' is non-nil, prompt for a Denote template.
+
 When `citar-denote-signature' is non-nil, prompt for a signature or
 use citation key."
   (denote
@@ -421,16 +423,12 @@ use citation key."
        (denote-subdirectory-prompt)))
    nil
    (when citar-denote-template
-     ;; TODO: eq requires two arguments!
-     (if (not (eq citar-denote-template))
-         citar-denote-template
-       (denote-template-prompt)))
+       (denote-template-prompt))
    (cond ((eq citar-denote-signature 'ask)
           (denote-signature-prompt nil "Signature: "))
          ((eq citar-denote-signature 'citekey)
           citekey)
-         (nil nil))
-   )
+         (nil nil)))
   (citar-denote--add-reference citekey citar-denote-file-type))
 
 ;; Interactive functions
