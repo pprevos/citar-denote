@@ -408,7 +408,8 @@ The title format is set by `citar-denote-title-format'.
 
 When `citar-denote-subdir' is non-nil, prompt for a subdirectory.
 
-When `citar-denote-template' is non-nil, prompt for a Denote template.
+When `citar-denote-template' is a symbol, use the specified
+template, if otherwise non-nil, prompt for a Denote template.
 
 When `citar-denote-signature' is non-nil, prompt for a signature or
 use citation key."
@@ -423,7 +424,8 @@ use citation key."
        (denote-subdirectory-prompt)))
    nil
    (when citar-denote-template
-       (denote-template-prompt))
+     (or (alist-get citar-denote-template denote-templates)
+         (denote-template-prompt)))
    (cond ((eq citar-denote-signature 'ask)
           (denote-signature-prompt nil "Signature: "))
          ((eq citar-denote-signature 'citekey)
