@@ -91,22 +91,21 @@ When this variable is set at ='citekey=, the citation key forms the basis of the
 For example, when the citation key is =einstein_1905=, the signature becomes =einstein=2005=.
 
 ** Create notes using templates
-Denote allows you to create templates for various types of notes. You could have standard headings for bibliographic notes, other headings for meta notes, or whatever else you might need.
+Denote allows you to create templates for various types of notes. You could use standard headings for bibliographic notes, other headings for meta notes, or whatever else you might need, [[info:denote#The denote-templates option][Denote templates]]
 
 To include templates in new bibliographic notes, set the ~citar-denote-template~ to either:
 
 - =t=: Ask for a template when creating a note.
-- The name of the default template for creating new notes
+- The name of the default template for creating bibliographic notes
 
-The example below lets the user choose between a note with two headings (Abstract and Review) or a plain note without any template content, [[info:denote#The denote-templates option][Denote templates]]
+The example below lets the user choose between a note with two headings (Abstract and Review) or a plain note without any template content when ~citar-denote-template~ is non-nil. Setting ~citar-denote-template~ to =biblio= will always use this template for new literature notes.
 
 #+begin_src elisp :tangle no
   (setq denote-templates
         '((biblio . "* Abstract\n\n* Review")
-          (plain . nil)))
+          (plain . nil))
+        citar-denote-template 'biblio)
 #+end_src
-
-Setting ~citar-denote-template~ to =biblio= will always use this template for new literature notes.
 
 ** Literature meta notes
 If you have a set of notes from the same book and use Org mode, you can create a meta note to combine the relevant notes. This note can have automated links to all related references with dynamic blocks or transclude the note's content.
@@ -125,13 +124,13 @@ Use ~citar-denote-open-note~ to open the Citar menu with only entries with one o
 
 Citar provides a list of resources for the selected entry: attachments, existing notes, links and an option to create an additional note. Select the note you seek, hit =RET= again and select the Denote file you want to open. 
 
-The previous function shows all literature with one or more bibliographic note(s). The ~citar-denote-find-citation~ function lists all bibliographic entries cited inside your Denote collection, from which you can open the relevant note.
+The previous function shows all literature with one or more bibliographic note(s) linked through a reference line. The ~citar-denote-find-citation~ function lists all bibliographic entries cited inside your Denote collection, from which you can open the relevant note.
 
-Some of these will also have their own bibliographic note, indicated in the Citar menu sidebar.
+When only one note cites the selected entry, then this file is opened. When more than one file cites the chosen entry, then you first need to select which file to jump to.
 
-Setting the ~citar-denote-cite-includes-reference~ to non-nil will include references in the search list when searching for files citing a bibtex key.
+This function only looks at citations in your document by default. Setting the ~citar-denote-cite-includes-reference~ to non-nil includes references.
 
-When using the ~citar-embark~ package, then you can activate this function with Embark after you create a keyboard shortcut.
+When using the ~citar-embark~ package, you can activate this function with Embark after you create a keyboard shortcut.
 
 ~(define-key citar-embark-citation-map "c" 'citar-denote-find-citation)~
 
