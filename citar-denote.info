@@ -1,4 +1,4 @@
-This is citar-denote.info, produced by makeinfo version 7.1 from
+This is citar-denote.info, produced by makeinfo version 7.1.1 from
 citar-denote.texi.
 
 
@@ -83,9 +83,8 @@ pieces of literature.
 
    You can create several atomic notes for each publication or write a
 complete literature review of a collection of references within one
-note.  For example, you could create a note about each book chapter or
-write a single literature review note for a collection of journal
-articles.
+note.  For example, you could write a note about each book chapter or a
+single literature review note for a collection of journal articles.
 
    The system requires a stable link between the collection of notes and
 the bibliography to enable references.  The most common behaviour for
@@ -129,12 +128,12 @@ Open the Citar interface with ‘citar-create-note’.  The letters at the
 start of the Citar menu indicate whether the entry has a link (‘L’),
 note (‘N’), attachment (‘F’) or is cited in the current buffer (‘C’).
 Select the entry you want to create a note for and use the ‘TAB’ key to
-select more than one reference.  Hit ‘RET’ and follow the prompts to
+select more than one reference.  Hit Return and follow the prompts to
 create a new note.
 
-   If a note already exists, you can open it.  If you want to enable
-multiple notes for bibliographic items, set the
-‘citar-open-always-create-notes’ variable to ‘t’.
+   If a note already exists, you can open it.  To enable multiple notes
+for bibliographic items, set the ‘citar-open-always-create-notes’
+variable to ‘t’.
 
    Various configuration options are available to fine-tune and
 determine how Citar-Denote creates bibliographic notes.
@@ -229,7 +228,7 @@ Denote-Explore package provides a function to rename Denote keywords.
 *note Denote-Explore: (denote-explore)Managing Keywords.
 
    The ‘citar-denote-use-bib-keywords’ variable lets you include any
-keywords defined in the bibliography as Denote keywords.  When set to
+keywords defined in the bibliography entry in the note.  When set to
 ‘t’, Citar-Denote extracts the available keywords from the BibTeX
 ‘keywords’ field and uses these as Denote file tags.
 
@@ -248,8 +247,8 @@ subdirectory when creating a new bibliographic note.
 
    When the content of this variable is a string, Denote saves the note
 in a subdirectory with that name under ‘denote-directory’.  For example,
-if this variable is set at "literature", then all bibliographic notes
-are stored under ‘denote-directory/literature/’.
+if this variable is set at "literature", all bibliographic notes are
+stored under ‘denote-directory/literature/’.
 
 
 File: citar-denote.info,  Node: Signature,  Next: Create notes using templates,  Prev: Subdirectory,  Up: Create bibliographic notes
@@ -275,25 +274,26 @@ File: citar-denote.info,  Node: Create notes using templates,  Next: Literature 
 ================================
 
 Denote allows you to create templates for various types of notes.  You
-could have standard headings for bibliographic notes, other headings for
-meta notes, or whatever else you might need.
+could use standard headings for bibliographic notes, other headings for
+meta notes, or whatever else you might need, *note Denote templates:
+(denote)The denote-templates option.
 
    To include templates in new bibliographic notes, set the
 ‘citar-denote-template’ to either:
 
    • ‘t’: Ask for a template when creating a note.
-   • The name of the default template for creating new notes
+   • The name of the default template for creating bibliographic notes
 
    The example below lets the user choose between a note with two
 headings (Abstract and Review) or a plain note without any template
-content, *note Denote templates: (denote)The denote-templates option.
+content when ‘citar-denote-template’ is non-nil.  Setting
+‘citar-denote-template’ to ‘biblio’ will always use this template for
+new literature notes.
 
      (setq denote-templates
            '((biblio . "* Abstract\n\n* Review")
-             (plain . nil)))
-
-   Setting ‘citar-denote-template’ to ‘biblio’ will always use this
-template for new literature notes.
+             (plain . nil))
+           citar-denote-template 'biblio)
 
 
 File: citar-denote.info,  Node: Literature meta notes,  Prev: Create notes using templates,  Up: Create bibliographic notes
@@ -312,11 +312,10 @@ as explained above.  You can then use the signature as the regular
 expression for the block.
 
    Other options include creating a meta note for an author or a
-specific subject matter.  You can use dynamic blocks as long as the
-relevant notes all include the same character string in their file
-names, which you can fetch with a regular expression.  For more
-information on meta notes, *note Writing metanotes: (denote)Writing
-metanotes.
+specific subject matter.  You can use dynamic blocks if the relevant
+notes all include the same character string in their file names, which
+you can fetch with a regular expression.  For more information on meta
+notes, *note Writing metanotes: (denote)Writing metanotes.
 
 
 File: citar-denote.info,  Node: Working with existing notes,  Next: Relationships between bibliographic notes,  Prev: Create bibliographic notes,  Up: Top
@@ -344,31 +343,33 @@ File: citar-denote.info,  Node: Open existing bibliographic notes,  Next: Open a
 3.1 Open existing bibliographic notes
 =====================================
 
-There are two entry points to find notes that relate to literature,
-either as a reference or as a citation.
+There are two entry points to finding notes related to literature,
+either as references or as citations.
 
    Use ‘citar-denote-open-note’ to open the Citar menu with only entries
-with one or more associated notes.  Select your target and hit ‘RET’.
+with one or more associated notes.  Select your target and hit Return.
 
    Citar provides a list of resources for the selected entry:
 attachments, existing notes, links and an option to create an additional
-note.  Select the note you seek, hit ‘RET’ again and select the Denote
+note.  Select the note you seek, hit Return again and select the Denote
 file you want to open.
 
    The previous function shows all literature with one or more
-bibliographic note(s).  The ‘citar-denote-find-citation’ function lists
-all bibliographic entries cited inside your Denote collection, from
-which you can open the relevant note.
+bibliographic note(s) linked through a reference line.  The
+‘citar-denote-find-citation’ function lists all bibliographic entries
+cited inside your Denote collection, from which you can open the
+relevant note.
 
-   Some of these will also have their own bibliographic note, indicated
-in the Citar menu sidebar.
+   When only one note cites the selected entry, this file is opened.
+When multiple files cite the chosen entry, you must pick which file to
+jump to.
 
-   Setting the ‘citar-denote-cite-includes-reference’ to non-nil will
-include references in the search list when searching for files citing a
-bibtex key.
+   By default, this function only looks at citations in your document.
+Setting the ‘citar-denote-cite-includes-reference’ to non-nil includes
+references.
 
-   When using the ‘citar-embark’ package, then you can activate this
-function with Embark after you create a keyboard shortcut.
+   When using the ‘citar-embark’ package, you can activate this function
+with Embark after you create a keyboard shortcut.
 
    ‘(define-key citar-embark-citation-map "c"
 'citar-denote-find-citation)’
@@ -391,7 +392,7 @@ citation references associated with the current Denote buffer.
 
    Select the required bibliographic item when there is more than one
 reference.  You can then select the attachment, link, or note you would
-like to access and hit ‘RET’, after which you will choose your link,
+like to access and hit Return, after which you will choose your link,
 note, or attachment.  Alternatively, you can also create a new note for
 that reference.
 
@@ -426,10 +427,11 @@ File: citar-denote.info,  Node: Remove references from bibliographic notes,  Pre
 ==============================================
 
 You remove citation references with the ‘citar-denote-remove-citekey’
-command.  If the current buffer references more than one piece of
-literature, you need to select the unwanted item in the minibuffer.
+command.  Suppose the current buffer references more than one piece of
+literature.  In that case, you must select the unwanted item in the
+minibuffer.
 
-   When no more reference items are left, the ‘_bib’ keyword is removed
+   When no more reference items are left, the ‘_bib’ keyword is removed,
 and the file is renamed.
 
    You can also manually edit your file and add and remove reference
@@ -447,7 +449,7 @@ series about the same topic or about the same book.
    The ‘citar-denote-find-reference’ function finds all notes where
 another note cites the selected reference from the active buffer.  A
 warning appears in the minibuffer when the selected reference is not
-found in any Denote files, or you are not in a Denote file.
+found in any Denote files or you are not in a Denote file.
 
    If you would like to know whether one of the references in the
 current buffer is also referenced in another note, then use
@@ -497,8 +499,8 @@ File: citar-denote.info,  Node: Installation and example configuration,  Next: A
 
 This package is available in MELPA.  The example below provides a
 minimum configuration for Citar and Denote.  The minimum required
-configuration for Citar is to set the list of bibliography files.  If
-you use Org mode citations, you can set this variable the same as
+configuration for Citar is to set the list of bibliography files.  Using
+Org mode citations, you can set this variable the same as
 ‘org-cite-global-bibliography’.  This configuration also sets Citar to
 accept multiple notes per reference.
 
@@ -523,7 +525,7 @@ accept multiple notes per reference.
 with their package defaults.  You can either remove these entries or
 configure them to your preferences.  This configuration example also
 binds all available Citar-Denote commands.  You will need to change the
-directory paths to suits your preferences.
+directory paths to suit your preferences.
 
      (use-package citar-denote
      :ensure t
@@ -608,27 +610,27 @@ General Public License for more details.
 
 
 Tag Table:
-Node: Top85
-Node: Principles1909
-Node: Create bibliographic notes4633
-Node: Default file type5693
-Node: Bibliographic note title6325
-Node: Bibliographic keywords8506
-Node: Subdirectory9584
-Node: Signature10300
-Node: Create notes using templates10979
-Node: Literature meta notes12026
-Node: Working with existing notes13023
-Node: Open existing bibliographic notes13778
-Node: Open attachments links and notes15562
-Node: Open bibliographic entry16331
-Node: Convert existing notes to bibliographic notes16768
-Node: Remove references from bibliographic notes17433
-Node: Relationships between bibliographic notes18090
-Node: Citation management19343
-Node: Installation and example configuration20704
-Node: Acknowledgements23677
-Node: License24430
+Node: Top87
+Node: Principles1911
+Node: Create bibliographic notes4628
+Node: Default file type5673
+Node: Bibliographic note title6305
+Node: Bibliographic keywords8486
+Node: Subdirectory9563
+Node: Signature10274
+Node: Create notes using templates10953
+Node: Literature meta notes12091
+Node: Working with existing notes13080
+Node: Open existing bibliographic notes13835
+Node: Open attachments links and notes15687
+Node: Open bibliographic entry16453
+Node: Convert existing notes to bibliographic notes16890
+Node: Remove references from bibliographic notes17555
+Node: Relationships between bibliographic notes18230
+Node: Citation management19482
+Node: Installation and example configuration20843
+Node: Acknowledgements23810
+Node: License24563
 
 End Tag Table
 
