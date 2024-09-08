@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 2.2.2
+;; Version: 2.2.3
 ;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "2.0") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -510,7 +510,6 @@ Add a reference? ")
 ;;;###autoload
 (defun citar-denote-add-citekey ()
   "Add citation key(s) to existing note.
-
 Convert note to a bibliographic note when no existing reference exists."
   (interactive)
   (if-let* ((file (buffer-file-name))
@@ -529,7 +528,10 @@ Convert note to a bibliographic note when no existing reference exists."
             (save-buffer))
         ;; Add new reference line
         (progn (citar-denote--add-reference references file-type)
-               (denote-keywords-add (list citar-denote-keyword))
+               (denote-rename-file file
+                                   (denote-retrieve-front-matter-title-value file file-type)
+                                   (cons citar-denote-keyword
+                                         (denote-retrieve-front-matter-keywords-value file file-type)))
                (save-buffer)))
     (message "Buffer is not a Denote file")))
 
