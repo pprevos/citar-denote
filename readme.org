@@ -2,12 +2,20 @@
 
 Citar-Denote is a minor-mode integrating the Emacs [[https://github.com/emacs-citar/citar][Citar]] and [[https://protesilaos.com/emacs/denote][Denote]] packages to enable create managing bibliographic notes and citations.
 
+This package is part of the [[https://github.com/pprevos/emacs-writing-studio/][Emacs Writing Studio]], a configuration, website and (e)book about researching, writing and publishing articles, books, dissertations and anything else an author needs.
+
 For more information read the [[file:citar-denote.org][Citar-Denote Manual]] in this repository with =C-h R= (~info-display-manual~) and select =citar-denote=.
 
+The =init.el= file in the =test= folder provides a minimum configuration for testing the package.
+
 * Change Log
+** Version 2.2.3
+- Fixed ~citar-denote-add-citekey~ (compatibility with Denote 3.0)
+- Grammar check of the manual
+  
 ** Version 2.2.2
 - Integration with ~citar-embark~.
- - Added ~citar-denote-cite-includes-reference~ variable to include referneces when searching for citations.
+ - Added ~citar-denote-cite-includes-reference~ variable to include references when searching for citations.
 - Updated manual and function docstrings.
 - Bug fixes (compilation errors)
   
