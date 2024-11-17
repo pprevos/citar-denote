@@ -431,7 +431,12 @@ use citation key."
          ((eq citar-denote-signature 'citekey)
           citekey)
          (nil nil)))
-  (citar-denote--add-reference citekey citar-denote-file-type))
+  (citar-denote--add-reference citekey citar-denote-file-type)
+  ;; Open available atachment in other window
+  (when (one-window-p)
+    (split-window-right))
+  (other-window 1)
+  (citar-open-files citekey))
 
 ;; Interactive functions
 
@@ -531,7 +536,8 @@ Convert note to a bibliographic note when no existing reference exists."
                (denote-rename-file file
                                    (denote-retrieve-front-matter-title-value file file-type)
                                    (cons citar-denote-keyword
-                                         (denote-retrieve-front-matter-keywords-value file file-type)))
+                                         (denote-retrieve-front-matter-keywords-value
+                                          file file-type)))
                (save-buffer)))
     (message "Buffer is not a Denote file")))
 
