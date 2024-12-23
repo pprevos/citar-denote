@@ -301,7 +301,7 @@ See documentation for `citar-has-notes'."
      file
      (delete citar-denote-keyword keywords)
      file-type)
-    (denote-rename-file-using-front-matter file t)))
+    (denote-rename-file-using-front-matter file)))
 
 (defun citar-denote--extract-citations-blocks (line)
   "Extract all Org mode citation blocks from LINE."
@@ -544,8 +544,7 @@ Convert note to a bibliographic note when no existing reference exists."
 ;;;###autoload
 (defun citar-denote-remove-citekey ()
   "Remove a reference from a bibliographic note.
-
-If the only or last reference is removed, remove `_bib' keyword."
+If the only or last reference is removed, also remove the `_bib' keyword."
   (interactive)
   (if-let* ((file (buffer-file-name))
             (file-type (denote-filetype-heuristics file))
