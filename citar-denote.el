@@ -5,8 +5,8 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 2.2.3
-;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "2.0") (dash "2.19.1"))
+;; Version: 2.2.4
+;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "3.1") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -50,7 +50,7 @@
 (defgroup citar-denote ()
   "Creating and accessing bibliography files with Citar and Denote."
   :group 'files
-  :link  '(url-link :tag "Homepage" "https://lucidmanager.org/productivity/bibliographic-notes-in-emacs-with-citar-denote/"))
+  :link  '(url-link :tag "Homepage" "https://github.com/pprevos/citar-denote/"))
 
 (defcustom citar-denote-keyword "bib"
   "Denote keyword (file tag) to indicate bibliographical notes.
@@ -84,8 +84,8 @@ text mode."
 (defcustom citar-denote-subdir nil
   "Save new bibliographic notes in a chosen or defined subdirectory.
 Options:
-- `nil', note is stored in `denote-directory'.
-- `t', Denote asks for subdirectory to store the note.
+- nil, note is stored in `denote-directory'.
+- t, Denote asks for subdirectory to store the note.
 - `string': When entering a string, the note is save in a subdirectory
   under `denote-directory'."
   ;; https://github.com/pprevos/citar-denote/issues/11
@@ -115,7 +115,7 @@ Options:
 - `author-year': Author-year citation style, e.g. Stallman (1981)
 - `author-year-title': Combine author, year and title
 - `full': Full citation
-- `nil': BibTeX citekey
+- nil: BibTeX citekey
 
 For `author-year' and `author-year-title' you can configure:
 - `citar-denote-title-format-authors'
@@ -140,9 +140,9 @@ For `author-year' and `author-year-title' you can configure:
 
 (defcustom citar-denote-cite-includes-reference nil
   "Include reference notes in cite search.
-When non-nil, searching for files citing a bibtex key will
-include Denote files that only contain the citekey in the
-reference front matter (and not as a @-style citation)."
+When non-nil, searching for files citing a bibtex key includes Denote files
+that only contain the citekey in the reference front matter (and not as a
+@-style citation)."
   ;; https://github.com/pprevos/citar-denote/issues/34
   :group 'citar-denote
   :type  'boolean)
@@ -210,7 +210,7 @@ citation key CITEKEY."
     (append keywords (list citar-denote-keyword))))
 
 (defun citar-denote--add-reference (citekey file-type)
-  "Add reference with CITEKEY in front matter of the file with FILE-TYPE.
+  "Add reference with CITEKEY to the front matter of file with FILE-TYPE.
 
 `citar-denote-add-citekey' is the interactive version of this function."
   (save-excursion
@@ -284,7 +284,6 @@ See documentation for `citar-has-notes'."
 
 (defun citar-denote--has-citekeys (citekeys)
   "Return hash table of citar entries with associated CITEKEYS."
-  ;; TODO: Is this function doing the same thing as cetar-denote--get-notes?
   (let ((citar-entries (citar-get-entries))
         (citekey-entries (make-hash-table :test 'equal)))
     (mapc (lambda (key)
@@ -472,7 +471,7 @@ bibliographic entries cited in Denote files."
               (citekey (citar-select-ref
                         :filter (citar-denote--has-citekeys citations))))
         (list citekey)
-      (user-error "No citations found in Denote files.")))
+      (user-error "No citations found in Denote files")))
   (if-let ((files (citar-denote--retrieve-cite-files citekey)))
       (progn (find-file (denote-get-path-by-id
                          (denote-extract-id-from-string
