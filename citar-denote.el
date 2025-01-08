@@ -659,6 +659,7 @@ When more than one bibliographic item is referenced, select item first."
   "Check that all notes with references has a bib keyword.
 Remove bib keyword when no reference, but `citar-denote-keyword' is present.
 Add bib keyword when refenece is present, but `citar-denote-keyword' is missing."
+  (interactive)
   (let ((files (denote-directory-files nil nil t)))
     (dolist (file files)
       (message file)
