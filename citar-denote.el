@@ -649,6 +649,28 @@ When more than one bibliographic item is referenced, select item first."
              (length nobib)
              (mapconcat #'identity nobib ", "))))
 
+;;;###autoload
+(defun citar-denote-check-keywords ()
+  "Check that all notes with references has a bib keyword.
+Remove bib keyword when no reference, but `citar-denote-keyword' is present.
+Add bib keyword when refenece is present, but `citar-denote-keyword' is missing."
+  (let ((files (denote-directory-files nil nil t)))
+    (dolist (file files)
+      (message file)
+      (let* ((file-type (denote-filetype-heuristics file))
+             (regex (citar-denote--reference-regex file-type))
+             (reference-p (with-temp-buffer
+                            (insert-file-contents file)
+                            (re-search-forward regex nil t)))
+             (keywords (denote-retrieve-front-matter-keywords-value file file-type))
+             (bib-keyword-p (not (null (member citar-denote-keyword keywords)))))
+        ;; Remove bib keyword when no reference but citar-denote-keyword
+        (when (and (not reference-p) bib-keyword-p)
+          (citar-denote--remove-bibkey file))
+        ;; Add bib keyword when refenece but no citar-denote-keyword
+        (when (and reference-p (not bib-keyword-p))
+          (citar-denote--add-bibkey file))))))
+ 
 (define-obsolete-function-alias
   'citar-denote-find-nocite
   'citar-denote-cite-nocite
