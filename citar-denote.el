@@ -303,6 +303,16 @@ See documentation for `citar-has-notes'."
      file-type)
     (denote-rename-file-using-front-matter file)))
 
+(defun citar-denote--add-bibkey (file)
+  "Add `citar-denote-bibkey' file tag from FILE."
+  (let* ((file-type (denote-filetype-heuristics file))
+         (keywords (denote-retrieve-keywords-value file file-type)))
+    (denote-rewrite-keywords
+     file
+     ((delete-dups (denote-keywords-sort (cons citar-denote-keyword keywords))))
+     file-type)
+    (denote-rename-file-using-front-matter file)))
+
 (defun citar-denote--extract-citations-blocks (line)
   "Extract all Org mode citation blocks from LINE."
   (let ((org-cite-regex "\\[\\(?:cite\\(?:/[a-z]\\)?\\)\\:@\\([^]]+\\)\\]")
@@ -533,18 +543,14 @@ Convert note to a bibliographic note when no existing reference exists."
             (save-buffer))
         ;; Add new reference line
         (progn (citar-denote--add-reference references file-type)
-               (denote-rename-file file
-                                   (denote-retrieve-front-matter-title-value file file-type)
-                                   (cons citar-denote-keyword
-                                         (denote-retrieve-front-matter-keywords-value
-                                          file file-type)))
+               (citar-denote--add-bibkey file)
                (save-buffer)))
     (message "Buffer is not a Denote file")))
 
 ;;;###autoload
 (defun citar-denote-remove-citekey ()
   "Remove a reference from a bibliographic note.
-If the only or last reference is removed, also remove the `_bib' keyword."
+If the only or last reference is removed, also remove `citar-denote-keyword'."
   (interactive)
   (if-let* ((file (buffer-file-name))
             (file-type (denote-filetype-heuristics file))
