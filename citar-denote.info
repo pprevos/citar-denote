@@ -51,6 +51,7 @@ Create bibliographic notes
 * Subdirectory::
 * Signature::
 * Create notes using templates::
+* Working with Denote silos::
 * Literature meta notes::
 
 Working with existing notes
@@ -84,28 +85,28 @@ between your notes and your bibliography through references.  Each item
 in the bibliography can have one or more notes, and each note can
 reference one or more pieces of literature.
 
-   You can create several atomic notes for a single publication or write
-a complete literature review of a collection of references within one
+   You can create a collection of atomic notes for a single publication
+or write a complete literature review assorted references within one
 note.  For example, you could write a note about each book chapter or a
-single literature review note for a collection of journal articles.
+single literature review note for a collection of journal articles about
+a shared topic.
 
-   The system requires a stable link between the collection of notes and
-the bibliography to enable references.  The most common behaviour for
-bibliography packages in Emacs is that the filename for the relevant
+   The package requires a stable link between the collection of notes
+and the bibliography to enable references.  The most common behaviour
+for bibliography packages in Emacs is that the filename for the relevant
 note includes the citation key to link it to the bibliography (e.g.,
 ‘marcuse_1969_essay.org’).  However, Denote follows a strict naming
 convention, so this approach to linking notes and literature is not
 feasible.
 
    In Citar-Denote, the citation key is part of the front matter of
-Denote files through the ‘reference:’ line.
+Denote files through the ‘reference’ line.
 
    Citar-Denote stores the relationship between citation keys and note
 files in a cache.  The package regenerates this cache after you edit a
 bibliography file or call any Citar functions.  Each bibliographic note
-is marked with the configurable ‘_bib’ file tag
-(‘citar-denote-keyword’).  This tag reduces the search space to generate
-the cache.
+is marked with the configurable ‘bib’ file tag (‘citar-denote-keyword’).
+This tag reduces the search space to generate the cache.
 
    The front matter for a bibliographic Org mode note looks something
 like this:
@@ -117,8 +118,8 @@ like this:
      #+reference:  marcuse_1969_essay
 
    Depending on the size of your digital garden, searching through all
-your notes for citations can take a moment.  The citations search
-mechanism uses the ‘xref’ system.  You can improve the search process by
+notes for citations can take a moment.  The citations search mechanism
+uses the ‘xref’ system.  You can improve the search process by
 installing the faster ripgrep (https://github.com/BurntSushi/ripgrep)
 program and setting ‘xref-search-program’ to ‘ripgrep’.
 
@@ -149,6 +150,7 @@ Citar-Denote creates bibliographic notes.
 * Subdirectory::
 * Signature::
 * Create notes using templates::
+* Working with Denote silos::
 * Literature meta notes::
 
 
@@ -274,7 +276,7 @@ naming convention.
 becomes ‘einstein=2005’.
 
 
-File: citar-denote.info,  Node: Create notes using templates,  Next: Literature meta notes,  Prev: Signature,  Up: Create bibliographic notes
+File: citar-denote.info,  Node: Create notes using templates,  Next: Working with Denote silos,  Prev: Signature,  Up: Create bibliographic notes
 
 2.6 Create notes using templates
 ================================
@@ -302,9 +304,23 @@ new literature notes.
            citar-denote-template 'biblio)
 
 
-File: citar-denote.info,  Node: Literature meta notes,  Prev: Create notes using templates,  Up: Create bibliographic notes
+File: citar-denote.info,  Node: Working with Denote silos,  Next: Literature meta notes,  Prev: Create notes using templates,  Up: Create bibliographic notes
 
-2.7 Literature meta notes
+2.7 Working with Denote silos
+=============================
+
+All Citar-Denote commands detect the current silo and act accordingly,
+*note Denote silos: (denote)Maintain separate directory silos for notes.
+
+   A convenience command is available to select a silo before creating a
+new bibliographic note.  using ‘citar-denote-create-silo-note’ activates
+the extended silo commands in Denote and lets you select a silo defined
+in ‘denote-silo-extras-directories’.
+
+
+File: citar-denote.info,  Node: Literature meta notes,  Prev: Working with Denote silos,  Up: Create bibliographic notes
+
+2.8 Literature meta notes
 =========================
 
 If you have a set of notes from the same book and use Org mode, you can
@@ -373,10 +389,9 @@ Setting the ‘citar-denote-cite-includes-reference’ to non-nil includes
 references.
 
    When using the ‘citar-embark’ package, you can activate this function
-with Embark after you create a keyboard shortcut.
+after you create a keyboard shortcut:
 
-   ‘(define-key citar-embark-citation-map "c"
-'citar-denote-find-citation)’
+   ‘(define-key citar-embark-map "d" 'citar-denote-find-citation)’
 
 
 File: citar-denote.info,  Node: Open attachments links and notes,  Next: Open bibliographic entry,  Prev: Open existing bibliographic notes,  Up: Working with existing notes
@@ -410,10 +425,15 @@ File: citar-denote.info,  Node: Add references of convert existing notes to bibl
 3.4 Add references of convert existing notes to bibliographic notes
 ===================================================================
 
-The ‘citar-denote-add-citekey’ function adds citation keys or converts
-an existing Denote file to a bibliographic note.  When converting a
-regular Denote file, the function adds the ‘bib’ keyword to the front
-matter and renames the file accordingly.
+The ‘citar-denote-add-reference’ command adds one or more citation keys
+to the reference line.  This command converts an existing Denote file to
+a bibliographic note when no existing reference line exists.  When
+converting a regular Denote file, the function adds the
+‘citar-denote-keyword’ to the front matter and renames the file
+accordingly.
+
+   Using the universal argument ‘C-u’ lets you select entries that are
+not yet referenced or cited in your Denote files.
 
 
 File: citar-denote.info,  Node: Remove references from bibliographic notes,  Prev: Add references of convert existing notes to bibliographic notes,  Up: Working with existing notes
@@ -502,6 +522,9 @@ does the following:
      present.
    • Add bib keyword when refenece is present, but
      ‘citar-denote-keyword’ is missing.
+
+   The ‘citar-denote-nobib’ command lists all citations referenced or
+cited in Denote, but not present in the bibliography.
 
 
 File: citar-denote.info,  Node: Installation and example configuration,  Next: Acknowledgements,  Prev: Quality Assurance,  Up: Top
@@ -592,10 +615,12 @@ This code would only have existed with the help of Protesilaos Stavrou,
 developer of Denote and Citar developer Bruce D'Arcus.
 
    In addition, Joel Lööw and Noboru Ota made significant contributions,
-without which this package would not exist.  Troy Figiel, Taha Aziz, Ben
-Ali, Guillermo Navarro, Colin McLear, Lucas Gruss, Adrian Adermon,
-Jonathan Sahar, Samuel W.  Flint, Yejun Su, and Elias Storms provided
-valuable suggestions to extend functionality.
+without which this package would not exist.
+
+   Troy Figiel, Taha Aziz, Ben Ali, Guillermo Navarro, Colin McLear,
+Lucas Gruss, Adrian Adermon, Jonathan Sahar, Samuel W.  Flint, Yejun Su,
+Elias Storms, and Rafael Palomar provided valuable suggestions to extend
+functionality.
 
    Feel free to raise an issue here on GitHub if you have any questions
 or find bugs or suggestions for enhanced functionality.
@@ -623,27 +648,28 @@ General Public License for more details.
 
 Tag Table:
 Node: Top260
-Node: Principles2117
-Node: Create bibliographic notes4897
-Node: Default file type5867
-Node: Bibliographic note title6487
-Node: Bibliographic keywords8705
-Node: Subdirectory9772
-Node: Signature10574
-Node: Create notes using templates11211
-Node: Literature meta notes12343
-Node: Working with existing notes13353
-Node: Open existing bibliographic notes14131
-Node: Open attachments links and notes15633
-Node: Open bibliographic entry16399
-Node: Add references of convert existing notes to bibliographic notes16854
-Node: Remove references from bibliographic notes17467
-Node: Relationships between bibliographic notes18160
-Node: Citation management19419
-Node: Quality Assurance20838
-Node: Installation and example configuration21305
-Node: Acknowledgements24275
-Node: License25028
+Node: Principles2147
+Node: Create bibliographic notes4939
+Node: Default file type5939
+Node: Bibliographic note title6559
+Node: Bibliographic keywords8777
+Node: Subdirectory9844
+Node: Signature10646
+Node: Create notes using templates11283
+Node: Working with Denote silos12419
+Node: Literature meta notes13050
+Node: Working with existing notes14057
+Node: Open existing bibliographic notes14835
+Node: Open attachments links and notes16316
+Node: Open bibliographic entry17082
+Node: Add references of convert existing notes to bibliographic notes17537
+Node: Remove references from bibliographic notes18371
+Node: Relationships between bibliographic notes19064
+Node: Citation management20323
+Node: Quality Assurance21742
+Node: Installation and example configuration22338
+Node: Acknowledgements25308
+Node: License26080
 
 End Tag Table
 

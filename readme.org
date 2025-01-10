@@ -9,6 +9,15 @@ For more information read the [[file:citar-denote.org][Citar-Denote Manual]] in 
 The =init.el= file in the =test= folder provides a minimum configuration for testing the package.
 
 * Change Log
+** Version 2.3
+- New command to add bibliographic note in a silo: ~citar-denote-create-silo-note~.
+- Renamed ~citar-denote-add-citekey~ to ~citar-denote-add-reference~ and implemented ability to select only from entries not yet used in any Denote file.
+- Added ~citar-denote-check-keywords~ command to check.
+- New command ~citar-denote-nobib~ lists citation keys referenced or cited in Denote, but not present in the in bibliography in the messages buffer.
+- Improvements to detection of bibliographic items not used in Denote (nocite)
+- Improvements to adding and removing bibliographic keyword
+- Updated mechanism to add references
+
 ** Version 2.2.3
 - Fixed ~citar-denote-add-citekey~ (compatibility with Denote 3.0)
 - Grammar check of the manual
