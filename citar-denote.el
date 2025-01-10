@@ -676,16 +676,30 @@ Add bib keyword when refenece is present, but `citar-denote-keyword' is missing.
         ;; Add bib keyword when refenece but no citar-denote-keyword
         (when (and reference-p (not bib-keyword-p))
           (citar-denote--add-bibkey file))))))
- 
+
+;;;###autoload
+(defun citar-denote-create-silo-note (silo)
+  "Select SILO and run `citar-create-denote' in it.
+SILO is a file path from `denote-silo-extras-directories'.
+
+When called from Lisp, SILO is a file system path to a directory."
+  ;; https://github.com/pprevos/citar-denote/issues/41
+  (interactive (list (denote-silo-extras-directory-prompt)))
+  (require 'denote-silo-extras)
+  (let ((denote-directory silo))
+    (call-interactively #'citar-create-note)))
+
 (define-obsolete-function-alias
   'citar-denote-find-nocite
-  'citar-denote-cite-nocite
-  "1.6")
+  'citar-denote-cite-nocite "1.6")
 
 (define-obsolete-function-alias
   'citar-denote-reference-nocite
-  'citar-denote-nocite
-  "1.8.1")
+  'citar-denote-nocite "1.8.1")
+
+(define-obsolete-function-alias
+  'citar-denote-add-citekey
+  'citar-denote-add-reference "2.3")
 
 ;; Citar integration
 
