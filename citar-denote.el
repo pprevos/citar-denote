@@ -209,18 +209,31 @@ citation key CITEKEY."
 			                           (denote-keywords)))))))
     (append keywords (list citar-denote-keyword))))
 
-(defun citar-denote--add-reference (citekey file-type)
-  "Add reference with CITEKEY to the front matter of file with FILE-TYPE.
-
-`citar-denote-add-citekey' is the interactive version of this function."
-  (save-excursion
-    (goto-char (point-min))
-    (re-search-forward "^\n" nil t)
-    (forward-line -1)
-    (if (not (eq (or file-type 'org) 'org))
-        (forward-line -1))
-    (insert
-     (format (citar-denote--reference-format file-type) citekey))))
+(defun citar-denote--add-reference (citekeys)
+  "Add reference with CITEKEYS to the front matter of the current buffer.
+`citar-denote-add-reference' is the interactive version of this function."
+  (if-let* ((file (buffer-file-name))
+            (file-type (denote-filetype-heuristics file))
+            (new-references (mapconcat #'identity citekeys ";"))
+            (references (citar-denote--retrieve-references file)))
+      ;; Add to existing
+      (save-excursion
+        (goto-char (point-min))
+        (re-search-forward (citar-denote--reference-regex file-type))
+        (end-of-line)
+        (insert (concat ";" new-references))
+        (save-buffer))
+    ;; New reference line
+    (progn
+      (message new-references)
+      (save-excursion
+        (goto-char (point-min))
+        (re-search-forward "^\n" nil t)
+        (forward-line -1)
+        (when (not (eq (or file-type 'org) 'org))
+          (forward-line -1))
+        (insert (format (citar-denote--reference-format file-type) new-references)))
+      (citar-denote--add-bibkey file))))
 
 (defun citar-denote--retrieve-references (file)
   "Return reference citekey(s) from FILE front matter."
