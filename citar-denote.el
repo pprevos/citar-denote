@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 2.2.4
+;; Version: 2.3
 ;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "3.1") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -533,29 +533,20 @@ Add a reference? ")
       (message "Buffer is not a Denote file"))))
 
 ;;;###autoload
-(defun citar-denote-add-citekey ()
+(defun citar-denote-add-reference (&optional nocite)
   "Add citation key(s) to existing note.
-Convert note to a bibliographic note when no existing reference exists."
-  (interactive)
+With universal argument choose from entries not yet used (NOCITE).
+Add `citar-denote-bibkey' keyword when no existing reference exists."
+  (interactive "P")
   (if-let* ((file (buffer-file-name))
-            (file-type (denote-filetype-heuristics file))
-            ((denote-file-is-note-p file))
-            (citekeys (citar-denote--get-non-referenced file))
-            (references (mapconcat 'identity citekeys ";")))
-      ;; Check whether reference line already exists
-      (if-let (keys (citar-denote--retrieve-references file))
-          ;; Append existing reference
-          (save-excursion
-            (goto-char (point-min))
-            (re-search-forward (citar-denote--reference-regex file-type))
-            (end-of-line)
-            (insert (concat ";" references))
-            (save-buffer))
-        ;; Add new reference line
-        (progn (citar-denote--add-reference references file-type)
-               (citar-denote--add-bibkey file)
-               (save-buffer)))
-    (message "Buffer is not a Denote file")))
+            (denote-p (denote-file-is-note-p file))
+            (citekeys (if nocite
+                          (citar-denote--get-nocite)
+                        (citar-denote--get-non-referenced file))))
+      (citar-denote--add-reference citekeys)
+    (if (not denote-p)
+        (message "Buffer is not a Denote file")
+      (message "All bibliogary entries have been cited or referenced"))))
 
 ;;;###autoload
 (defun citar-denote-remove-citekey ()
@@ -640,8 +631,10 @@ When more than one bibliographic item is referenced, select item first."
 (defun citar-denote-nocite ()
   "Open bibliographic entries not cited or referenced in Denote files with Citar."
   (interactive)
-  (citar-open (citar-denote--get-nocite)))
-
+  (if-let ((citekeys (citar-denote--get-nocite)))
+      (citar-open citekeys)
+    (message "All bibliogary entries have been cited or referenced")))
+  
 ;;;###autoload
 (defun citar-denote-cite-nocite ()
   "Cite bibliographic entries not cited or referenced in Denote files."
@@ -673,7 +666,6 @@ Add bib keyword when refenece is present, but `citar-denote-keyword' is missing.
   (interactive)
   (let ((files (denote-directory-files nil nil t)))
     (dolist (file files)
-      (message file)
       (let* ((file-type (denote-filetype-heuristics file))
              (regex (citar-denote--reference-regex file-type))
              (reference-p (with-temp-buffer
