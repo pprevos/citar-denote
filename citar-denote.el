@@ -307,22 +307,21 @@ See documentation for `citar-has-notes'."
 
 (defun citar-denote--remove-bibkey (file)
   "Remove `citar-denote-bibkey' file tag from FILE."
+  ;; https://github.com/pprevos/citar-denote/issues/43
   (let* ((file-type (denote-filetype-heuristics file))
-         (keywords (denote-retrieve-keywords-value file file-type)))
-    (denote-rewrite-keywords
-     file
-     (delete citar-denote-keyword keywords)
-     file-type)
+         (keywords (denote-retrieve-keywords-value file file-type))
+         (new-keywords (delete citar-denote-keyword keywords)))
+    (denote-rewrite-keywords file new-keywords file-type)
     (denote-rename-file-using-front-matter file)))
 
 (defun citar-denote--add-bibkey (file)
   "Add `citar-denote-bibkey' file tag from FILE."
+  ;; https://github.com/pprevos/citar-denote/issues/44
   (let* ((file-type (denote-filetype-heuristics file))
-         (keywords (denote-retrieve-keywords-value file file-type)))
-    (denote-rewrite-keywords
-     file
-     ((delete-dups (denote-keywords-sort (cons citar-denote-keyword keywords))))
-     file-type)
+         (keywords (denote-retrieve-keywords-value file file-type))
+         (new-keywords (delete-dups (denote-keywords-sort
+                                      (cons citar-denote-keyword keywords)))))
+    (denote-rewrite-keywords file new-keywords file-type)
     (denote-rename-file-using-front-matter file)))
 
 (defun citar-denote--extract-citations-blocks (line)
