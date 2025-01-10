@@ -390,24 +390,23 @@ Based on the `citar-denote-title-format' variable."
 
 (defun citar-denote--get-nocite ()
   "Select item(s) from Citar entries not cited or referenced in Denote files."
-  (if-let* ((bibliography (hash-table-keys (citar-get-entries)))
-            (citations (citar-denote--extract-citations))
-            (references (hash-table-keys (citar-denote--get-notes)))
-	    (union (cl-union citations references))
-	    (nocite (cl-set-difference bibliography union :test #'string=)))
-      (citar-select-refs
-       :multiple t
-       :filter (citar-denote--has-citekeys nocite))
-    nil))
+  (let* ((bibliography (hash-table-keys (citar-get-entries)))
+         (citations (citar-denote--extract-citations))
+         (references (hash-table-keys (citar-denote--get-notes)))
+	 (cite-ref (cl-union citations references))
+	 (nocite (cl-set-difference bibliography cite-ref :test #'string=)))
+    (when nocite (citar-select-refs
+                  :multiple t
+                  :filter (citar-denote--has-citekeys nocite)))))
 
 (defun citar-denote--get-non-referenced (file)
   "Select Citar entry not already referenced in FILE."
-  (let* ((all-items (hash-table-keys (citar-get-entries)))
+  (let* ((bibliography (hash-table-keys (citar-get-entries)))
          (references (citar-denote--retrieve-references file))
-         (unused (-difference all-items references)))
-    (citar-select-refs
-     :multiple t
-     :filter (citar-denote--has-citekeys unused))))
+         (unused (-difference bibliography references)))
+    (when unused (citar-select-refs
+                  :multiple t
+                  :filter (citar-denote--has-citekeys unused)))))
 
 (defun citar-denote--select-file-using-title (files)
   "Select a file based on a list of note titles from a list of FILES."
