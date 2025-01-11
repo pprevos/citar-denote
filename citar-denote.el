@@ -549,7 +549,7 @@ Add `citar-denote-bibkey' keyword when no existing reference exists."
       (message "All bibliogary entries have been cited or referenced"))))
 
 ;;;###autoload
-(defun citar-denote-remove-citekey ()
+(defun citar-denote-remove-reference ()
   "Remove a reference from a bibliographic note.
 If the only or last reference is removed, also remove `citar-denote-keyword'."
   (interactive)
@@ -703,6 +703,10 @@ When called from Lisp, SILO is a file system path to a directory."
 (define-obsolete-function-alias
   'citar-denote-add-citekey
   'citar-denote-add-reference "2.3")
+
+(define-obsolete-function-alias
+  'citar-denote-remove-citekey
+  'citar-denote-remove-reference "2.3")
 
 ;; Citar integration
 

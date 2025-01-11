@@ -63,7 +63,7 @@ The default name for a new note is the title of the bibliographic entry. You can
 4. =full=: Full citation of the entry
 5. Fallback option or =nil=: The citation key
 
-For example, using this citation: Coppa, Hass, Peck, Burger (2008) /Performing Magic on the Western Stage: From the Eighteenth Century to the Present/, Palgrave Macmillan https://doi.org/10.1057/9780230617124. The five options result in:
+For example, using this citation: Coppa, Hass, Peck, Burger (2008) /Performing Magic on the Western Stage: From the Eighteenth Century to the Present/, Palgrave Macmillan. The five options result in:
 
 1. =title=: "Performing Magic on the Western Stage: From the Eighteenth Century to the Present".
 2. =author-year=: "Coppa et al. (2008)". 
@@ -161,11 +161,11 @@ The ~citar-denote-add-reference~ command adds one or more citation keys to the r
 Using the universal argument =C-u= lets you select entries that are not yet referenced or cited in your Denote files.
 
 ** Remove references from bibliographic notes
-You remove citation references with the ~citar-denote-remove-citekey~ command. Suppose the current buffer references more than one piece of literature. In that case, you must select the unwanted item in the minibuffer.
+You remove citation references with the ~citar-denote-remove-reference~ command. Suppose the current buffer references more than one piece of literature. In that case, you must select the unwanted item in the minibuffer.
 
-When no more reference items are left, the =_bib= keyword is removed, and the file is renamed.
+When no more reference items are left, ~citar-denote-keyword~ is removed, and the file is renamed.
 
-You can also manually edit your file and add and remove reference citation keys.
+You can of course also manually edit your file and add and remove reference citation keys.
 
 * Relationships between bibliographic notes
 Bibliographic notes rarely exist in solitude. A note might be one of a series about the same topic or about the same book. 
