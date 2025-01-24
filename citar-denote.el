@@ -210,30 +210,32 @@ citation key CITEKEY."
     (append keywords (list citar-denote-keyword))))
 
 (defun citar-denote--add-reference (citekeys)
-  "Add reference with CITEKEYS to the front matter of the current buffer.
+  "Add CITEKEYS to the front matter of the current buffer.
 `citar-denote-add-reference' is the interactive version of this function."
-  (if-let* ((file (buffer-file-name))
-            (file-type (denote-filetype-heuristics file))
-            (new-references (mapconcat #'identity citekeys ";"))
-            (references (citar-denote--retrieve-references file)))
-      ;; Add to existing
-      (save-excursion
-        (goto-char (point-min))
-        (re-search-forward (citar-denote--reference-regex file-type))
-        (end-of-line)
-        (insert (concat ";" new-references))
-        (save-buffer))
-    ;; New reference line
-    (progn
-      (message new-references)
-      (save-excursion
-        (goto-char (point-min))
-        (re-search-forward "^\n" nil t)
-        (forward-line -1)
-        (when (not (eq (or file-type 'org) 'org))
-          (forward-line -1))
-        (insert (format (citar-denote--reference-format file-type) new-references)))
-      (citar-denote--add-bibkey file))))
+  (let* ((file (buffer-file-name))
+         (filetype (denote-filetype-heuristics file))
+         (new-references (mapconcat #'identity citekeys ";"))
+         (existing-references (citar-denote--retrieve-references file)))
+    (if existing-references
+        ;; Add to existing
+        (save-excursion
+          (goto-char (point-min))
+          (re-search-forward (citar-denote--reference-regex filetype))
+          (end-of-line)
+          (insert (concat ";" new-references))
+          (save-buffer))
+      ;; New reference line
+      (citar-denote--add-new-reference-line citekeys filetype))))
+
+(defun citar-denote--add-new-reference-line (citekeys filetype)
+  "Add a new reference line with CITEKEYS to buffer of FILETYPE."
+  (save-excursion
+    (goto-char (point-min))
+    (while (not (looking-at "^$")) ;; Search for the first empty line
+      (forward-line 1))
+    (when (not (eq filetype 'org)) (forward-line -1))
+    (insert (format (citar-denote--reference-format filetype)
+                    (mapconcat #'identity citekeys ";")))))
 
 (defun citar-denote--retrieve-references (file)
   "Return reference citekey(s) from FILE front matter."
@@ -317,10 +319,11 @@ See documentation for `citar-has-notes'."
 (defun citar-denote--add-bibkey (file)
   "Add `citar-denote-bibkey' file tag from FILE."
   ;; https://github.com/pprevos/citar-denote/issues/44
-  (let* ((file-type (denote-filetype-heuristics file))
-         (keywords (denote-retrieve-keywords-value file file-type))
-         (new-keywords (delete-dups (denote-keywords-sort
-                                      (cons citar-denote-keyword keywords)))))
+  (when-let* ((file-type (denote-filetype-heuristics file))
+              (keywords (string-split (denote-retrieve-filename-keywords file) "_"))
+              (existing-p (not (member citar-denote-keyword keywords)))
+              (new-keywords (delete-dups (denote-keywords-sort
+                                          (cons citar-denote-keyword keywords)))))
     (denote-rewrite-keywords file new-keywords file-type)
     (denote-rename-file-using-front-matter file)))
 
@@ -422,17 +425,13 @@ Based on the `citar-denote-title-format' variable."
 (defun citar-denote--create-note (citekey &optional _entry)
   "Create a bibliographic note for CITEKEY with properties ENTRY.
 
-The note file type is determined by `citar-denote-file-type'.
-
-The title format is set by `citar-denote-title-format'.
-
-When `citar-denote-subdir' is non-nil, prompt for a subdirectory.
-
-When `citar-denote-template' is a symbol, use the specified
-template, if otherwise non-nil, prompt for a Denote template.
-
-When `citar-denote-signature' is non-nil, prompt for a signature or
-use citation key."
+- The note file type is determined by `citar-denote-file-type'.
+- The title format is set by `citar-denote-title-format'.
+- When `citar-denote-subdir' is non-nil, prompt for a subdirectory.
+- When `citar-denote-template' is a symbol, use the specified template,
+  if otherwise non-nil, prompt for a Denote template.
+- When `citar-denote-signature' is non-nil, prompt for a signature or use
+  the citation key."
   (denote
    (read-string "Title: " (citar-denote--generate-title citekey))
    (citar-denote--keywords-prompt citekey)
@@ -451,12 +450,14 @@ use citation key."
          ((eq citar-denote-signature 'citekey)
           citekey)
          (nil nil)))
-  (citar-denote--add-reference citekey citar-denote-file-type)
+  (citar-denote--add-new-reference-line (list citekey)
+                                        citar-denote-file-type)
   ;; Open available atachment in other window
-  (when (one-window-p)
-    (split-window-right))
-  (other-window 1)
-  (citar-open-files citekey))
+  (when (citar-get-value "file" citekey)
+    (when (one-window-p)
+      (split-window-right))
+    (other-window 1)
+    (citar-open-files citekey)))
 
 ;; Interactive functions
 
@@ -535,7 +536,7 @@ Add a reference? ")
 ;;;###autoload
 (defun citar-denote-add-reference (&optional nocite)
   "Add citation key(s) to existing note.
-With universal argument choose from entries not yet used (NOCITE).
+With universal argument choose from entries not yet used in Denote (NOCITE).
 Add `citar-denote-bibkey' keyword when no existing reference exists."
   (interactive "P")
   (if-let* ((file (buffer-file-name))
@@ -543,7 +544,10 @@ Add `citar-denote-bibkey' keyword when no existing reference exists."
             (citekeys (if nocite
                           (citar-denote--get-nocite)
                         (citar-denote--get-non-referenced file))))
-      (citar-denote--add-reference citekeys)
+      (progn
+        (citar-denote--add-reference citekeys)
+        (citar-denote--add-bibkey file)
+        (save-buffer))
     (if (not denote-p)
         (message "Buffer is not a Denote file")
       (message "All bibliogary entries have been cited or referenced"))))
@@ -554,28 +558,26 @@ Add `citar-denote-bibkey' keyword when no existing reference exists."
 If the only or last reference is removed, also remove `citar-denote-keyword'."
   (interactive)
   (if-let* ((file (buffer-file-name))
-            (file-type (denote-filetype-heuristics file))
-	    (citekeys (citar-denote--retrieve-references file))
-	    (selected (if (< (length citekeys) 2)
-			  (car citekeys)
-			(citar-select-ref
-			 :filter
-			 (citar-denote--has-citekeys citekeys)))))
+            (filetype (denote-filetype-heuristics file))
+            (citekeys (citar-denote--retrieve-references file))
+            (selected (if (< (length citekeys) 2)
+                          (car citekeys)
+                        (citar-select-ref
+                         :filter
+                         (citar-denote--has-citekeys citekeys)))))
       (let ((new-citekeys (delete selected citekeys)))
         (save-excursion
-	  ;; Remove references line
-	  (goto-char (point-min))
-	  (re-search-forward
-	   (citar-denote--reference-regex file-type))
-	  (move-beginning-of-line nil)
-	  (kill-line 1)
-	  ;; Add new line or remove file tags when applicable
-	  (if (> (length new-citekeys) 0)
-	      (citar-denote--add-reference
-	       (mapconcat 'identity new-citekeys ";")
-               file-type)
-	    (citar-denote--remove-bibkey file))
-	  (save-buffer)))
+          ;; Remove references line
+          (goto-char (point-min))
+          (re-search-forward
+           (citar-denote--reference-regex filetype))
+          (move-beginning-of-line nil)
+          (kill-line 1)
+          ;; Add new line or remove file tags when applicable
+          (if (> (length new-citekeys) 0)
+              (citar-denote--add-new-reference-line new-citekeys filetype)
+            (citar-denote--remove-bibkey file))
+          (save-buffer)))
     (message "No references in this buffer, or not a Denote file")))
 
 ;;;###autoload
