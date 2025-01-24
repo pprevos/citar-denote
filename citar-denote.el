@@ -129,12 +129,12 @@ For `author-year' and `author-year-title' you can configure:
            (const :tag "Citekey" nil)))
 
 (defcustom citar-denote-title-format-authors 1
-  "Maximum number of authors in `author-year' for `citar-denote-title-format'."
+  "Maximum number of authors befor et al. in `citar-denote--format-author-editor'."
   :group 'citar-denote
   :type  'integer)
 
 (defcustom citar-denote-title-format-andstr "and"
-  "Connecting word for authors in `author-year' for `citar-denote-note-title'."
+  "Connecting word for last two authors `citar-denote--format-author-editor'."
   :group 'citar-denote
   :type  'string)
 
@@ -361,26 +361,33 @@ See documentation for `citar-has-notes'."
 			    citation-blocks-flat)))
 	 (delete-dups (apply #'append citations))))
 
+(defun citar-denote--format-author-editor (citekey)
+  "Extract author or editor from CITEKEY.
+Format author(s) or editor(s) in accordance with:
+- `citar-denote-title-format-authors': Number of authors before et al.
+- `citar-denote-title-format-andstr': Connecting string between last two authors."
+  (let ((author-names (or (citar-get-value "author" citekey)
+                          (citar-get-value "editor" citekey))))
+    (citar--shorten-names
+     author-names
+     citar-denote-title-format-authors
+     citar-denote-title-format-andstr)))
+
 (defun citar-denote--generate-title (citekey)
   "Generate title for new bibliographic note using CITEKEY.
 
 Either title, author/year, full reference or citation key.
 Based on the `citar-denote-title-format' variable."
   ;; https://github.com/pprevos/citar-denote/issues/15
-  (let ((title (citar-get-value "title" citekey))
-        (author-names (or (citar-get-value "author" citekey)
-                          (citar-get-value "editor" citekey)))
+  (let ((author-editor (citar-denote--format-author-editor citekey))
+        (title (citar-get-value "title" citekey))
         (year (or (citar-get-value "year" citekey)
                   (citar-get-value "date" citekey)
                   (citar-get-value "issued" citekey))))
     (cond ((equal citar-denote-title-format "title")
            title)
           ((equal citar-denote-title-format "author-year")
-           (concat (citar--shorten-names
-                    author-names
-                    citar-denote-title-format-authors
-                    citar-denote-title-format-andstr)
-                   " (" year ")"))
+           (concat author-editor " (" year ")"))
           ((equal citar-denote-title-format "author-year-title")
            (let* ((citar-denote-title-format "author-year")
                   (author-year (citar-denote--generate-title citekey))
