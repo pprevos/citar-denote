@@ -1,11 +1,11 @@
 ;;; citar-denote.el --- Minor mode integrating Citar and Denote -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022-2024 Peter Prevos
+;; Copyright (C) 2022-2025 Peter Prevos
 
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 2.3
+;; Version: 2.4
 ;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "3.1") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -84,7 +84,7 @@ text mode."
 (defcustom citar-denote-subdir nil
   "Save new bibliographic notes in a chosen or defined subdirectory.
 Options:
-- nil, note is stored in `denote-directory'.
+- nil, note is stored in the default `denote-directory'.
 - t, Denote asks for subdirectory to store the note.
 - `string': When entering a string, the note is save in a subdirectory
   under `denote-directory'."
@@ -278,9 +278,9 @@ If `citar-denote-cite-includes-reference' is non-nil, the results
 will include Denote files with CITEKEY only in the reference
 front matter."
   (let ((cite-sign (if citar-denote-cite-includes-reference "" "@"))
-                    ;; Include '@' in the xref query only when front
-                    ;; matter '#+reference:' to bibtex keyword should
-                    ;; not be included in the results
+        ;; Include '@' in the xref query only when front
+        ;; matter '#+reference:' to bibtex keyword should
+        ;; not be included in the results
         (files (denote-directory-files nil nil t)))
     (delete-dups
      (mapcar
@@ -350,16 +350,16 @@ See documentation for `citar-has-notes'."
   "Extract citations from all Denote files."
   ;; Extract lines with citations
   (let* ((xrefs (xref-matches-in-files "\\[cite:@.*\\]"
-                 (denote-directory-files nil nil t)))
+                                       (denote-directory-files nil nil t)))
          (citation-lines (mapcar #'substring-no-properties
                                  (mapcar #'xref-match-item-summary
                                          xrefs)))
          (citation-blocks (mapcar #'citar-denote--extract-citations-blocks
-				       citation-lines))
+				  citation-lines))
 	 (citation-blocks-flat  (apply #'append citation-blocks))
 	 (citations (mapcar #'citar-denote--extract-citation-keys
 			    citation-blocks-flat)))
-	 (delete-dups (apply #'append citations))))
+    (delete-dups (apply #'append citations))))
 
 (defun citar-denote--format-author-editor (citekey)
   "Extract author or editor from CITEKEY.
@@ -414,7 +414,7 @@ There are four special citation macros:
   (let* ((author-or-editor (citar-denote--format-author-editor citekey))
          (url-value (citar-get-value "url" citekey))
          (doi-value (citar-get-value "doi" citekey))
-         (url (cond
+         (doi-url (cond
                (doi-value (concat "doi:" doi-value))
                (url-value url-value)
                (t nil)))
@@ -523,11 +523,11 @@ Provides a selection list of all bibliographic entries with notes."
 When called interactively, select an entry from a list with all
 bibliographic entries cited in Denote files."
   (interactive
-    (if-let* ((citations (citar-denote--extract-citations))
-              (citekey (citar-select-ref
-                        :filter (citar-denote--has-citekeys citations))))
-        (list citekey)
-      (user-error "No citations found in Denote files")))
+   (if-let* ((citations (citar-denote--extract-citations))
+             (citekey (citar-select-ref
+                       :filter (citar-denote--has-citekeys citations))))
+       (list citekey)
+     (user-error "No citations found in Denote files")))
   (if-let ((files (citar-denote--retrieve-cite-files citekey)))
       (progn (find-file (denote-get-path-by-id
                          (denote-extract-id-from-string
@@ -680,7 +680,7 @@ When more than one bibliographic item is referenced, select item first."
   (if-let ((citekeys (citar-denote--get-nocite)))
       (citar-open citekeys)
     (message "All bibliogary entries have been cited or referenced")))
-  
+
 ;;;###autoload
 (defun citar-denote-cite-nocite ()
   "Cite bibliographic entries not cited or referenced in Denote files."
@@ -706,9 +706,9 @@ When more than one bibliographic item is referenced, select item first."
 
 ;;;###autoload
 (defun citar-denote-check-keywords ()
-  "Check that all notes with references has a bib keyword.
+  "Check that each note with references has a bib keyword.
 Remove bib keyword when no reference, but `citar-denote-keyword' is present.
-Add bib keyword when refenece is present, but `citar-denote-keyword' is missing."
+Add bib keyword when reference is present, but `citar-denote-keyword' is missing."
   (interactive)
   (let ((files (denote-directory-files nil nil t)))
     (dolist (file files)

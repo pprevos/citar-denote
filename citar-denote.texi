@@ -47,7 +47,7 @@ Citar-Denote integrates the @uref{https://github.com/emacs-citar/citar, Citar} b
 Create bibliographic notes
 
 * Default file type::
-* Bibliographic note title::
+* Title of a bibliographic note::
 * Bibliographic keywords::
 * Subdirectory::
 * Signature::
@@ -105,13 +105,13 @@ Depending on the size of your digital garden, searching through all notes for ci
 
 Open the Citar interface with @code{citar-create-note}. The letters at the start of the Citar menu indicate whether the entry has a link (@samp{L}), note (@samp{N}), attachment (@samp{F}) or is cited in the current buffer (@samp{C}). Select the entry you want to create a note for, hit return and follow the prompts to create a new note.
 
-If a note already exists, you can open it. To enable multiple notes for bibliographic items, set the @code{citar-open-always-create-notes} variable to @samp{t}.
+If a note already exists, you can open it from within the Citar menu. To enable multiple notes for bibliographic items, set the @code{citar-open-always-create-notes} variable to @samp{t}.
 
 Various configuration options are available to customise how Citar-Denote creates bibliographic notes.
 
 @menu
 * Default file type::
-* Bibliographic note title::
+* Title of a bibliographic note::
 * Bibliographic keywords::
 * Subdirectory::
 * Signature::
@@ -125,14 +125,14 @@ Various configuration options are available to customise how Citar-Denote create
 
 You can create bibliographic notes for each file type that Denote supports: Org mode, two Markdown flavours and plain text.
 
-Citar-Denote uses the default file type set by the @code{denote-file-type} variable, which you can override with @code{citar-denote-file-type} to use a different file type for bibliographic notes.
+Citar-Denote uses the default set by the @code{denote-file-type} variable, which you can override with @code{citar-denote-file-type} to use a different type for bibliographic notes.
 
 Please note that the citations only works in Org mode. Citation mechanisms exist for Markdown, but these are not standardised.
 
-@node Bibliographic note title
-@section Bibliographic note title
+@node Title of a bibliographic note
+@section Title of a bibliographic note
 
-The default name for a new note is the title of the bibliographic entry. You can modify this behaviour with the @code{citar-denote-title-format} variable. Four options are available:
+The default title for a new note is the title of the bibliographic entry. You can modify this behaviour with the @code{citar-denote-title-format} variable. Four options are available:
 
 @enumerate
 @item
@@ -147,7 +147,7 @@ The default name for a new note is the title of the bibliographic entry. You can
 Fallback option or @samp{nil}: The citation key
 @end enumerate
 
-For example, using this citation: Coppa, Hass, Peck, Burger (2008) @emph{Performing Magic on the Western Stage: From the Eighteenth Century to the Present}, Palgrave Macmillan @uref{https://doi.org/10.1057/9780230617124}. The five options result in:
+For example, using this citation: Coppa, Hass, Peck, Burger (2008) @emph{Performing Magic on the Western Stage: From the Eighteenth Century to the Present}, Palgrave Macmillan. The five options result in:
 
 @enumerate
 @item
@@ -162,9 +162,9 @@ For example, using this citation: Coppa, Hass, Peck, Burger (2008) @emph{Perform
 @samp{nil}: ``coppa@math{_2008}@math{_perf}''.
 @end enumerate
 
-Using @samp{author-year} for entries allows for some further configuration.
+Using @samp{author-year} and @samp{author-year-title} allows for some further configuration.
 
-For entries with more than one author, you can specify the maximum number of names with @code{citar-denote-title-format-authors}, which is one by default. When the number of defined authors exceeds the number in the citation, ``et al.'' is added to the end. All authors are listed when this variable exceeds the number of defined authors.
+For entries with more than one author, you can specify the maximum number of names with @code{citar-denote-title-format-authors}, which is one by default. When the number of defined authors exceeds this number, ``et al.'' is added after the last author name. All authors are listed when this variable exceeds the number of defined authors.
 
 The default term between authors is ``and'', which can be changed by customising @code{citar-denote-title-format-andstr}.
 
@@ -177,7 +177,7 @@ Every new bibliographic note includes the @samp{bib} file tag. This tag minimise
 
 Changing the default keyword requires updating all your bibliographic notes because the package only recognises a single string. The Denote-Explorer package provides a function to rename Denote keywords, @ref{Managing Keywords,Denote-Explorer,,denote-explore,}
 
-The @code{citar-denote-use-bib-keywords} variable includes keywords defined in the bibliography entry in the note. When set to @samp{t}, Citar-Denote extracts the available keywords from the Bib@TeX{} @samp{keywords} field and uses these as Denote file tags.
+When @code{citar-denote-use-bib-keywords} is non-nil, Citar-Denote extracts the available keywords from the Bib@TeX{} @samp{keywords} field and uses these as Denote file tags, in addition to the @code{citar-denote=keyword}.
 
 @node Subdirectory
 @section Subdirectory
@@ -200,7 +200,7 @@ For example, when the citation key is @samp{einstein_1905}, the signature become
 @node Create notes using templates
 @section Create notes using templates
 
-Denote includes provisions to create templates for new notes. You could use standard headings for bibliographic notes, other headings for meta notes, or whatever else you might need, @ref{The denote-templates option,Denote templates,,denote,}
+Denote includes provisions to create templates for new notes. This functionality enables you to define standard headings for bibliographic notes, other headings for meta notes, or whatever else you might need, @ref{The denote-templates option,Denote templates,,denote,}
 
 To include templates in new bibliographic notes, set @code{citar-denote-template} to either:
 
@@ -220,6 +220,28 @@ The example below lets the user choose between a note with two headings (Abstrac
       citar-denote-template 'biblio)
 @end lisp
 
+Templates can also contain citation macros to expand fields from the bibliographic entry in the new note. You can use any field available in the bibliography. For example, use @samp{%^@{title@}} to expand the title of the publication. There are three special macros:
+
+@itemize
+@item
+@samp{%^@{author-or-editor@}}: Format author(s) or editor(s) as specified in the title generation section above.
+@item
+@samp{%^@{doi-url@}}: Expands to URL or the DOI@. When both are available use the DOI@.
+@item
+@samp{%^file}: Expands to the first defined file. Note that links only work with absolute paths for files.
+@item
+@samp{%^@{citation@}}: Expands to formatted reference.
+@end itemize
+
+This use case is an expanded version of the example above but with an expanded citation added to the start of the note.
+
+@lisp
+(setq denote-templates
+      '((biblio . "%^@{citation@}\n* Abstract\n\n* Review\n")
+        (plain . nil))
+      citar-denote-template 'biblio)
+@end lisp
+
 @node Working with Denote silos
 @section Working with Denote silos
 
@@ -227,12 +249,16 @@ All Citar-Denote commands detect the current silo and act accordingly, @ref{Main
 
 A convenience command is available to select a silo before creating a new bibliographic note. using @code{citar-denote-create-silo-note} activates the extended silo commands in Denote and lets you select a silo defined in @code{denote-silo-extras-directories}.
 
+For this command to be functional you need to load the Denote silos library with  @code{(require 'denote-silo-extras)}.
+
 @node Literature meta notes
 @section Literature meta notes
 
 If you have a set of notes from the same book and use Org mode, you can create a meta note to combine the relevant notes. This note can have automated links to all related references with dynamic blocks or display the content of serval notes (transclusion).
 
-The best way to create a meta note that combines literature notes from a single publication is to add the citation key in the signature, as explained above. You can then use the signature as the regular expression for the block. Other options include creating a meta note for an author or a specific subject matter. You can use dynamic blocks if the relevant notes all include the same character string in their file names, which you can fetch with a regular expression.
+The most convenient way to create a meta note that combines literature notes from a single publication is to add the citation key in the signature, as explained above. You can then use the signature as the regular expression for the block.
+
+Other options include creating a meta note for an author or a specific subject matter. Dynamic blocks can help group relevant notes if they include the same character string in their file names, which you can fetch with a regular expression.
 
 For more information on meta notes, @ref{Writing metanotes,Writing metanotes,,denote,}
 
@@ -258,13 +284,9 @@ Use @code{citar-denote-open-note} to open the Citar menu with only entries with 
 
 Citar provides a list of resources for the selected entry: attachments, existing notes, links and an option to create an additional note. Select the note you seek, hit Return again and select the Denote file you want to open. 
 
-The previous function shows all literature with one or more bibliographic note(s) linked through a reference line. The @code{citar-denote-find-citation} function lists all bibliographic entries cited inside your Denote collection, from which you can open the relevant note. When only one note cites the selected entry, this file is opened. When multiple files cite the chosen entry, you must pick which file to jump to.
+The previous function shows all literature with one or more bibliographic note(s) linked through a reference line. The @code{citar-denote-find-citation} function lists all bibliographic entries cited inside your Denote collection. When only one note cites the selected entry, this file is opened. When multiple files cite the chosen entry, you must pick which file to open.
 
 By default, this function only looks at citations in your document. Setting the @code{citar-denote-cite-includes-reference} to non-nil includes references.
-
-When using the @code{citar-embark} package, you can activate this function after you create a keyboard shortcut:
-
-@code{(define-key citar-embark-map "d" 'citar-denote-find-citation)}
 
 @node Open attachments links and notes
 @section Open attachments, links and notes
@@ -276,7 +298,7 @@ Select the required bibliographic item when there is more than one reference. Yo
 @node Open bibliographic entry
 @section Open bibliographic entry
 
-The @code{citar-denote-open-reference-entry} function opens the bibliographic entry (Bib@TeX{}, Bib@LaTeX{} or CSL file) for a selected reference, from where you can edit the bibliographic data.
+The @code{citar-denote-open-reference-entry} function opens the bibliographic entry (Bib@TeX{}, Bib@LaTeX{} or CSL file) for a selected reference, from where you can edit the data.
 
 @node Add references of convert existing notes to bibliographic notes
 @section Add references of convert existing notes to bibliographic notes
@@ -288,18 +310,18 @@ Using the universal argument @samp{C-u} lets you select entries that are not yet
 @node Remove references from bibliographic notes
 @section Remove references from bibliographic notes
 
-You remove citation references with the @code{citar-denote-remove-citekey} command. Suppose the current buffer references more than one piece of literature. In that case, you must select the unwanted item in the minibuffer.
+You remove citation references with the @code{citar-denote-remove-reference} command. Suppose the current buffer references more than one piece of literature. In that case, you must select the unwanted item in the minibuffer.
 
-When no more reference items are left, the @samp{_bib} keyword is removed, and the file is renamed.
+When no more reference items are left, @code{citar-denote-keyword} is removed, and the file is renamed.
 
-You can also manually edit your file and add and remove reference citation keys.
+You can of course also manually edit your file and add and remove reference citation keys.
 
 @node Relationships between bibliographic notes
 @chapter Relationships between bibliographic notes
 
 Bibliographic notes rarely exist in solitude. A note might be one of a series about the same topic or about the same book. 
 
-The @code{citar-denote-find-reference} function finds all notes where another note cites the selected reference from the active buffer. A warning appears in the minibuffer when the selected reference is not found in any Denote files or you are not in a Denote file. 
+The @code{citar-denote-find-reference} function finds any notes where another note references or cites the selected reference from the active buffer. A warning appears in the minibuffer when the selected reference is not found in any Denote files or you are not in a Denote file. 
 
 If you would like to know whether one of the references in the current buffer is also referenced in another note, then use @code{citar-denote-dwim}, discussed above.
 
@@ -313,8 +335,6 @@ What is the point of building a bibliography without using each entry as a citat
 The @code{citar-denote-nocite} function opens the Citar menu. It shows all items in your bibliography that are neither cited nor referenced. From there, you can create a new bibliographic note, follow a link or read the associated file(s). If your Denote collection references or cites all items in your bibliography, a message appears in the minibuffer: ``No associated resources''. 
 
 The @code{citar-denote-cite-nocite} function cites any unused bibliographic items. This function only works when the active buffer is a Denote Org mode note.
-
-Lastly, the @code{citar-denote-nobib} function lists all references and citations in your Denote collection that are absent in the global bibliography in the @samp{*Messages*} buffer. Note that this list excludes any local bibliographies. The output of this function is a list of citation keys used in Denote that need to be added or corrected.
 
 Please note that these functions only recognises citations in Org files.
 
@@ -330,7 +350,7 @@ Remove bib keyword when no reference, but @code{citar-denote-keyword} is present
 Add bib keyword when refenece is present, but @code{citar-denote-keyword} is missing.
 @end itemize
 
-The @code{citar-denote-nobib} command lists all citations referenced or cited in Denote, but not present in the bibliography.
+The @code{citar-denote-nobib} function lists all references and citations in your Denote collection that are absent in the global bibliography in the @samp{*Messages*} buffer. Note that this list excludes local Org mode bibliographies. The output of this function is a list of citation keys used in Denote that need to be added or corrected.
 
 @node Installation and example configuration
 @chapter Installation and example configuration
