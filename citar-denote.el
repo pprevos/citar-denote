@@ -694,12 +694,17 @@ Add bib keyword when refenece is present, but `citar-denote-keyword' is missing.
   "Select SILO and run `citar-create-denote' in it.
 SILO is a file path from `denote-silo-extras-directories'.
 
-When called from Lisp, SILO is a file system path to a directory."
+When called from Lisp, SILO is a directory path."
   ;; https://github.com/pprevos/citar-denote/issues/41
-  (interactive (list (denote-silo-extras-directory-prompt)))
-  (require 'denote-silo-extras)
-  (let ((denote-directory silo))
-    (call-interactively #'citar-create-note)))
+  (interactive
+   (progn
+     (require 'denote-silos-extra nil t)
+     (when (featurep 'denote-silo-extras)
+       (list (denote-silo-extras-directory-prompt)))))
+  (if-let ((denote-directory silo))
+      (progn (message "creating note in: %s" silo)
+             (call-interactively #'citar-create-note))
+    (message "Denote extra silo functionality not enabled")))
 
 (define-obsolete-function-alias
   'citar-denote-find-nocite
