@@ -398,6 +398,42 @@ Based on the `citar-denote-title-format' variable."
              (substring ref 0 (- (length ref) 2))))
           (t citekey))))
 
+(defun citar-denote--expand-citation-macros (citekey)
+  "Expand Citar-Denote citation macros for CITEKEY.
+
+Citation macros expand to information from the bibliographoc enytry and
+are in the form of %^{field-name}, for example %^{title}. Any field can be
+used as a macro.
+
+There are four special citation macros:
+- %^{author-or-editor}: Author(s) or Editors(s) formatted with
+  `citar-denote--format-author-editor'.
+- %^{doi-url}: DOI or URL. When both are defined, use DOI.
+- %^{file}: First listed file (links only work with absolute file path).
+- %^{citation}: Full citation."
+  (let* ((author-or-editor (citar-denote--format-author-editor citekey))
+         (url-value (citar-get-value "url" citekey))
+         (doi-value (citar-get-value "doi" citekey))
+         (url (cond
+               (doi-value (concat "doi:" doi-value))
+               (url-value url-value)
+               (t nil)))
+         (files (citar-get-value "file" citekey))
+         (file (when files (car (split-string files ";"))))
+         (citation (citar-format-reference (list citekey)))
+         (entry (citar-get-entry citekey)))
+    (save-excursion
+      (goto-char (point-min))
+      ;; Macro format: %^{field-name}
+      (while (re-search-forward "\\%^{\\([^}]+\\)}" nil t)
+        (let* ((macro-name (match-string 1))
+               (bib-field (cdr (assoc-string macro-name entry 'case-fold)))
+               (replacement (or (and (boundp (intern macro-name))
+                                     (symbol-value (intern macro-name)))
+                                bib-field)))
+          (when replacement
+            (replace-match replacement t t)))))))
+
 (defun citar-denote--get-nocite ()
   "Select item(s) from Citar entries not cited or referenced in Denote files."
   (let* ((bibliography (hash-table-keys (citar-get-entries)))
@@ -436,7 +472,8 @@ Based on the `citar-denote-title-format' variable."
 - The title format is set by `citar-denote-title-format'.
 - When `citar-denote-subdir' is non-nil, prompt for a subdirectory.
 - When `citar-denote-template' is a symbol, use the specified template,
-  if otherwise non-nil, prompt for a Denote template.
+  if otherwise non-nil, prompt for a Denote template. Citation macros are
+  expanded with `citar-denote--expand-citation-macros'.
 - When `citar-denote-signature' is non-nil, prompt for a signature or use
   the citation key."
   (denote
@@ -457,8 +494,8 @@ Based on the `citar-denote-title-format' variable."
          ((eq citar-denote-signature 'citekey)
           citekey)
          (nil nil)))
-  (citar-denote--add-new-reference-line (list citekey)
-                                        citar-denote-file-type)
+  (citar-denote--add-new-reference-line (list citekey) citar-denote-file-type)
+  (when citar-denote-template (citar-denote--expand-citation-macros citekey))
   ;; Open available atachment in other window
   (when (citar-get-value "file" citekey)
     (when (one-window-p)
