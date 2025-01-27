@@ -401,36 +401,41 @@ Based on the `citar-denote-title-format' variable."
 (defun citar-denote--expand-citation-macros (citekey)
   "Expand Citar-Denote citation macros for CITEKEY.
 
-Citation macros expand to information from the bibliographoc enytry and
+Citation macros expand to information from the bibliographic entry and
 are in the form of %^{field-name}, for example %^{title}. Any field can be
 used as a macro.
 
 There are four special citation macros:
-- %^{author-or-editor}: Author(s) or Editors(s) formatted with
+- %^{author-or-editor}: Author(s) or Editor(s) formatted with
   `citar-denote--format-author-editor'.
 - %^{doi-url}: DOI or URL. When both are defined, use DOI.
 - %^{file}: First listed file (links only work with absolute file path).
 - %^{citation}: Full citation."
+  ;; Define special citation macros
   (let* ((author-or-editor (citar-denote--format-author-editor citekey))
          (url-value (citar-get-value "url" citekey))
          (doi-value (citar-get-value "doi" citekey))
          (doi-url (cond
-               (doi-value (concat "doi:" doi-value))
-               (url-value url-value)
-               (t nil)))
+                   (doi-value (concat "doi:" doi-value))
+                   (url-value url-value)
+                   (t nil)))
          (files (citar-get-value "file" citekey))
          (file (when files (car (split-string files ";"))))
          (citation (citar-format-reference (list citekey)))
-         (entry (citar-get-entry citekey)))
+         ;; All defined bibtex fields
+         (entry (citar-get-entry citekey))
+         ;; Create a mapping of macro names to values
+         (macro-map `(("author-or-editor" . ,author-or-editor)
+                      ("doi-url" . ,doi-url)
+                      ("file" . ,file)
+                      ("citation" . ,citation))))
     (save-excursion
       (goto-char (point-min))
       ;; Macro format: %^{field-name}
       (while (re-search-forward "\\%^{\\([^}]+\\)}" nil t)
         (let* ((macro-name (match-string 1))
-               (bib-field (cdr (assoc-string macro-name entry 'case-fold)))
-               (replacement (or (and (boundp (intern macro-name))
-                                     (symbol-value (intern macro-name)))
-                                bib-field)))
+               (replacement (or (cdr (assoc-string macro-name macro-map 'case-fold))
+                                (cdr (assoc-string macro-name entry 'case-fold)))))
           (when replacement
             (replace-match replacement t t)))))))
 
