@@ -117,18 +117,27 @@ The example below lets the user choose between a note with two headings (Abstrac
         citar-denote-template 'biblio)
 #+end_src
 
-Templates can also contain citation macros to expand fields from the bibliographic entry in the new note. You can use any field available in the bibliography. For example, use =%^{title}= to expand the title of the publication. There are three special macros:
+Templates can also contain citation macros to expand fields from the bibliographic entry in the new note. You can use any field available in the bibliography. For example, use =%^{title}= to expand the title of the publication. Citar has two special field names:
+
+#+begin_src org
+  - %^{=key=}: Citation key
+  - %^{=type=}: Publication type (book, article etc.)
+#+end_src
+
+Citar-Denote also provides three special macros:
 
 - =%^{author-or-editor}=: Format author(s) or editor(s) as specified in the title generation section above.
 - =%^{doi-url}=: Expands to URL or the DOI. When both are available use the DOI.
-- =%^file=: Expands to the first defined file. Note that links only work with absolute paths for files.
+- =%^{file}=: Expands to the first defined file. Note that links only work with absolute paths for files.
 - =%^{citation}=: Expands to formatted reference.
 
-This use case is an expanded version of the example above but with an expanded citation added to the start of the note.
+The use case below is an expanded version of the example above but with a citation added to the start of the template.
 
 #+begin_src elisp :tangle no :results none
   (setq denote-templates
-        '((biblio . "%^{citation}\n* Abstract\n\n* Review\n")
+        '((biblio . ,(concat "%^{citation}\n"
+                             "* Abstract\n\n"
+                             "* Review\n"))
           (plain . nil))
         citar-denote-template 'biblio)
 #+end_src
