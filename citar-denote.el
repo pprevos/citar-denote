@@ -147,6 +147,11 @@ that only contain the citekey in the reference front matter (and not as a
   :group 'citar-denote
   :type  'boolean)
 
+(defcustom citar-denote-open-attachment t
+  "When non-nil, open the first defined attachment of the bibliographic entry."
+  :group 'citar-denote
+  :type 'boolean)
+
 (defvar citar-denote-file-types
   `((org
      :reference-format "#+reference:  %s\n"
@@ -502,7 +507,7 @@ There are four special citation macros:
   (citar-denote--add-new-reference-line (list citekey) citar-denote-file-type)
   (when citar-denote-template (citar-denote--expand-citation-macros citekey))
   ;; Open available atachment in other window
-  (when (citar-get-value "file" citekey)
+  (when (and citar-denote-open-attachment (citar-get-value "file" citekey))
     (when (one-window-p)
       (split-window-right))
     (other-window 1)

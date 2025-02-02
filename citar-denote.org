@@ -45,6 +45,8 @@ Open the Citar interface with ~citar-create-note~. The letters at the start of t
 
 If a note already exists, you can open it from within the Citar menu. To enable multiple notes for bibliographic items, set the ~citar-open-always-create-notes~ variable to =t=.
 
+When the literature has an electronic file registered and the ~citar-denote-open-attachment~ variable is non-nil, then the first registered fill will be opened when creating a new note. Customise this variable to change this behaviour.
+
 Various configuration options are available to customise how Citar-Denote creates bibliographic notes.
 
 ** Default file type
