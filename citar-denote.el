@@ -5,7 +5,7 @@
 ;; Author: Peter Prevos <peter@prevos.net>
 ;; Maintainer: Peter Prevos <peter@prevos.net>
 ;; Homepage: https://github.com/pprevos/citar-denote
-;; Version: 2.4
+;; Version: 2.4.1
 ;; Package-Requires: ((emacs "28.1") (citar "1.4") (denote "3.1") (dash "2.19.1"))
 
 ;; This file is NOT part of GNU Emacs.
@@ -261,20 +261,21 @@ citation key CITEKEY."
 
 If CITEKEYS is omitted, return all Denote files tagged with
 `citar-denote-keyword'."
-  (let ((files (make-hash-table :test 'equal)))
-    (prog1 files
-      (dolist (file (denote-directory-files
-                     (concat "_" citar-denote-keyword)))
+  (let ((files (denote-directory-files (concat "_" citar-denote-keyword)))
+	(notes (make-hash-table :test 'equal)))
+    (prog1 notes
+      (dolist (file files)
         (let ((keys-in-file (citar-denote--retrieve-references file)))
           (dolist (key keys-in-file)
             (if citekeys
                 (dolist (k citekeys)
                   (when (string= k key)
-                    (push file (gethash key files))))
-              (push file (gethash key files))))))
+                    (push file (gethash key notes))))
+              (push file (gethash key notes))))))
       (maphash
        (lambda (key filelist)
-         (puthash key (nreverse filelist) files)) files))))
+         (puthash key (nreverse filelist) notes))
+       notes))))
 
 (defun citar-denote--retrieve-cite-files (citekey)
   "Return names of Denote files that contain CITEKEY.
@@ -492,8 +493,7 @@ There are four special citation macros:
    citar-denote-file-type
    (when citar-denote-subdir
      (if (stringp citar-denote-subdir)
-         (expand-file-name
-          (concat denote-directory citar-denote-subdir))
+         (expand-file-name denote-directory citar-denote-subdir)
        (denote-subdirectory-prompt)))
    nil
    (when citar-denote-template
@@ -555,15 +555,17 @@ bibliographic entries cited in Denote files."
 When more than one bibliographic item is referenced, select item first."
   (interactive)
   ;; Any citation keys in the note?
-  (if-let* ((keys (citar-denote--retrieve-references (buffer-file-name)))
+  ;; TODO: Error when used in a read-only buffer
+  (if-let* ((buffer-name (buffer-file-name))
+            (keys (citar-denote--retrieve-references buffer-name))
             (key (if (= (length keys) 1)
                      (car keys)
                    (citar-select-ref
                     :filter (citar-denote--has-citekeys keys)))))
       (citar-open (list key))
     (if (denote-file-is-note-p (buffer-file-name))
-        (when (yes-or-no-p "Current buffer does not reference a citation key.
-Add a reference? ")
+        (when (yes-or-no-p
+               "Current note does contain a reference. Add one? ")
           (citar-denote-add-citekey)
           (citar-denote-dwim))
       (message "Buffer is not a Denote file"))))
