@@ -493,7 +493,7 @@ There are four special citation macros:
    citar-denote-file-type
    (when citar-denote-subdir
      (if (stringp citar-denote-subdir)
-         (expand-file-name denote-directory citar-denote-subdir)
+         (expand-file-name citar-denote-subdir denote-directory)
        (denote-subdirectory-prompt)))
    nil
    (when citar-denote-template
