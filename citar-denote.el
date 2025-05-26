@@ -576,18 +576,14 @@ When more than one bibliographic item is referenced, select item first."
 
 When more than one bibliographic item is referenced, select item first."
   (interactive)
-  (if-let* ((keys (citar-denote--retrieve-references (buffer-file-name)))
+  (if-let* ((buffer (buffer-file-name))
+            (keys (citar-denote--retrieve-references buffer))
             (key (if (= (length keys) 1)
                      (car keys)
                    (citar-select-ref
                     :filter (citar-denote--has-citekeys keys)))))
       (citar-open-entry key)
-    (if (denote-file-is-note-p (buffer-file-name))
-        (when (yes-or-no-p "Current buffer does not reference a citation key.
-Add a reference? ")
-          (citar-denote-add-citekey)
-          (citar-denote-open-reference-entry))
-      (message "Buffer is not a Denote file"))))
+    (message "Buffer is not a Denote file or has no refenece(s)")))
 
 ;;;###autoload
 (defun citar-denote-add-reference (&optional nocite)
