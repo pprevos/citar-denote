@@ -95,9 +95,11 @@ Options:
                   (string :tag "Save in named subdirectory")))
 
 (defcustom citar-denote-signature nil
-  "Ask for a signature, or use citation key when saving new bibliographic notes."
+  "Create a note with a signature (child sequence, citation key or free text).
+The option to create child notes requires the Denote-Sequence package."
   :group 'citar-denote
   :type  '(choice (const :tag "No signature" nil)
+                  (const :tag "Sequence" sequence)
                   (const :tag "Ask for signature" ask)
                   (const :tag "Use citation key as signature" citekey)))
 
@@ -485,8 +487,8 @@ There are four special citation macros:
 - When `citar-denote-template' is a symbol, use the specified template,
   if otherwise non-nil, prompt for a Denote template. Citation macros are
   expanded with `citar-denote--expand-citation-macros'.
-- When `citar-denote-signature' is non-nil, prompt for a signature or use
-  the citation key."
+- When `citar-denote-signature' is non-nil, select a parent, prompt for a
+  signature or use the citation key."
   (denote
    (read-string "Title: " (citar-denote--generate-title citekey))
    (citar-denote--keywords-prompt citekey)
@@ -499,7 +501,12 @@ There are four special citation macros:
    (when citar-denote-template
      (or (alist-get citar-denote-template denote-templates)
          (denote-template-prompt)))
-   (cond ((eq citar-denote-signature 'ask)
+   (cond ((eq citar-denote-signature 'sequence)
+          (let ((parent (denote-retrieve-filename-signature
+                         (denote-sequence-file-prompt
+                          "New child of SEQUENCE"))))
+            (denote-sequence-get-new 'child parent)))
+         ((eq citar-denote-signature 'ask)
           (denote-signature-prompt nil "Signature: "))
          ((eq citar-denote-signature 'citekey)
           citekey)
