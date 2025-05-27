@@ -502,10 +502,12 @@ There are four special citation macros:
      (or (alist-get citar-denote-template denote-templates)
          (denote-template-prompt)))
    (cond ((eq citar-denote-signature 'sequence)
-          (let ((parent (denote-retrieve-filename-signature
-                         (denote-sequence-file-prompt
-                          "New child of SEQUENCE"))))
-            (denote-sequence-get-new 'child parent)))
+          (if (locate-library "denote-sequence")
+              (let ((parent (denote-retrieve-filename-signature
+                            (denote-sequence-file-prompt
+                             "New child of SEQUENCE"))))
+                (denote-sequence-get-new 'child parent))
+            (user-error "Please modify `citar-denote-signature' of install Denote-Sequence")))
          ((eq citar-denote-signature 'ask)
           (denote-signature-prompt nil "Signature: "))
          ((eq citar-denote-signature 'citekey)
