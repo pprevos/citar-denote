@@ -750,12 +750,11 @@ SILO is a file path from `denote-silo-directories'.
 
 When called from Lisp, SILO is a directory path."
   ;; https://github.com/pprevos/citar-denote/issues/41
-  (interactive (progn (when (locate-library "denote-silo")
-                        (list (denote-silo-directory-prompt)))))
-  (if-let ((denote-directory silo))
-      (progn (message "creating note in: %s" silo)
-             (call-interactively #'citar-create-note))
-    (message "The Denote-Silo package is not enabled")))
+  (interactive (if (locate-library "denote-silo")
+		   (list (denote-silo-directory-prompt))
+		 (user-error "Denote-Silo package not installed")))
+  (let ((denote-directory silo))
+    (call-interactively #'citar-create-note)))
 
 (define-obsolete-function-alias
   'citar-denote-find-nocite
