@@ -25,9 +25,12 @@
 @node Top
 @top Citar-Denote Manual
 
-Taking notes about the articles and books is essential to intellectual life. Many note-taking systems can connect to a bibliographic database (such as a plain text Bib@TeX{} file or external software such as Zotero). These databases are helpful when you need to add citations to your writing. Electronic bibliographies also help you create and find notes related to your literature collection and provide access to related materials, such as online sources and files stored on your computer.
+Taking notes about the articles and books is essential to intellectual life. Many note-taking systems can connect to a bibliographic database (such as a plain text Bib@TeX{} file or external software such as Zotero).
+
+These databases are helpful when you need to add citations to your writing. Electronic bibliographies also help you create and find notes related to your literature collection and provide access to related materials, such as online sources and files stored on your computer.
 
 Citar-Denote integrates the @uref{https://github.com/emacs-citar/citar, Citar} bibliography package with the Denote note-taking system:  @ref{Top,Denote,,denote,}  Citar lets you browse and act on bibliographic data in Bib@TeX{}, Bib@LaTeX{} or JSON format. Denote is a versatile Emacs package for taking and managing notes and associated files. Combining these two packages enables linking Denote notes to your bibliography, providing a complete solution for documenting literature reviews.
+
 @end ifnottex
 
 @menu
@@ -107,6 +110,8 @@ Open the Citar interface with @code{citar-create-note}. The letters at the start
 
 If a note already exists, you can open it from within the Citar menu. To enable multiple notes for bibliographic items, set the @code{citar-open-always-create-notes} variable to @samp{t}.
 
+When the literature has an electronic file registered and the @code{citar-denote-open-attachment} variable is @code{non-nil}, then the first registered file will be opened in another window when creating a new note. Customise this variable to change this behaviour.
+
 Various configuration options are available to customise how Citar-Denote creates bibliographic notes.
 
 @menu
@@ -125,9 +130,9 @@ Various configuration options are available to customise how Citar-Denote create
 
 You can create bibliographic notes for each file type that Denote supports: Org mode, two Markdown flavours and plain text.
 
-Citar-Denote uses the default set by the @code{denote-file-type} variable, which you can override with @code{citar-denote-file-type} to use a different type for bibliographic notes.
+Citar-Denote uses the default type set by the @code{denote-file-type} variable, which you can override with @code{citar-denote-file-type} to use a different type for bibliographic notes.
 
-Please note that the citations only works in Org mode. Citation mechanisms exist for Markdown, but these are not standardised.
+Please note that citations only works in Org mode. Citation mechanisms exist for Markdown, but these are not standardised.
 
 @node Title of a bibliographic note
 @section Title of a bibliographic note
@@ -173,11 +178,13 @@ For example, when using the @samp{author-year} option and up to three authors an
 @node Bibliographic keywords
 @section Bibliographic keywords
 
-Every new bibliographic note includes the @samp{bib} file tag. This tag minimises the search space when caching notes to accelerate the process. The @code{citar-denote-keyword} variable lets you change the tag to something else. For example, if your primary language is Welsh, you might want to change it to @samp{llenyddiaeth} (literature).
+Every new bibliographic note includes the @samp{bib} file tag. This tag minimises the search space when caching notes to accelerate the process.
+
+The @code{citar-denote-keyword} variable lets you change the tag to something else. For example, if your primary language is Welsh, you might want to change it to @samp{llenyddiaeth} (literature).
 
 Changing the default keyword requires updating all your bibliographic notes because the package only recognises a single string. The Denote-Explorer package provides a function to rename Denote keywords, @ref{Managing Keywords,Denote-Explorer,,denote-explore,}
 
-When @code{citar-denote-use-bib-keywords} is non-nil, Citar-Denote extracts the available keywords from the Bib@TeX{} @samp{keywords} field and uses these as Denote file tags, in addition to the @code{citar-denote=keyword}.
+When @code{citar-denote-use-bib-keywords} is non-nil, Citar-Denote extracts the available keywords from the Bib@TeX{} @samp{keywords} field and uses these as Denote file tags, in addition to the @code{citar-denote-keyword}.
 
 @node Subdirectory
 @section Subdirectory
@@ -186,16 +193,16 @@ All new notes are stored in the location specified by @samp{denote-directory}.
 
 If you like storing your bibliographic notes in a subdirectory, set the @code{citar-denote-subdir} variable to @samp{t}. Denote now asks for a subdirectory when creating a new bibliographic note.
 
-When the content of this variable is a string, Denote saves the note in a subdirectory with that name under @samp{denote-directory}. For example, if this variable is set at ``literature'', all bibliographic notes are stored under @samp{denote-directory/literature/}. The first time you save a new note, Emacs will confirm before creating the new directory.
+When the content of this variable is a string, Denote saves the note in a subdirectory with that name under @samp{denote-directory}. For example, if this variable is ``literature'', all bibliographic notes are stored under @samp{denote-directory/literature/}. The first time you save a new note, Emacs will confirm before creating the new directory.
 
 @node Signature
 @section Signature
 
 When the @code{citar-denote-signature} variable is @samp{'ask}, Denote will ask for a signature when creating a new bibliographic note.
 
-When this variable is set at @samp{'citekey}, the citation key forms the basis of the signature. Please note that Denote changes or removes punctuation in the citation key to enforce compliance with its file naming convention.
+When this variable is set at @samp{'citekey}, the citation key forms the basis of the signature. Please note that Denote changes or removes punctuation in the citation key to enforce compliance with its file naming convention. For example, when the citation key is @samp{einstein_1905}, the signature becomes @samp{einstein=2005}.
 
-For example, when the citation key is @samp{einstein_1905}, the signature becomes @samp{einstein=2005}.
+For users of the Denote-Sequence package, literature notes can also be created as the child of an existing sequence by setting this variable to @samp{'sequence}.  Refer to the Denote-Sequence manual for further information about using signatures as sequences, @ref{Top,,,denote-sequence,}.
 
 @node Create notes using templates
 @section Create notes using templates
@@ -220,7 +227,14 @@ The example below lets the user choose between a note with two headings (Abstrac
       citar-denote-template 'biblio)
 @end lisp
 
-Templates can also contain citation macros to expand fields from the bibliographic entry in the new note. You can use any field available in the bibliography. For example, use @samp{%^@{title@}} to expand the title of the publication. There are three special macros:
+Templates can also contain citation macros to expand fields from the bibliographic entry in the new note. You can use any field available in the bibliography. For example, use @samp{%^@{title@}} to expand the title of the publication. Citar has two special field names not used in Bib@TeX{}:
+
+@example
+- %^@{=key=@}: Citation key
+- %^@{=type=@}: Publication type (book, article etc.)
+@end example
+
+Citar-Denote also provides three special macros:
 
 @itemize
 @item
@@ -228,16 +242,16 @@ Templates can also contain citation macros to expand fields from the bibliograph
 @item
 @samp{%^@{doi-url@}}: Expands to URL or the DOI@. When both are available use the DOI@.
 @item
-@samp{%^file}: Expands to the first defined file. Note that links only work with absolute paths for files.
+@samp{%^@{file@}}: Expands to the first defined file. Note that links only work with absolute paths for files.
 @item
 @samp{%^@{citation@}}: Expands to formatted reference.
 @end itemize
 
-This use case is an expanded version of the example above but with an expanded citation added to the start of the note.
+The use case below is an expanded version of the example above but with a citation added to the start of the template.
 
 @lisp
 (setq denote-templates
-      '((biblio . "%^@{citation@}\n* Abstract\n\n* Review\n")
+      '((biblio . "%^@{title@}\n\n* Abstract\n\n* Review\n")
         (plain . nil))
       citar-denote-template 'biblio)
 @end lisp
@@ -245,11 +259,11 @@ This use case is an expanded version of the example above but with an expanded c
 @node Working with Denote silos
 @section Working with Denote silos
 
-All Citar-Denote commands detect the current silo and act accordingly, @ref{Maintain separate directory silos for notes,Denote silos,,denote,}.
+All Citar-Denote commands detect the current silo and act accordingly.
 
-A convenience command is available to select a silo before creating a new bibliographic note. using @code{citar-denote-create-silo-note} activates the extended silo commands in Denote and lets you select a silo defined in @code{denote-silo-extras-directories}.
+A convenience command is available to select a silo before creating a new bibliographic note, using functionality from the Denote-Silos package, @ref{Top,Denote silo,,denote-silo,}.
 
-For this command to be functional you need to load the Denote silos library with  @code{(require 'denote-silo-extras)}.
+Using @code{citar-denote-create-silo-note} activates the extended silo commands in Denote-Silo. This enhancement lets you select a silo defined in @code{denote-silo-directories}.
 
 @node Literature meta notes
 @section Literature meta notes
@@ -258,9 +272,9 @@ If you have a set of notes from the same book and use Org mode, you can create a
 
 The most convenient way to create a meta note that combines literature notes from a single publication is to add the citation key in the signature, as explained above. You can then use the signature as the regular expression for the block.
 
-Other options include creating a meta note for an author or a specific subject matter. Dynamic blocks can help group relevant notes if they include the same character string in their file names, which you can fetch with a regular expression.
+Other options include creating a meta note for an author or a specific subject matter. Dynamic blocks, provided by the Denote-Org package can help group relevant notes if they include the same character string in their file names, which you can fetch with a regular expression.
 
-For more information on meta notes, @ref{Writing metanotes,Writing metanotes,,denote,}
+For more information on meta notes, @ref{Top,Denote-Org,,denote-org,}
 
 @node Working with existing notes
 @chapter Working with existing notes
@@ -286,7 +300,9 @@ Citar provides a list of resources for the selected entry: attachments, existing
 
 The previous function shows all literature with one or more bibliographic note(s) linked through a reference line. The @code{citar-denote-find-citation} function lists all bibliographic entries cited inside your Denote collection. When only one note cites the selected entry, this file is opened. When multiple files cite the chosen entry, you must pick which file to open.
 
-By default, this function only looks at citations in your document. Setting the @code{citar-denote-cite-includes-reference} to non-nil includes references.
+By default, this function only looks at citations in your document. Setting the @code{citar-denote-cite-includes-reference} to non-nil includes references in the completion candidates.
+
+The @code{citar-open-note} command provides a list of all registered literature notes in the minibuffer, without first selecting from the bibliography.
 
 @node Open attachments links and notes
 @section Open attachments, links and notes
