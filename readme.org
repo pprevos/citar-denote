@@ -9,9 +9,14 @@ For more information read the [[file:citar-denote.org][Citar-Denote Manual]] in 
 The =init.el= file in the =test= folder provides a minimum configuration for testing the package.
 
 * Change Log
+** version 2.5
+- Updated manual in relation to Denote 4.0
+- Silo function now refer to the Denote-Silo package
+- Ability to integrate with Denote-Sequence
+- Bug fixes
+
 ** Version 2.4.1
 - Fixed bug in ~citar-denote-subdir~ concatenation
-  
 ** Version 2.4
 - New functionality to expand citation macros in templates.
 - Fixed bugs in adding and removing references.
