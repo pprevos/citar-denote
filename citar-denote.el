@@ -552,7 +552,7 @@ bibliographic entries cited in Denote files."
                          (denote-extract-id-from-string
                           (if (= (length files) 1)
                               (car files)
-                            (denote-link--find-file-prompt files)))))
+                            (denote-select-linked-file-prompt files)))))
              (goto-char (point-min))
              (search-forward citekey))
     (message "No citations of %s found in Denote files" citekey)))
