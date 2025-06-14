@@ -9,7 +9,10 @@ For more information read the [[file:citar-denote.org][Citar-Denote Manual]] in 
 The =init.el= file in the =test= folder provides a minimum configuration for testing the package.
 
 * Change Log
-** version 2.5
+** Version 2.5.1
+- Replaced obsolete Denote function in ~citar-denote-find-citation~
+
+** Version 2.5
 - Updated manual in relation to Denote 4.0
 - Silo function now refer to the Denote-Silo package
 - Ability to integrate with Denote-Sequence
@@ -17,9 +20,11 @@ The =init.el= file in the =test= folder provides a minimum configuration for tes
 
 ** Version 2.4.1
 - Fixed bug in ~citar-denote-subdir~ concatenation
+  
 ** Version 2.4
 - New functionality to expand citation macros in templates.
 - Fixed bugs in adding and removing references.
+  
 ** Version 2.3
 - New command to add bibliographic note in a silo: ~citar-denote-create-silo-note~.
 - Renamed ~citar-denote-add-citekey~ to ~citar-denote-add-reference~ and implemented ability to select only from entries not yet used in any Denote file.
@@ -29,6 +34,7 @@ The =init.el= file in the =test= folder provides a minimum configuration for tes
 - Improvements to detection of bibliographic items not used in Denote (nocite)
 - Improvements to adding and removing bibliographic keyword
 - Updated mechanism to add references
+
 ** Version 2.2.3
 - Fixed ~citar-denote-add-citekey~ (compatibility with Denote 3.0)
 - Grammar check of the manual
@@ -106,3 +112,4 @@ The =init.el= file in the =test= folder provides a minimum configuration for tes
 - Code refactoring
 - Added ~citar-denote-link-reference~ to insert a Denote link to an existing bibliographic note.
 - Added ~citar-denote-find-citation~ to find a citation in your Denote files.
+
