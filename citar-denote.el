@@ -323,15 +323,14 @@ See documentation for `citar-has-notes'."
     (denote-rename-file-using-front-matter file)))
 
 (defun citar-denote--add-bibkey (file)
-  "Add `citar-denote-bibkey' file tag from FILE."
-  ;; https://github.com/pprevos/citar-denote/issues/44
-  (when-let* ((file-type (denote-filetype-heuristics file))
-              (keywords (string-split (denote-retrieve-filename-keywords file) "_"))
-              (existing-p (not (member citar-denote-keyword keywords)))
-              (new-keywords (delete-dups (denote-keywords-sort
-                                          (cons citar-denote-keyword keywords)))))
-    (denote-rewrite-keywords file new-keywords file-type)
-    (denote-rename-file-using-front-matter file)))
+  "Add `citar-denote-bibkey' file tag to FILE."
+  (let ((keywords (denote-extract-keywords-from-path file)))
+    (unless (member citar-denote-keyword keywords)
+      (let ((file-type (denote-filetype-heuristics file))
+            (new-keywords (delete-dups (denote-keywords-sort
+                                        (cons citar-denote-keyword keywords)))))
+        (denote-rewrite-keywords file new-keywords file-type)
+        (denote-rename-file-using-front-matter file)))))
 
 (defun citar-denote--extract-citations-blocks (line)
   "Extract all Org mode citation blocks from LINE."
